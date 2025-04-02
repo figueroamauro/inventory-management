@@ -18,7 +18,11 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Column(name = "enabled")
+    private Boolean enabled;
+
     public User() {
+        this.enabled = true;
     }
 
     public User(Long id, String userName, String password, String email) {
@@ -26,6 +30,7 @@ public class User {
         this.userName = userName;
         this.password = password;
         this.email = email;
+        this.enabled = true;
     }
 
     public Long getId() {
@@ -42,5 +47,13 @@ public class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 }
