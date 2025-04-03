@@ -4,6 +4,7 @@ import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -42,5 +43,15 @@ class UserServiceImplTest {
         assertEquals(3, result.getTotalElements());
 
         verify(userRepository).findAll(pageable);
+    }
+
+    @Test
+    void shouldThrowException_whenPageableIsNull(){
+        //WHEN
+        Executable executable = () -> userService.findAll(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Pageable can not be null", e.getMessage());
     }
 }

@@ -18,8 +18,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> findAll(Pageable pageable) {
+        validateNull(pageable,"Pageable can not be null ");
         return userRepository.findAll(pageable);
     }
+
 
     @Override
     public User findOne(Long id) {
@@ -39,5 +41,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void delete(Long id) {
 
+    }
+
+
+    private static void validateNull(Object o, String message) {
+        if (o == null) {
+            throw new IllegalArgumentException(message);
+        }
     }
 }
