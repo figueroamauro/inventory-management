@@ -1,6 +1,7 @@
 package ar.com.old.ms_users.services;
 
 import ar.com.old.ms_users.entities.User;
+import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,5 +74,17 @@ class UserServiceImplTest {
         assertEquals("test", result.getUserName());
 
         verify(userRepository).findByIdAndEnabledTrue(1L);
+    }
+    
+    @Test
+    void shouldThrowExceptionFindingById_whenUserNotFound(){
+        //WHEN
+        Executable executable = () -> userService.findOne(2L);
+    
+        //THEN
+        UserNotFoundException e = assertThrows(UserNotFoundException.class, executable);
+        assertEquals("User not found", e.getMessage());
+
+        verify(userRepository).findByIdAndEnabledTrue(2L);
     }
 }
