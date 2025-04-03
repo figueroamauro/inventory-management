@@ -1,5 +1,6 @@
 package ar.com.old.ms_users.entities;
 
+import ar.com.old.ms_users.Role;
 import jakarta.persistence.*;
 
 @Entity
@@ -21,8 +22,13 @@ public class User {
     @Column(name = "enabled")
     private Boolean enabled;
 
+    @Column(name = "role", nullable = false, columnDefinition = "VARCHAR(20)")
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     public User() {
         this.enabled = true;
+        this.role = Role.USER;
     }
 
     public User(Long id, String userName, String password, String email) {
@@ -31,6 +37,7 @@ public class User {
         this.password = password;
         this.email = email;
         this.enabled = true;
+        this.role = Role.USER;
     }
 
     public Long getId() {
@@ -55,5 +62,13 @@ public class User {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

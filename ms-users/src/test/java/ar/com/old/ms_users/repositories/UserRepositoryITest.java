@@ -35,6 +35,7 @@ class UserRepositoryITest {
         Page<User> result = userRepository.findAllByEnabledTrue(pageable);
 
         //THEN
+        //View dataset users.json
         assertNotNull(result);
         assertEquals(4, result.getTotalElements());
 
