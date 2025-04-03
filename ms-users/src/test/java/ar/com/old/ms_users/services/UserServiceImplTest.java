@@ -157,8 +157,8 @@ class UserServiceImplTest {
     @Test
     void shouldUpdateUser(){
         //GIVEN
-
         userWithId.setRole(Role.USER);
+        when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.ofNullable(userWithId));
         when(mapper.toEntity(dtoWithId)).thenReturn(userWithId);
         when(userRepository.save(any(User.class))).thenReturn(userWithId);
 
@@ -179,5 +179,15 @@ class UserServiceImplTest {
         //THEN
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Id can not be null", e.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionUpdatingUser_whenUserNotFound(){
+        //WHEN
+        Executable executable = () -> userService.update(dtoWithId);
+
+        //THEN
+        UserNotFoundException e = assertThrows(UserNotFoundException.class, executable);
+        assertEquals("User not found", e.getMessage());
     }
 }

@@ -27,14 +27,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<User> findAll(Pageable pageable) {
-        validateNull(pageable,"Pageable can not be null");
+        validateNull(pageable, "Pageable can not be null");
         return userRepository.findAllByEnabledTrue(pageable);
     }
 
 
     @Override
     public User findOne(Long id) {
-        validateNull(id,"Id can not be null");
+        validateNull(id, "Id can not be null");
         Optional<User> user = userRepository.findByIdAndEnabledTrue(id);
         if (user.isPresent()) {
             return user.get();
@@ -54,12 +54,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(UserRequestDTO dto) {
-        if (dto.id() == null) {
-            throw new IllegalArgumentException("Id can not be null");
-        }
-        User user = mapper.toEntity(dto);
+        requireIdValidation(dto.id());
+        User user = userRepository.findByIdAndEnabledTrue(dto.id())
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        Role role = user.getRole();
+        user = mapper.toEntity(dto);
+        user.setRole(role);
 
         return userRepository.save(user);
+
+    }
+
+    private static void requireIdValidation(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id can not be null");
+        }
     }
 
     @Override
