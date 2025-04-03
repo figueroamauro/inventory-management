@@ -28,7 +28,6 @@ public class User{
 
     public User() {
         this.enabled = true;
-        this.role = Role.USER;
     }
 
     public User(Long id, String userName, String password, String email) {
@@ -37,11 +36,14 @@ public class User{
         this.password = password;
         this.email = email;
         this.enabled = true;
-        this.role = Role.USER;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getUserName() {

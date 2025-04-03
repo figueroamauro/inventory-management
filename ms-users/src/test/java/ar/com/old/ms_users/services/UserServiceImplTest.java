@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -30,6 +31,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
+    private User user;
+    private User savedUser;
+    private UserRequestDTO dto;
     @InjectMocks
     private UserServiceImpl userService;
     @Mock
@@ -37,9 +41,12 @@ class UserServiceImplTest {
     @Mock
     private UserMapper mapper;
 
+
     @BeforeEach
     void init() {
-
+        user = new User(null, "test","123123", "test@mail.com");
+        savedUser =  new User(1L, "test","123123", "test@mail.com");
+        dto = new UserRequestDTO(null, "test", "123123", "test@mail.com");
     }
 
     @Test
@@ -69,14 +76,13 @@ class UserServiceImplTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Pageable can not be null", e.getMessage());
 
-        verify(userRepository, never()).findAllByEnabledTrue(any());
+        verify(userRepository, never()).findAllByEnabledTrue(any(Pageable.class));
     }
 
     @Test
     void shouldReturnUserById() {
         //GIVEN
-        User user = new User(1L, "test", "123123", "test@mail.com");
-        when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.of(savedUser));
 
         //WHEN
         User result = userService.findOne(1L);
@@ -116,10 +122,9 @@ class UserServiceImplTest {
     @Test
     void shouldCreateAndReturnAnUser() {
         //GIVEN
-        User createdUser = new User(1L, "test", "123123", "test@mail.com");
-        UserRequestDTO dto = new UserRequestDTO(null, "test", "123123", "test@mail.com");
-        when(mapper.toEntity(dto)).thenReturn(createdUser);
-        when(userRepository.save(any(User.class))).thenReturn(createdUser);
+        when(mapper.toEntity(dto)).thenReturn(user);
+
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         //WHEN
         User result = userService.create(dto);
@@ -130,5 +135,23 @@ class UserServiceImplTest {
         assertEquals("test", result.getUserName());
 
         verify(userRepository).save(any(User.class));
+    }
+    
+    @Test
+    void shouldSetIdNullAndDefaultRole_beforeToSave(){
+        //GIVEN
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+        when(mapper.toEntity(dto)).thenReturn(user);
+
+        //WHEN
+        userService.create(dto);
+
+        //THEN
+        verify(userRepository).save(captor.capture());
+        User capture = captor.getValue();
+
+        assertNull(capture.getId());
+        assertEquals("USER", capture.getRole().name());
+
     }
 }

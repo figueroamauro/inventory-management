@@ -1,5 +1,6 @@
 package ar.com.old.ms_users.services;
 
+import ar.com.old.ms_users.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
@@ -45,6 +46,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(UserRequestDTO dto) {
         User user = mapper.toEntity(dto);
+        user.setId(null);
+        user.setRole(Role.USER);
+
         return userRepository.save(user);
     }
 
