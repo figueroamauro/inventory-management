@@ -1,5 +1,6 @@
 package ar.com.old.ms_users.services;
 
+import ar.com.old.ms_users.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
@@ -152,6 +153,21 @@ class UserServiceImplTest {
 
         assertNull(capture.getId());
         assertEquals("USER", capture.getRole().name());
+    }
 
+    @Test
+    void shouldUpdateUser(){
+        //GIVEN
+        savedUser.setRole(Role.USER);
+        when(mapper.toEntity(dto)).thenReturn(savedUser);
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        //WHEN
+        User result = userService.update(dto);
+
+        //THEN
+        assertEquals(savedUser.getId(), result.getId());
+        assertEquals(savedUser.getUserName(), result.getUserName());
+        assertEquals(savedUser.getEmail(), result.getEmail());
     }
 }
