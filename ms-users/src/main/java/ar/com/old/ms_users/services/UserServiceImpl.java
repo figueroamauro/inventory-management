@@ -3,7 +3,9 @@ package ar.com.old.ms_users.services;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
+import ar.com.old.ms_users.mappers.UserMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,9 +16,12 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    @Autowired
+    private final UserMapper mapper;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper mapper) {
         this.userRepository = userRepository;
+        this.mapper = mapper;
     }
 
     @Override
@@ -39,7 +44,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(UserRequestDTO dto) {
-        return null;
+        User user = mapper.toEntity(dto);
+        return userRepository.save(user);
     }
 
     @Override
@@ -53,9 +59,9 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private static void validateNull(Object o, String message) {
-        if (o == null) {
-            throw new IllegalArgumentException(message);
+    private static void validateNull(Object obj, String errorMessage) {
+        if (obj == null) {
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 }
