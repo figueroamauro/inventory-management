@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findOne(Long id) {
+        validateNull(id,"Id can not be null");
         Optional<User> user = userRepository.findByIdAndEnabledTrue(id);
         if (user.isPresent()) {
             return user.get();

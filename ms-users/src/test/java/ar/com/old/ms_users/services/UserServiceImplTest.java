@@ -87,4 +87,16 @@ class UserServiceImplTest {
 
         verify(userRepository).findByIdAndEnabledTrue(2L);
     }
+
+    @Test
+    void shouldThrowExceptionFindingById_whenIdIsNull(){
+        //WHEN
+        Executable executable = () -> userService.findOne(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Id can not be null", e.getMessage());
+
+        verify(userRepository, never()).findByIdAndEnabledTrue(null);
+    }
 }
