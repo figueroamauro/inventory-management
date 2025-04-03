@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -33,7 +34,7 @@ class UserServiceImplTest {
         List<User> userList = List.of(new User(), new User(), new User());
         Pageable pageable = PageRequest.of(0, 10);
         Page<User> page = new PageImpl<>(userList, pageable, userList.size());
-        when(userRepository.findAll(pageable)).thenReturn(page);
+        when(userRepository.findAllByEnabledTrue(pageable)).thenReturn(page);
 
         //WHEN
         Page<User> result = userService.findAll(pageable);
@@ -42,7 +43,7 @@ class UserServiceImplTest {
         assertNotNull(result);
         assertEquals(3, result.getTotalElements());
 
-        verify(userRepository).findAll(pageable);
+        verify(userRepository).findAllByEnabledTrue(pageable);
     }
 
     @Test
@@ -53,5 +54,24 @@ class UserServiceImplTest {
         //THEN
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Pageable can not be null", e.getMessage());
+
+        verify(userRepository, never()).findAllByEnabledTrue(any());
+    }
+
+    @Test
+    void shouldReturnUserById(){
+        //GIVEN
+        User user = new User(1L, "test", "123123", "test@mail.com");
+        when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.of(user));
+
+        //WHEN
+        User result = userService.findOne(1L);
+
+        //THEN
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("test", result.getUserName());
+
+        verify(userRepository).findByIdAndEnabledTrue(1L);
     }
 }
