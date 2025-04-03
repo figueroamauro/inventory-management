@@ -54,6 +54,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(UserRequestDTO dto) {
+        if (dto.id() == null) {
+            throw new IllegalArgumentException("Id can not be null");
+        }
         User user = mapper.toEntity(dto);
 
         return userRepository.save(user);

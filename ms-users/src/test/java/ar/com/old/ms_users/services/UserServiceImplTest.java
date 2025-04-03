@@ -15,10 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,8 +30,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserServiceImplTest {
 
     private User user;
-    private User savedUser;
+    private User userWithId;
     private UserRequestDTO dto;
+    private UserRequestDTO dtoWithId;
     @InjectMocks
     private UserServiceImpl userService;
     @Mock
@@ -46,8 +44,9 @@ class UserServiceImplTest {
     @BeforeEach
     void init() {
         user = new User(null, "test","123123", "test@mail.com");
-        savedUser =  new User(1L, "test","123123", "test@mail.com");
+        userWithId =  new User(1L, "test","123123", "test@mail.com");
         dto = new UserRequestDTO(null, "test", "123123", "test@mail.com");
+        dtoWithId = new UserRequestDTO(1L, "test", "123123", "test@mail.com");
     }
 
     @Test
@@ -83,7 +82,7 @@ class UserServiceImplTest {
     @Test
     void shouldReturnUserById() {
         //GIVEN
-        when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.of(savedUser));
+        when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.of(userWithId));
 
         //WHEN
         User result = userService.findOne(1L);
@@ -125,7 +124,7 @@ class UserServiceImplTest {
         //GIVEN
         when(mapper.toEntity(dto)).thenReturn(user);
 
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        when(userRepository.save(any(User.class))).thenReturn(userWithId);
 
         //WHEN
         User result = userService.create(dto);
@@ -158,16 +157,27 @@ class UserServiceImplTest {
     @Test
     void shouldUpdateUser(){
         //GIVEN
-        savedUser.setRole(Role.USER);
-        when(mapper.toEntity(dto)).thenReturn(savedUser);
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
+        userWithId.setRole(Role.USER);
+        when(mapper.toEntity(dtoWithId)).thenReturn(userWithId);
+        when(userRepository.save(any(User.class))).thenReturn(userWithId);
 
         //WHEN
-        User result = userService.update(dto);
+        User result = userService.update(dtoWithId);
 
         //THEN
-        assertEquals(savedUser.getId(), result.getId());
-        assertEquals(savedUser.getUserName(), result.getUserName());
-        assertEquals(savedUser.getEmail(), result.getEmail());
+        assertEquals(userWithId.getId(), result.getId());
+        assertEquals(userWithId.getUserName(), result.getUserName());
+        assertEquals(userWithId.getEmail(), result.getEmail());
+    }
+
+    @Test
+    void shouldThrowExceptionUpdatingUser_whenIdIsNull(){
+        //WHEN
+        Executable executable = () -> userService.update(dto);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Id can not be null", e.getMessage());
     }
 }
