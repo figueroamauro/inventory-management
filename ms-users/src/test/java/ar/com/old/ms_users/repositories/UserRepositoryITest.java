@@ -16,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Optional;
+
 @ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -39,5 +41,17 @@ class UserRepositoryITest {
         assertNotNull(result);
         assertEquals(4, result.getTotalElements());
 
+    }
+
+    @Test
+    void shouldFindUserById_whenIsEnabled(){
+        //WHEN
+        Optional<User> result = userRepository.findByIdAndEnabledTrue(1L);
+
+        //THEN
+        //View dataset users.json
+        assertTrue(result.isPresent());
+        assertEquals(1L, result.get().getId());
+        assertEquals("test1", result.get().getUserName());
     }
 }
