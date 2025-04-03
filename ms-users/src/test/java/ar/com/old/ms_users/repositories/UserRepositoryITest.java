@@ -6,6 +6,7 @@ import ar.com.old.ms_users.entities.User;
 import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.configuration.Orthography;
 import com.github.database.rider.core.api.dataset.DataSet;
+import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import com.github.database.rider.spring.api.DBRider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +54,16 @@ class UserRepositoryITest {
         assertTrue(result.isPresent());
         assertEquals(1L, result.get().getId());
         assertEquals("test1", result.get().getUserName());
+    }
+
+    @Test
+    @ExpectedDataSet("users-deleted-logic.json")
+    void shouldDeleteLogicById(){
+        //WHEN
+        userRepository.deleteLogicById(1L);
+        userRepository.deleteLogicById(2L);
+
+        //THEN;
+        //View dataset users-deleted-logic.json
     }
 }
