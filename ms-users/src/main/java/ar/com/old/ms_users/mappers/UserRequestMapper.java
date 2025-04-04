@@ -5,7 +5,7 @@ import ar.com.old.ms_users.entities.User;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
+public interface UserRequestMapper {
     UserRequestDTO toDto(User user);
     User toEntity(UserRequestDTO dto);
 }

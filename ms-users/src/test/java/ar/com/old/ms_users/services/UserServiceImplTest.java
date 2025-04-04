@@ -1,10 +1,10 @@
 package ar.com.old.ms_users.services;
 
-import ar.com.old.ms_users.Role;
+import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
-import ar.com.old.ms_users.mappers.UserMapper;
+import ar.com.old.ms_users.mappers.UserRequestMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private UserMapper mapper;
+    private UserRequestMapper mapper;
 
 
     @BeforeEach

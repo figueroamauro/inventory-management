@@ -1,26 +1,25 @@
 package ar.com.old.ms_users.services;
 
-import ar.com.old.ms_users.Role;
+import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
-import ar.com.old.ms_users.mappers.UserMapper;
+import ar.com.old.ms_users.mappers.UserRequestMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     @Autowired
-    private final UserMapper mapper;
+    private final UserRequestMapper mapper;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper mapper) {
+    public UserServiceImpl(UserRepository userRepository, UserRequestMapper mapper) {
         this.userRepository = userRepository;
         this.mapper = mapper;
     }
@@ -35,12 +34,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findOne(Long id) {
         validateNull(id, "Id can not be null");
-        Optional<User> user = userRepository.findByIdAndEnabledTrue(id);
-        if (user.isPresent()) {
-            return user.get();
-        } else {
-            throw new UserNotFoundException("User not found");
-        }
+
+        return userRepository.findByIdAndEnabledTrue(id)
+                .orElseThrow(()-> new UserNotFoundException("User not found"));
     }
 
     @Override

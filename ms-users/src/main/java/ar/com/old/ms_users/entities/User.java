@@ -1,6 +1,6 @@
 package ar.com.old.ms_users.entities;
 
-import ar.com.old.ms_users.Role;
+import ar.com.old.ms_users.enumerations.Role;
 import jakarta.persistence.*;
 
 @Entity
