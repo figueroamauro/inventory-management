@@ -66,14 +66,10 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private static void requireIdValidation(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Id can not be null");
-        }
-    }
 
     @Override
     public void delete(Long id) {
+        userRepository.deleteLogicById(id);
 
     }
 
@@ -81,6 +77,12 @@ public class UserServiceImpl implements UserService {
     private static void validateNull(Object obj, String errorMessage) {
         if (obj == null) {
             throw new IllegalArgumentException(errorMessage);
+        }
+    }
+
+    private static void requireIdValidation(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Id can not be null");
         }
     }
 }

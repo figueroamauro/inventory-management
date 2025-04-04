@@ -169,6 +169,8 @@ class UserServiceImplTest {
         assertEquals(userWithId.getId(), result.getId());
         assertEquals(userWithId.getUserName(), result.getUserName());
         assertEquals(userWithId.getEmail(), result.getEmail());
+
+        verify(userRepository).save(any(User.class));
     }
 
     @Test
@@ -179,6 +181,8 @@ class UserServiceImplTest {
         //THEN
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Id can not be null", e.getMessage());
+
+        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
@@ -189,5 +193,16 @@ class UserServiceImplTest {
         //THEN
         UserNotFoundException e = assertThrows(UserNotFoundException.class, executable);
         assertEquals("User not found", e.getMessage());
+
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void shouldDeleteById(){
+        //WHEN
+        userService.delete(1L);
+
+        //THEN
+        verify(userRepository).deleteLogicById(1L);
     }
 }
