@@ -13,6 +13,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,8 +44,8 @@ class UserServiceImplTest {
 
     @BeforeEach
     void init() {
-        user = new User(null, "test","123123", "test@mail.com");
-        userWithId =  new User(1L, "test","123123", "test@mail.com");
+        user = new User(null, "test", "123123", "test@mail.com");
+        userWithId = new User(1L, "test", "123123", "test@mail.com");
         dto = new UserRequestDTO(null, "test", "123123", "test@mail.com");
         dtoWithId = new UserRequestDTO(1L, "test", "123123", "test@mail.com");
     }
@@ -136,9 +137,9 @@ class UserServiceImplTest {
 
         verify(userRepository).save(any(User.class));
     }
-    
+
     @Test
-    void shouldSetIdNullAndDefaultRole_beforeToSave(){
+    void shouldSetIdNullAndDefaultRole_beforeToSave() {
         //GIVEN
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         when(mapper.toEntity(dto)).thenReturn(user);
@@ -155,7 +156,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldUpdateUser(){
+    void shouldUpdateUser() {
         //GIVEN
         userWithId.setRole(Role.USER);
         when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.ofNullable(userWithId));
@@ -174,7 +175,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionUpdatingUser_whenIdIsNull(){
+    void shouldThrowExceptionUpdatingUser_whenIdIsNull() {
         //WHEN
         Executable executable = () -> userService.update(dto);
 
@@ -186,7 +187,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionUpdatingUser_whenUserNotFound(){
+    void shouldThrowExceptionUpdatingUser_whenUserNotFound() {
         //WHEN
         Executable executable = () -> userService.update(dtoWithId);
 
@@ -198,11 +199,26 @@ class UserServiceImplTest {
     }
 
     @Test
-    void shouldDeleteById(){
+    void shouldDeleteById() {
+        //GIVEN
+        when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.ofNullable(userWithId));
+
         //WHEN
         userService.delete(1L);
 
         //THEN
         verify(userRepository).deleteLogicById(1L);
+    }
+
+    @Test
+    void shouldThrowExceptionDeleting_whenUserNotFound() {
+        //WHEN
+        Executable executable = () -> userService.delete(1L);
+
+        //THEN
+        UserNotFoundException e = assertThrows(UserNotFoundException.class, executable);
+        assertEquals("User not found", e.getMessage());
+
+        verify(userRepository, never()).delete(any(User.class));
     }
 }
