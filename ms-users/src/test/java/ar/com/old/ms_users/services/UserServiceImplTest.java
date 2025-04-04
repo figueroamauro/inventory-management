@@ -221,4 +221,16 @@ class UserServiceImplTest {
 
         verify(userRepository, never()).delete(any(User.class));
     }
+
+    @Test
+    void shouldThrowExceptionDeleting_whenIdIsNull() {
+        //WHEN
+        Executable executable = () -> userService.delete(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Id can not be null", e.getMessage());
+
+        verify(userRepository, never()).delete(any(User.class));
+    }
 }
