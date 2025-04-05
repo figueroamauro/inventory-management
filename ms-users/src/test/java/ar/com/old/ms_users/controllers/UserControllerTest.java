@@ -1,11 +1,15 @@
 package ar.com.old.ms_users.controllers;
 
+import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.dto.UserResponseDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
 import ar.com.old.ms_users.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+
 import static org.mockito.Mockito.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +38,8 @@ class UserControllerTest {
     private UserService userService;
     @MockitoBean
     UserResponseMapper mapper;
+
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void shouldReturnPageWith3Users_status200() throws Exception {
@@ -79,10 +85,6 @@ class UserControllerTest {
         verify(userService).findOne(1L);
     }
 
-    private void verifyMapToDTOMock() {
-        when(mapper.toDto(any(User.class))).thenReturn(new UserResponseDTO(1L, "test", "test@mail.com"));
-    }
-
     @Test
     void shouldThrowExceptionFindingById_whenUserNotFound_status404() throws Exception {
         //GIVEN
@@ -99,6 +101,32 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.error").value("User not found"));
 
         verify(userService).findOne(1L);
+    }
+
+    @Test
+    void shouldCreateUser_status201() throws Exception {
+        //GIVEN
+        UserRequestDTO dto = new UserRequestDTO(null, "test", "123123", "test@mail.com");
+        when(userService.create(dto)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
+        verifyMapToDTOMock();
+
+        //WHEN
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                dto)))
+
+                //THEN
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.userName").value("test"));
+
+        verify(userService).create(any(UserRequestDTO.class));
+    }
+
+
+    private void verifyMapToDTOMock() {
+        when(mapper.toDto(any(User.class))).thenReturn(new UserResponseDTO(1L, "test", "test@mail.com"));
     }
 
 }

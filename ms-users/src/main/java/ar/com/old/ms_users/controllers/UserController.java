@@ -1,5 +1,6 @@
 package ar.com.old.ms_users.controllers;
 
+import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.dto.UserResponseDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
@@ -9,10 +10,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 
 @RestController
@@ -38,5 +38,13 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> findOne(@PathVariable Long id) {
         User user = userService.findOne(id);
         return ResponseEntity.ok(mapper.toDto(user));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO dto) {
+        User user = userService.create(dto);
+        return ResponseEntity.created(
+                URI.create("/api/users/" + user.getId()))
+                .body(mapper.toDto(user));
     }
 }
