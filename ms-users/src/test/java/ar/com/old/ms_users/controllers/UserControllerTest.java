@@ -169,6 +169,26 @@ class UserControllerTest {
         verify(userService).update(any(UserRequestDTO.class));
     }
 
+    @Test
+    void shouldReturnErrorUpdatingUser_whenUserNotFound_status400() throws Exception {
+        //GIVEN
+        when(userService.update(requestDTO))
+                .thenThrow(new UserNotFoundException("User not found"));
+
+        //WHEN
+        mockMvc.perform(put("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                requestDTO)))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("User not found"));
+
+        verify(userService).update(any(UserRequestDTO.class));
+    }
+
 
 
 
