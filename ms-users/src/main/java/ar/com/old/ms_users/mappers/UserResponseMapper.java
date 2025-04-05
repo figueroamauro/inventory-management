@@ -9,5 +9,4 @@ public interface UserResponseMapper {
     UserResponseDTO toDto(User user);
 
     User toEntity(UserResponseDTO dto);
-
 }
