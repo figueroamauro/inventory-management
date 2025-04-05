@@ -2,6 +2,7 @@ package ar.com.old.ms_users.controllers;
 
 import ar.com.old.ms_users.dto.UserResponseDTO;
 import ar.com.old.ms_users.entities.User;
+import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
 import ar.com.old.ms_users.services.UserService;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ class UserControllerTest {
     UserResponseMapper mapper;
 
     @Test
-    void shouldReturnPageWith3UsersAndStatus200() throws Exception {
+    void shouldReturnPageWith3Users_status200() throws Exception {
         //GIVEN
         Pageable pageable = PageRequest.of(0, 10);
         List<User> list = List.of(new User(1L, "user1", "123123", "user1@mail.com"),
@@ -58,7 +59,7 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldFindUserById() throws Exception {
+    void shouldFindUserById_status200() throws Exception {
         //GIVEN
         User user = new User(1L, "test", "123123", "test@mail.com");
         when(userService.findOne(1L)).thenReturn(user);
@@ -81,4 +82,23 @@ class UserControllerTest {
     private void verifyMapToDTOMock() {
         when(mapper.toDto(any(User.class))).thenReturn(new UserResponseDTO(1L, "test", "test@mail.com"));
     }
+
+    @Test
+    void shouldThrowExceptionFindingById_whenUserNotFound_status404() throws Exception {
+        //GIVEN
+        when(userService.findOne(1L))
+                .thenThrow(new UserNotFoundException("User not found"));
+
+        //WHEN
+        mockMvc.perform(get("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("User not found"));
+
+        verify(userService).findOne(1L);
+    }
+
 }
