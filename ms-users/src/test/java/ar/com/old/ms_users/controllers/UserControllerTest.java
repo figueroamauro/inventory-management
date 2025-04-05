@@ -37,7 +37,8 @@ class UserControllerTest {
     @MockitoBean
     private UserService userService;
     @MockitoBean
-    UserResponseMapper mapper;
+    private UserResponseMapper mapper;
+
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -122,6 +123,27 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.userName").value("test"));
 
         verify(userService).create(any(UserRequestDTO.class));
+    }
+
+    @Test
+    void shouldUpdateUser_status200() throws Exception {
+        //GIVEN
+        UserRequestDTO dto = new UserRequestDTO(1L, "test", "123123", "test@mail.com");
+        when(userService.update(dto)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
+        verifyMapToDTOMock();
+
+        //WHEN
+        mockMvc.perform(put("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                dto)))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.userName").value("test"));
+
+        verify(userService).update(any(UserRequestDTO.class));
     }
 
 

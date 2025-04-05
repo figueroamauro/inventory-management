@@ -47,4 +47,11 @@ public class UserController {
                 URI.create("/api/users/" + user.getId()))
                 .body(mapper.toDto(user));
     }
+
+    @PutMapping
+    public ResponseEntity<UserResponseDTO> update(@RequestBody UserRequestDTO dto) {
+        User user = userService.update(dto);
+        return ResponseEntity.ok(mapper.toDto(user));
+
+    }
 }
