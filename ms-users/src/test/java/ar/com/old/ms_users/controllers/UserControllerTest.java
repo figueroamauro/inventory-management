@@ -152,8 +152,8 @@ class UserControllerTest {
     @Test
     void shouldReturnErrorUpdatingUser_whenIdIsNull_status400() throws Exception {
         //GIVEN
-        when(userService.update(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
-        verifyMapToDTOMock();
+        when(userService.update(requestDTO))
+                .thenThrow(new IllegalArgumentException("Id can not be null"));
 
         //WHEN
         mockMvc.perform(put("/api/users")
@@ -162,12 +162,14 @@ class UserControllerTest {
                                 requestDTO)))
 
                 //THEN
-                .andExpect(status().isOk())
+                .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.userName").value("test"));
+                .andExpect(jsonPath("$.error").value("Id can not be null"));
 
         verify(userService).update(any(UserRequestDTO.class));
     }
+
+
 
 
     private void verifyMapToDTOMock() {
