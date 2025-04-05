@@ -6,8 +6,9 @@ import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
 import ar.com.old.ms_users.services.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
@@ -38,17 +39,21 @@ class UserControllerTest {
     private UserService userService;
     @MockitoBean
     private UserResponseMapper mapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private User user;
+    private UserRequestDTO requestDTO;
 
-
-    ObjectMapper objectMapper = new ObjectMapper();
+    @BeforeEach
+    void init() {
+        user = new User(1L, "test", "123123", "test@mail.com");
+        requestDTO = new UserRequestDTO(1L, "test", "123123", "test@mail.com");
+    }
 
     @Test
     void shouldReturnPageWith3Users_status200() throws Exception {
         //GIVEN
         Pageable pageable = PageRequest.of(0, 10);
-        List<User> list = List.of(new User(1L, "user1", "123123", "user1@mail.com"),
-                new User(2L, "user2", "123123", "user2@mail.com"),
-                new User(3L, "user3", "123123", "user3@mail.com"));
+        List<User> list = getUserList();
         when(userService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(list, pageable, list.size()));
         verifyMapToDTOMock();
 
@@ -68,7 +73,6 @@ class UserControllerTest {
     @Test
     void shouldFindUserById_status200() throws Exception {
         //GIVEN
-        User user = new User(1L, "test", "123123", "test@mail.com");
         when(userService.findOne(1L)).thenReturn(user);
         verifyMapToDTOMock();
 
@@ -87,7 +91,7 @@ class UserControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionFindingById_whenUserNotFound_status404() throws Exception {
+    void shouldReturnErrorFindingById_whenUserNotFound_status404() throws Exception {
         //GIVEN
         when(userService.findOne(1L))
                 .thenThrow(new UserNotFoundException("User not found"));
@@ -107,15 +111,14 @@ class UserControllerTest {
     @Test
     void shouldCreateUser_status201() throws Exception {
         //GIVEN
-        UserRequestDTO dto = new UserRequestDTO(null, "test", "123123", "test@mail.com");
-        when(userService.create(dto)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
+        when(userService.create(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
         verifyMapToDTOMock();
 
         //WHEN
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                dto)))
+                                requestDTO)))
 
                 //THEN
                 .andExpect(status().isCreated())
@@ -128,15 +131,35 @@ class UserControllerTest {
     @Test
     void shouldUpdateUser_status200() throws Exception {
         //GIVEN
-        UserRequestDTO dto = new UserRequestDTO(1L, "test", "123123", "test@mail.com");
-        when(userService.update(dto)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
+
+        when(userService.update(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
         verifyMapToDTOMock();
 
         //WHEN
         mockMvc.perform(put("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(
-                                dto)))
+                                requestDTO)))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.userName").value("test"));
+
+        verify(userService).update(any(UserRequestDTO.class));
+    }
+
+    @Test
+    void shouldReturnErrorUpdatingUser_whenIdIsNull_status400() throws Exception {
+        //GIVEN
+        when(userService.update(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
+        verifyMapToDTOMock();
+
+        //WHEN
+        mockMvc.perform(put("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                requestDTO)))
 
                 //THEN
                 .andExpect(status().isOk())
@@ -149,6 +172,12 @@ class UserControllerTest {
 
     private void verifyMapToDTOMock() {
         when(mapper.toDto(any(User.class))).thenReturn(new UserResponseDTO(1L, "test", "test@mail.com"));
+    }
+
+    private static @NotNull List<User> getUserList() {
+        return List.of(new User(1L, "user1", "123123", "user1@mail.com"),
+                new User(2L, "user2", "123123", "user2@mail.com"),
+                new User(3L, "user3", "123123", "user3@mail.com"));
     }
 
 }
