@@ -218,6 +218,24 @@ class UserControllerTest {
         verify(userService).delete(1L);
     }
 
+    @Test
+    void shouldReturnErrorDeletingUser_whenIdIsNull_status400() throws Exception {
+        //GIVEN
+        doThrow(new IllegalArgumentException("Id can not be null")).when(userService).delete(1L);
+
+        //WHEN
+        mockMvc.perform(delete("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Id can not be null"));
+
+        verify(userService).delete(1L);
+    }
+
+
 
 
 
