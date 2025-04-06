@@ -29,7 +29,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<PagedModel<?>> findAll(Pageable pageable,
-                                              PagedResourcesAssembler<UserResponseDTO> assembler) {
+                                                 PagedResourcesAssembler<UserResponseDTO> assembler) {
         Page<UserResponseDTO> page = userService.findAll(pageable).map(mapper::toDto);
         return ResponseEntity.ok(assembler.toModel(page));
     }
@@ -44,7 +44,7 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO dto) {
         User user = userService.create(dto);
         return ResponseEntity.created(
-                URI.create("/api/users/" + user.getId()))
+                        URI.create("/api/users/" + user.getId()))
                 .body(mapper.toDto(user));
     }
 
@@ -53,5 +53,11 @@ public class UserController {
         User user = userService.update(dto);
         return ResponseEntity.ok(mapper.toDto(user));
 
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        userService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

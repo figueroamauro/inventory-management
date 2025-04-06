@@ -189,6 +189,18 @@ class UserControllerTest {
         verify(userService).update(any(UserRequestDTO.class));
     }
 
+    @Test
+    void shouldDeleteUser_status204() throws Exception {
+        //WHEN
+        mockMvc.perform(delete("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNoContent());
+
+        verify(userService).delete(1L);
+    }
+
 
 
 
