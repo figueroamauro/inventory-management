@@ -201,6 +201,23 @@ class UserControllerTest {
         verify(userService).delete(1L);
     }
 
+    @Test
+    void shouldReturnErrorDeletingUser_whenNotFound_status404() throws Exception {
+        //GIVEN
+        doThrow(new UserNotFoundException("User not found")).when(userService).delete(1L);
+
+        //WHEN
+        mockMvc.perform(delete("/api/users/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("User not found"));
+
+        verify(userService).delete(1L);
+    }
+
 
 
 
