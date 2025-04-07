@@ -9,6 +9,7 @@ import ar.com.old.ms_users.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
@@ -49,195 +50,212 @@ class UserControllerTest {
         requestDTO = new UserRequestDTO(1L, "test", "123123", "test@mail.com");
     }
 
-    @Test
-    void shouldReturnPageWith3Users_status200() throws Exception {
-        //GIVEN
-        Pageable pageable = PageRequest.of(0, 10);
-        List<User> list = getUserList();
-        when(userService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(list, pageable, list.size()));
-        verifyMapToDTOMock();
+    @Nested
+    class FindAllTest {
 
-        //WHEN
-        mockMvc.perform(get("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON))
+        @Test
+        void shouldReturnPageWith3Users_status200() throws Exception {
+            //GIVEN
+            Pageable pageable = PageRequest.of(0, 10);
+            List<User> list = getUserList();
+            when(userService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(list, pageable, list.size()));
+            verifyMapToDTOMock();
 
-                //THEN
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$._embedded").exists())
-                .andExpect(jsonPath("$._embedded.userResponseDTOList.length()").value(list.size()));
+            //WHEN
+            mockMvc.perform(get("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON))
 
-        verify(userService).findAll(any(Pageable.class));
+                    //THEN
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$._embedded").exists())
+                    .andExpect(jsonPath("$._embedded.userResponseDTOList.length()").value(list.size()));
+
+            verify(userService).findAll(any(Pageable.class));
+        }
     }
 
-    @Test
-    void shouldFindUserById_status200() throws Exception {
-        //GIVEN
-        when(userService.findOne(1L)).thenReturn(user);
-        verifyMapToDTOMock();
+    @Nested
+    class FindByIdTest {
 
-        //WHEN
-        mockMvc.perform(get("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+        @Test
+        void shouldFindUserById_status200() throws Exception {
+            //GIVEN
+            when(userService.findOne(1L)).thenReturn(user);
+            verifyMapToDTOMock();
 
-                //THEN
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.userName").value("test"))
-                .andExpect(jsonPath("$.email").value("test@mail.com"));
+            //WHEN
+            mockMvc.perform(get("/api/users/1")
+                            .contentType(MediaType.APPLICATION_JSON))
 
-        verify(userService).findOne(1L);
+                    //THEN
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.id").value(1L))
+                    .andExpect(jsonPath("$.userName").value("test"))
+                    .andExpect(jsonPath("$.email").value("test@mail.com"));
+
+            verify(userService).findOne(1L);
+        }
+
+        @Test
+        void shouldReturnErrorFindingById_whenUserNotFound_status404() throws Exception {
+            //GIVEN
+            when(userService.findOne(1L))
+                    .thenThrow(new UserNotFoundException("User not found"));
+
+            //WHEN
+            mockMvc.perform(get("/api/users/1")
+                            .contentType(MediaType.APPLICATION_JSON))
+
+                    //THEN
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("User not found"));
+
+            verify(userService).findOne(1L);
+        }
     }
 
-    @Test
-    void shouldReturnErrorFindingById_whenUserNotFound_status404() throws Exception {
-        //GIVEN
-        when(userService.findOne(1L))
-                .thenThrow(new UserNotFoundException("User not found"));
+    @Nested
+    class CreateTest {
 
-        //WHEN
-        mockMvc.perform(get("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+        @Test
+        void shouldCreateUser_status201() throws Exception {
+            //GIVEN
+            when(userService.create(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
+            verifyMapToDTOMock();
 
-                //THEN
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("User not found"));
+            //WHEN
+            mockMvc.perform(post("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(
+                                    requestDTO)))
 
-        verify(userService).findOne(1L);
+                    //THEN
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.userName").value("test"));
+
+            verify(userService).create(any(UserRequestDTO.class));
+        }
     }
 
-    @Test
-    void shouldCreateUser_status201() throws Exception {
-        //GIVEN
-        when(userService.create(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
-        verifyMapToDTOMock();
+    @Nested
+    class UpdateTest {
 
-        //WHEN
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(
-                                requestDTO)))
+        @Test
+        void shouldUpdateUser_status200() throws Exception {
+            //GIVEN
 
-                //THEN
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.userName").value("test"));
+            when(userService.update(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
+            verifyMapToDTOMock();
 
-        verify(userService).create(any(UserRequestDTO.class));
+            //WHEN
+            mockMvc.perform(put("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(
+                                    requestDTO)))
+
+                    //THEN
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.userName").value("test"));
+
+            verify(userService).update(any(UserRequestDTO.class));
+        }
+
+        @Test
+        void shouldReturnErrorUpdatingUser_whenIdIsNull_status400() throws Exception {
+            //GIVEN
+            when(userService.update(requestDTO))
+                    .thenThrow(new IllegalArgumentException("Id can not be null"));
+
+            //WHEN
+            mockMvc.perform(put("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(
+                                    requestDTO)))
+
+                    //THEN
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Id can not be null"));
+
+            verify(userService).update(any(UserRequestDTO.class));
+        }
+
+        @Test
+        void shouldReturnErrorUpdatingUser_whenUserNotFound_status400() throws Exception {
+            //GIVEN
+            when(userService.update(requestDTO))
+                    .thenThrow(new UserNotFoundException("User not found"));
+
+            //WHEN
+            mockMvc.perform(put("/api/users")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(
+                                    requestDTO)))
+
+                    //THEN
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("User not found"));
+
+            verify(userService).update(any(UserRequestDTO.class));
+        }
     }
 
-    @Test
-    void shouldUpdateUser_status200() throws Exception {
-        //GIVEN
+    @Nested
+    class DeleteTest {
 
-        when(userService.update(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
-        verifyMapToDTOMock();
+        @Test
+        void shouldDeleteUser_status204() throws Exception {
+            //WHEN
+            mockMvc.perform(delete("/api/users/1")
+                            .contentType(MediaType.APPLICATION_JSON))
 
-        //WHEN
-        mockMvc.perform(put("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(
-                                requestDTO)))
+                    //THEN
+                    .andExpect(status().isNoContent());
 
-                //THEN
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.userName").value("test"));
+            verify(userService).delete(1L);
+        }
 
-        verify(userService).update(any(UserRequestDTO.class));
+        @Test
+        void shouldReturnErrorDeletingUser_whenNotFound_status404() throws Exception {
+            //GIVEN
+            doThrow(new UserNotFoundException("User not found")).when(userService).delete(1L);
+
+            //WHEN
+            mockMvc.perform(delete("/api/users/1")
+                            .contentType(MediaType.APPLICATION_JSON))
+
+                    //THEN
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("User not found"));
+
+            verify(userService).delete(1L);
+        }
+
+        @Test
+        void shouldReturnErrorDeletingUser_whenIdIsNull_status400() throws Exception {
+            //GIVEN
+            doThrow(new IllegalArgumentException("Id can not be null")).when(userService).delete(1L);
+
+            //WHEN
+            mockMvc.perform(delete("/api/users/1")
+                            .contentType(MediaType.APPLICATION_JSON))
+
+                    //THEN
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Id can not be null"));
+
+            verify(userService).delete(1L);
+        }
+
     }
-
-    @Test
-    void shouldReturnErrorUpdatingUser_whenIdIsNull_status400() throws Exception {
-        //GIVEN
-        when(userService.update(requestDTO))
-                .thenThrow(new IllegalArgumentException("Id can not be null"));
-
-        //WHEN
-        mockMvc.perform(put("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(
-                                requestDTO)))
-
-                //THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Id can not be null"));
-
-        verify(userService).update(any(UserRequestDTO.class));
-    }
-
-    @Test
-    void shouldReturnErrorUpdatingUser_whenUserNotFound_status400() throws Exception {
-        //GIVEN
-        when(userService.update(requestDTO))
-                .thenThrow(new UserNotFoundException("User not found"));
-
-        //WHEN
-        mockMvc.perform(put("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(
-                                requestDTO)))
-
-                //THEN
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("User not found"));
-
-        verify(userService).update(any(UserRequestDTO.class));
-    }
-
-    @Test
-    void shouldDeleteUser_status204() throws Exception {
-        //WHEN
-        mockMvc.perform(delete("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-
-                //THEN
-                .andExpect(status().isNoContent());
-
-        verify(userService).delete(1L);
-    }
-
-    @Test
-    void shouldReturnErrorDeletingUser_whenNotFound_status404() throws Exception {
-        //GIVEN
-        doThrow(new UserNotFoundException("User not found")).when(userService).delete(1L);
-
-        //WHEN
-        mockMvc.perform(delete("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-
-                //THEN
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("User not found"));
-
-        verify(userService).delete(1L);
-    }
-
-    @Test
-    void shouldReturnErrorDeletingUser_whenIdIsNull_status400() throws Exception {
-        //GIVEN
-        doThrow(new IllegalArgumentException("Id can not be null")).when(userService).delete(1L);
-
-        //WHEN
-        mockMvc.perform(delete("/api/users/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-
-                //THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Id can not be null"));
-
-        verify(userService).delete(1L);
-    }
-
-
-
-
 
     private void verifyMapToDTOMock() {
         when(mapper.toDto(any(User.class))).thenReturn(new UserResponseDTO(1L, "test", "test@mail.com"));
