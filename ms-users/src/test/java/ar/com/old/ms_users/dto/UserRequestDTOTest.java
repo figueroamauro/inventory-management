@@ -13,5 +13,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserRequestDTOTest {
     
+    @Test
+    void shouldCreateDto_whenAllFieldsAreValid(){
+        //GIVEN
+        ValidatorFactory validatorFactory = buildDefaultValidatorFactory();
+        Validator validator = validatorFactory.getValidator();
+
+        UserRequestDTO dto = new UserRequestDTO(1L, "test", "pass123", "test@mail.com");
+
+        //WHEN
+        Set<ConstraintViolation<UserRequestDTO>> errors = validator.validate(dto);
+
+        //THEN
+        assertTrue(errors.isEmpty());
+    }
 
 }
