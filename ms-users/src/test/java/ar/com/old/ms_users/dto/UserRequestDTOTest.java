@@ -17,9 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserRequestDTOTest {
     private static final String NAME_TOO_LONG_20 = "AAAAABBBBBCCCCCDDDDDE";
-    public static final String CORRECT_PASS = "pass123";
-    public static final String CORRECT_EMAIL = "test@mail.com";
-    public static final String CORRECT_USERNAME = "test";
+    private static final String CORRECT_PASS = "pass123";
+    private static final String CORRECT_EMAIL = "test@mail.com";
+    private static final String CORRECT_USERNAME = "test";
 
     private Validator validator;
     private UserRequestDTO dto;
@@ -71,5 +71,19 @@ class UserRequestDTOTest {
         //THEN
         assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username must be between 4 and 20 characters long")));
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"j oh", "  test", "john doe", "johndoe "})
+    void shouldThrowException_whenUserNameContainsWhiteSpaces(String username) {
+        //GIVEN
+        dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
+
+        //WHEN
+        errors = validator.validate(dto);
+
+        //THEN
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username must not contain spaces")));
+    }
+
 
 }
