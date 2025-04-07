@@ -1,8 +1,8 @@
-create schema if not exists inventory;
-use inventory;
+CREATE SCHEMA if NOT EXISTS inventory;
+USE inventory;
 
-create table users(
-id int auto_increment primary key,
+CREATE TABLE users(
+id int AUTO_INCREMENT PRIMARY KEY,
 username varchar(50),
 password varchar(300),
 email varchar(255),
