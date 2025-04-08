@@ -11,14 +11,16 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 
+import java.util.List;
 import java.util.Set;
 
 import static jakarta.validation.Validation.buildDefaultValidatorFactory;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserRequestDTOTest {
-    private static final String NAME_TOO_LONG_20 = "AAAAABBBBBCCCCCDDDDDE";
-    private static final String CORRECT_PASS = "pass123";
+    private static final String TOO_LONG_20 = "AAAAABBBBBCCCCCDDDDDE";
+    private static final String TOO_LONG_30 = "AAAAABBBBBCCCCCDDDDDEEEEEFFFFFG";
+    private static final String CORRECT_PASS = "pass1234";
     private static final String CORRECT_EMAIL = "test@mail.com";
     private static final String CORRECT_USERNAME = "test";
 
@@ -64,8 +66,8 @@ class UserRequestDTOTest {
 
 
         @ParameterizedTest
-        @ValueSource(strings = {"joh", NAME_TOO_LONG_20})
-        void shouldThrowException_whenUserNameTooLess4AndTooLong20(String username) {
+        @ValueSource(strings = {"joh", TOO_LONG_20})
+        void shouldThrowException_whenUserNameIsShorterThan4OrLongerThan20(String username) {
             //GIVEN
             dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
 
@@ -105,10 +107,24 @@ class UserRequestDTOTest {
             //THEN
             assertErrors("Password can not be blank");
         }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"pas", TOO_LONG_30})
+        void shouldThrowException_whenPasswordIsShorterThan8OrLongerThan30(String password) {
+            //GIVEN
+            dto = new UserRequestDTO(1L, CORRECT_USERNAME, password, CORRECT_EMAIL);
+
+            //WHEN
+            validateDTO(dto);
+
+            //THEN
+            assertErrors("Password must be between 8 and 30 characters long");
+        }
     }
 
     private void assertErrors(String message) {
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals(message)), errors.toString());
+        List<String> list = errors.stream().map(ConstraintViolation::getMessage).toList();
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals(message)), list.toString());
     }
 
     private void validateDTO(UserRequestDTO dto) {

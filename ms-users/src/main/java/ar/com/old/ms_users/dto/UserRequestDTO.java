@@ -13,6 +13,7 @@ public record UserRequestDTO(
         String userName,
 
         @NotBlank(message = "Password can not be blank")
+        @Size(min = 8, max = 30, message = "Password must be between 8 and 30 characters long")
         String password,
 
         String email
