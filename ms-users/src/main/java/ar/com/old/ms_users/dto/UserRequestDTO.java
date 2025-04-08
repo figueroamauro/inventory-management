@@ -9,7 +9,7 @@ public record UserRequestDTO(
 
         @NotBlank(message = "Username can not be blank")
         @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters long")
-        @Pattern(regexp = WITHOUT_WHITESPACES, message = "Username must not contain spaces")
+        @Pattern(regexp = USERNAME_PATTERN, message = "Username must not contain spaces")
         String userName,
 
         @NotBlank(message = "Password can not be blank")
@@ -18,5 +18,5 @@ public record UserRequestDTO(
 
         String email
 ) {
-    private static final String WITHOUT_WHITESPACES = "^\\S+$";
+    private static final String USERNAME_PATTERN = "^[a-zA-Z0-9_]+$";
 }
