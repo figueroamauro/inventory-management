@@ -12,6 +12,7 @@ public record UserRequestDTO(
         @Pattern(regexp = WITHOUT_WHITESPACES, message = "Username must not contain spaces")
         String userName,
 
+        @NotBlank(message = "Password can not be blank")
         String password,
 
         String email

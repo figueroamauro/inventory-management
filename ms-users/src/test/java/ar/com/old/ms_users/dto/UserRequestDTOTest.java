@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -29,8 +30,6 @@ class UserRequestDTOTest {
     void init() {
         ValidatorFactory validatorFactory = buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
-
-
     }
 
     @Test
@@ -45,44 +44,65 @@ class UserRequestDTOTest {
         assertTrue(errors.isEmpty());
     }
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    void shouldThrowException_whenUserNameIsBlank(String username) {
-        //GIVEN
-        dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
+    @Nested
+    class UserNameTest {
 
-        //WHEN
-        errors = validator.validate(dto);
+        @ParameterizedTest
+        @NullAndEmptySource
+        void shouldThrowException_whenUserNameIsBlank(String username) {
+            //GIVEN
+            dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
 
-        //THEN
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username can not be blank")));
+            //WHEN
+            errors = validator.validate(dto);
+
+            //THEN
+            assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username can not be blank")),errors.toString());
+        }
+
+
+        @ParameterizedTest
+        @ValueSource(strings = {"joh", NAME_TOO_LONG_20})
+        void shouldThrowException_whenUserNameTooLess4AndTooLong20(String username) {
+            //GIVEN
+            dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
+
+            //WHEN
+            errors = validator.validate(dto);
+
+            //THEN
+            assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username must be between 4 and 20 characters long")),errors.toString());
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"j oh", "  test", "john doe", "johndoe "})
+        void shouldThrowException_whenUserNameContainsWhiteSpaces(String username) {
+            //GIVEN
+            dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
+
+            //WHEN
+            errors = validator.validate(dto);
+
+            //THEN
+            assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username must not contain spaces")),errors.toString());
+        }
     }
 
+    @Nested
+    class PasswordTest {
 
-    @ParameterizedTest
-    @ValueSource(strings = {"joh", NAME_TOO_LONG_20})
-    void shouldThrowException_whenUserNameTooLess4AndTooLong20(String username) {
-        //GIVEN
-        dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
+        @ParameterizedTest
+        @NullAndEmptySource
+        void shouldThrowException_whenEmailIsBlank(String password) {
+            //GIVEN
+            dto = new UserRequestDTO(1L, CORRECT_USERNAME, password, CORRECT_EMAIL);
 
-        //WHEN
-        errors = validator.validate(dto);
+            //WHEN
+            errors = validator.validate(dto);
 
-        //THEN
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username must be between 4 and 20 characters long")));
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"j oh", "  test", "john doe", "johndoe "})
-    void shouldThrowException_whenUserNameContainsWhiteSpaces(String username) {
-        //GIVEN
-        dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
-
-        //WHEN
-        errors = validator.validate(dto);
-
-        //THEN
-        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username must not contain spaces")));
+            //THEN
+            assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Password can not be blank")), errors.toString());
+        }
     }
 
 
