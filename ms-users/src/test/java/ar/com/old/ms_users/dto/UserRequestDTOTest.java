@@ -88,7 +88,7 @@ class UserRequestDTOTest {
             validateDTO(dto);
 
             //THEN
-            assertErrors("Username must not contain spaces");
+            assertErrors("Invalid username pattern. Must contain only alphanumeric characters and underscores");
         }
     }
 

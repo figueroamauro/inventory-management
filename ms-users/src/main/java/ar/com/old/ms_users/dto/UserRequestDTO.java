@@ -9,7 +9,8 @@ public record UserRequestDTO(
 
         @NotBlank(message = "Username can not be blank")
         @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters long")
-        @Pattern(regexp = USERNAME_PATTERN, message = "Username must not contain spaces")
+        @Pattern(regexp = USERNAME_PATTERN,
+                message = "Invalid username pattern. Must contain only alphanumeric characters and underscores")
         String userName,
 
         @NotBlank(message = "Password can not be blank")
