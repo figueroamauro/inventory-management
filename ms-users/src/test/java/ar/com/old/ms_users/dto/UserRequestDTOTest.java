@@ -30,6 +30,7 @@ class UserRequestDTOTest {
     void init() {
         ValidatorFactory validatorFactory = buildDefaultValidatorFactory();
         validator = validatorFactory.getValidator();
+        errors = null;
     }
 
     @Test
@@ -38,7 +39,7 @@ class UserRequestDTOTest {
         dto = new UserRequestDTO(1L, CORRECT_USERNAME, CORRECT_PASS, CORRECT_EMAIL);
 
         //WHEN
-        errors = validator.validate(dto);
+        validateDTO(dto);
 
         //THEN
         assertTrue(errors.isEmpty());
@@ -54,10 +55,11 @@ class UserRequestDTOTest {
             dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
 
             //WHEN
-            errors = validator.validate(dto);
+            validateDTO(dto);
 
             //THEN
-            assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username can not be blank")),errors.toString());
+            assertErrors("Username can not be blank");
+
         }
 
 
@@ -68,10 +70,10 @@ class UserRequestDTOTest {
             dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
 
             //WHEN
-            errors = validator.validate(dto);
+            validateDTO(dto);
 
             //THEN
-            assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username must be between 4 and 20 characters long")),errors.toString());
+            assertErrors("Username must be between 4 and 20 characters long");
         }
 
         @ParameterizedTest
@@ -81,10 +83,10 @@ class UserRequestDTOTest {
             dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
 
             //WHEN
-            errors = validator.validate(dto);
+            validateDTO(dto);
 
             //THEN
-            assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Username must not contain spaces")),errors.toString());
+            assertErrors("Username must not contain spaces");
         }
     }
 
@@ -98,12 +100,18 @@ class UserRequestDTOTest {
             dto = new UserRequestDTO(1L, CORRECT_USERNAME, password, CORRECT_EMAIL);
 
             //WHEN
-            errors = validator.validate(dto);
+            validateDTO(dto);
 
             //THEN
-            assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals("Password can not be blank")), errors.toString());
+            assertErrors("Password can not be blank");
         }
     }
 
+    private void assertErrors(String message) {
+        assertTrue(errors.stream().anyMatch(e -> e.getMessage().equals(message)), errors.toString());
+    }
 
+    private void validateDTO(UserRequestDTO dto) {
+        errors = validator.validate(dto);
+    }
 }
