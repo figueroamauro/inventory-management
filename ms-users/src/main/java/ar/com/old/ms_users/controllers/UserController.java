@@ -2,6 +2,7 @@ package ar.com.old.ms_users.controllers;
 
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.dto.UserResponseDTO;
+import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
 import ar.com.old.ms_users.services.UserService;
@@ -50,7 +51,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<UserResponseDTO> update(@Valid @RequestBody UserRequestDTO dto) {
+    public ResponseEntity<UserResponseDTO> update(@Valid @RequestBody UserUpdateRequestDTO dto) {
         User user = userService.update(dto);
         return ResponseEntity.ok(mapper.toDto(user));
 

@@ -2,6 +2,7 @@ package ar.com.old.ms_users.controllers;
 
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.dto.UserResponseDTO;
+import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
@@ -43,11 +44,13 @@ class UserControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private User user;
     private UserRequestDTO requestDTO;
+    private UserUpdateRequestDTO requestUpdateDTO;
 
     @BeforeEach
     void init() {
         user = new User(1L, "test", "123123", "test@mail.com");
         requestDTO = new UserRequestDTO(1L, "test", "password123", "test@mail.com");
+        requestUpdateDTO = new UserUpdateRequestDTO(1L, "test", "test@mail.com");
     }
 
     @Nested
@@ -148,7 +151,7 @@ class UserControllerTest {
         void shouldUpdateUser_status200() throws Exception {
             //GIVEN
 
-            when(userService.update(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
+            when(userService.update(requestUpdateDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
             verifyMapToDTOMock();
 
             //WHEN
@@ -162,13 +165,13 @@ class UserControllerTest {
                     .andExpect(jsonPath("$").isMap())
                     .andExpect(jsonPath("$.userName").value("test"));
 
-            verify(userService).update(any(UserRequestDTO.class));
+            verify(userService).update(any(UserUpdateRequestDTO.class));
         }
 
         @Test
         void shouldReturnErrorUpdatingUser_whenIdIsNull_status400() throws Exception {
             //GIVEN
-            when(userService.update(requestDTO))
+            when(userService.update(requestUpdateDTO))
                     .thenThrow(new IllegalArgumentException("Id can not be null"));
 
             //WHEN
@@ -182,13 +185,13 @@ class UserControllerTest {
                     .andExpect(jsonPath("$").isMap())
                     .andExpect(jsonPath("$.error").value("Id can not be null"));
 
-            verify(userService).update(any(UserRequestDTO.class));
+            verify(userService).update(any(UserUpdateRequestDTO.class));
         }
 
         @Test
         void shouldReturnErrorUpdatingUser_whenUserNotFound_status400() throws Exception {
             //GIVEN
-            when(userService.update(requestDTO))
+            when(userService.update(requestUpdateDTO))
                     .thenThrow(new UserNotFoundException("User not found"));
 
             //WHEN
@@ -202,7 +205,7 @@ class UserControllerTest {
                     .andExpect(jsonPath("$").isMap())
                     .andExpect(jsonPath("$.error").value("User not found"));
 
-            verify(userService).update(any(UserRequestDTO.class));
+            verify(userService).update(any(UserUpdateRequestDTO.class));
         }
     }
 

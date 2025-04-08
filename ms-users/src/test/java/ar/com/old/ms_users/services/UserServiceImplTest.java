@@ -1,10 +1,12 @@
 package ar.com.old.ms_users.services;
 
+import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
+import ar.com.old.ms_users.mappers.UserUpdateRequestMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -34,13 +36,15 @@ class UserServiceImplTest {
     private User user;
     private User userWithId;
     private UserRequestDTO dto;
-    private UserRequestDTO dtoWithId;
+    private UserUpdateRequestDTO updateRequestDTO;
     @InjectMocks
     private UserServiceImpl userService;
     @Mock
     private UserRepository userRepository;
     @Mock
     private UserRequestMapper mapper;
+    @Mock
+    UserUpdateRequestMapper updateRequestMapper;
 
 
     @BeforeEach
@@ -48,7 +52,7 @@ class UserServiceImplTest {
         user = new User(null, "test", "123123", "test@mail.com");
         userWithId = new User(1L, "test", "123123", "test@mail.com");
         dto = new UserRequestDTO(null, "test", "123123", "test@mail.com");
-        dtoWithId = new UserRequestDTO(1L, "test", "123123", "test@mail.com");
+        updateRequestDTO = new UserUpdateRequestDTO(1L, "test", "test@mail.com");
     }
 
     @Nested
@@ -166,6 +170,18 @@ class UserServiceImplTest {
             assertNull(capture.getId());
             assertEquals("USER", capture.getRole().name());
         }
+
+        @Test
+        void shouldThrowExceptionCreatingUser_whenEmailAlreadyExists() {
+            //GIVEN
+
+
+            //WHEN
+
+
+            //THEN
+
+        }
     }
 
     @Nested
@@ -176,11 +192,11 @@ class UserServiceImplTest {
             //GIVEN
             userWithId.setRole(Role.USER);
             when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.ofNullable(userWithId));
-            when(mapper.toEntity(dtoWithId)).thenReturn(userWithId);
+            when(updateRequestMapper.toEntity(updateRequestDTO)).thenReturn(userWithId);
             when(userRepository.save(any(User.class))).thenReturn(userWithId);
 
             //WHEN
-            User result = userService.update(dtoWithId);
+            User result = userService.update(updateRequestDTO);
 
             //THEN
             assertEquals(userWithId.getId(), result.getId());
@@ -191,21 +207,9 @@ class UserServiceImplTest {
         }
 
         @Test
-        void shouldThrowExceptionUpdatingUser_whenIdIsNull() {
-            //WHEN
-            Executable executable = () -> userService.update(dto);
-
-            //THEN
-            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-            assertEquals("Id can not be null", e.getMessage());
-
-            verify(userRepository, never()).save(any(User.class));
-        }
-
-        @Test
         void shouldThrowExceptionUpdatingUser_whenUserNotFound() {
             //WHEN
-            Executable executable = () -> userService.update(dtoWithId);
+            Executable executable = () -> userService.update(updateRequestDTO);
 
             //THEN
             UserNotFoundException e = assertThrows(UserNotFoundException.class, executable);

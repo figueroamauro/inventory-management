@@ -1,6 +1,7 @@
 package ar.com.old.ms_users.services;
 
 import ar.com.old.ms_users.dto.UserRequestDTO;
+import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +16,7 @@ public interface UserService {
 
     User create(UserRequestDTO dto);
 
-    User update(UserRequestDTO dto);
+    User update(UserUpdateRequestDTO dto);
 
     void delete(Long id);
 }
