@@ -19,6 +19,7 @@ public record UserRequestDTO(
                 message = "Invalid password pattern. Must contain 1 number, 1 letter and without whitespaces")
         String password,
 
+        @NotBlank(message = "Email can not be blank")
         String email
 ) {
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9_]+$";

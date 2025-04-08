@@ -97,7 +97,7 @@ class UserRequestDTOTest {
 
         @ParameterizedTest
         @NullAndEmptySource
-        void shouldThrowException_whenEmailIsBlank(String password) {
+        void shouldThrowException_whenPasswordIsBlank(String password) {
             //GIVEN
             dto = new UserRequestDTO(1L, CORRECT_USERNAME, password, CORRECT_EMAIL);
 
@@ -132,6 +132,23 @@ class UserRequestDTOTest {
 
             //THEN
             assertErrors("Invalid password pattern. Must contain 1 number, 1 letter and without whitespaces");
+        }
+    }
+
+    @Nested
+    class EmailTest {
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        void shouldThrowException_whenEmailIsBlank(String email) {
+            //GIVEN
+            dto = new UserRequestDTO(1L, CORRECT_USERNAME, CORRECT_PASS, email);
+
+            //WHEN
+            validateDTO(dto);
+
+            //THEN
+            assertErrors("Email can not be blank");
         }
     }
 
