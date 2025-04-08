@@ -163,6 +163,18 @@ class UserRequestDTOTest {
             //THEN
             assertErrors("Invalid email pattern");
         }
+
+        @Test
+        void shouldThrowException_whenEmailIsLongerThan255Characters(){
+            //GIVEN
+            dto = new UserRequestDTO(1L, CORRECT_USERNAME, CORRECT_PASS, "a".repeat(256));
+
+            //WHEN
+            validateDTO(dto);
+
+            //THEN
+            assertErrors("Email can not be longer than 255 characters");
+        }
     }
 
     private void assertErrors(String message) {
