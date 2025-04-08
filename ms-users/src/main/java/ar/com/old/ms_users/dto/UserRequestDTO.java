@@ -1,5 +1,6 @@
 package ar.com.old.ms_users.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -20,6 +21,7 @@ public record UserRequestDTO(
         String password,
 
         @NotBlank(message = "Email can not be blank")
+        @Email(message = "Invalid email pattern")
         String email
 ) {
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9_]+$";

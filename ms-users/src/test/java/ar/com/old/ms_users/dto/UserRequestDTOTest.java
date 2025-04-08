@@ -150,6 +150,19 @@ class UserRequestDTOTest {
             //THEN
             assertErrors("Email can not be blank");
         }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"mail.com", "mail@@com","mail_@.", "@.com","mail.@.com"})
+        void shouldThrowException_whenEmailHasInvalidPattern(String email) {
+            //GIVEN
+            dto = new UserRequestDTO(1L, CORRECT_USERNAME, CORRECT_PASS, email);
+
+            //WHEN
+            validateDTO(dto);
+
+            //THEN
+            assertErrors("Invalid email pattern");
+        }
     }
 
     private void assertErrors(String message) {
