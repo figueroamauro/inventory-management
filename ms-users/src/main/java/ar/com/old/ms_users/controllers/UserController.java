@@ -5,6 +5,7 @@ import ar.com.old.ms_users.dto.UserResponseDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
 import ar.com.old.ms_users.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -41,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO dto) {
+    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO dto) {
         User user = userService.create(dto);
         return ResponseEntity.created(
                         URI.create("/api/users/" + user.getId()))
@@ -49,7 +50,7 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<UserResponseDTO> update(@RequestBody UserRequestDTO dto) {
+    public ResponseEntity<UserResponseDTO> update(@Valid @RequestBody UserRequestDTO dto) {
         User user = userService.update(dto);
         return ResponseEntity.ok(mapper.toDto(user));
 

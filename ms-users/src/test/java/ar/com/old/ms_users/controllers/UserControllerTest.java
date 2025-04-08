@@ -47,7 +47,7 @@ class UserControllerTest {
     @BeforeEach
     void init() {
         user = new User(1L, "test", "123123", "test@mail.com");
-        requestDTO = new UserRequestDTO(1L, "test", "123123", "test@mail.com");
+        requestDTO = new UserRequestDTO(1L, "test", "password123", "test@mail.com");
     }
 
     @Nested
