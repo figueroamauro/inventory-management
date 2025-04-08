@@ -14,9 +14,13 @@ public record UserRequestDTO(
 
         @NotBlank(message = "Password can not be blank")
         @Size(min = 8, max = 30, message = "Password must be between 8 and 30 characters long")
+        @Pattern(regexp = PASSWORD_PATTERN,
+                message = "Invalid password pattern. Must contain 1 number, 1 letter and without whitespaces")
         String password,
 
         String email
 ) {
     private static final String USERNAME_PATTERN = "^[a-zA-Z0-9_]+$";
+    private static final String PASSWORD_PATTERN = "^(?=.*[a-zA-Z])(?=.*\\d)[^\\s;]+$";
+
 }

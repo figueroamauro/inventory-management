@@ -22,7 +22,7 @@ class UserRequestDTOTest {
     private static final String TOO_LONG_30 = "AAAAABBBBBCCCCCDDDDDEEEEEFFFFFG";
     private static final String CORRECT_PASS = "pass1234";
     private static final String CORRECT_EMAIL = "test@mail.com";
-    private static final String CORRECT_USERNAME = "test";
+    private static final String CORRECT_USERNAME = "test_01";
 
     private Validator validator;
     private UserRequestDTO dto;
@@ -79,8 +79,8 @@ class UserRequestDTOTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"j oh", "  test", "john doe", "johndoe "})
-        void shouldThrowException_whenUserNameContainsWhiteSpaces(String username) {
+        @ValueSource(strings = {"j oh", "  t@est", "john doe", "johndoe ","|@#~½~#¬ŧ"})
+        void shouldThrowException_whenUserNameHasInvalidPattern(String username) {
             //GIVEN
             dto = new UserRequestDTO(1L, username, CORRECT_PASS, CORRECT_EMAIL);
 
@@ -119,6 +119,19 @@ class UserRequestDTOTest {
 
             //THEN
             assertErrors("Password must be between 8 and 30 characters long");
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"pass;123", " pass123", "..pass@.com","","   ", "1.aaaPASS;"})
+        void shouldThrowException_whenPasswordHasInvalidPattern(String password) {
+            //GIVEN
+            dto = new UserRequestDTO(1L, CORRECT_USERNAME, password, CORRECT_EMAIL);
+
+            //WHEN
+            validateDTO(dto);
+
+            //THEN
+            assertErrors("Invalid password pattern. Must contain 1 number, 1 letter and without whitespaces");
         }
     }
 
