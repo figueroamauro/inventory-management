@@ -49,7 +49,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(UserUpdateRequestDTO dto) {
-        requireIdValidation(dto.id());
         User user = userRepository.findByIdAndEnabledTrue(dto.id())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -79,9 +78,4 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private static void requireIdValidation(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Id can not be null");
-        }
-    }
 }
