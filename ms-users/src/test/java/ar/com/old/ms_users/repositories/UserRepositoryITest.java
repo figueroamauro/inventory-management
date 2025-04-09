@@ -66,4 +66,16 @@ class UserRepositoryITest {
         //THEN;
         //View dataset users-deleted-logic.json
     }
+
+    @Test
+    void shouldFindByUserName_whenIsEnabled(){
+        //WHEN
+        Optional<User> foundUser = userRepository.findByUserNameAndEnabledTrue("test1");
+
+        //THEN
+        //View dataset users.json
+        assertTrue(foundUser.isPresent());
+        assertEquals("test1@mail.com", foundUser.get().getEmail());
+
+    }
 }
