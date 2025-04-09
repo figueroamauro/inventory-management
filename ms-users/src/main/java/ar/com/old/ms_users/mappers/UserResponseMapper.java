@@ -12,8 +12,4 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 public interface UserResponseMapper {
     UserResponseDTO toDto(User user);
 
-    User toEntity(UserResponseDTO dto);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateUserFromDto(UserUpdateRequestDTO dto, @MappingTarget User user);
 }

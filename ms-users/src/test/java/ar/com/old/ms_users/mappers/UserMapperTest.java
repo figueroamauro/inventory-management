@@ -87,6 +87,7 @@ class UserMapperTest {
             assertEquals("test", result.userName());
             assertEquals("test@mail.com",result.email());
         }
+
     }
 
 }
