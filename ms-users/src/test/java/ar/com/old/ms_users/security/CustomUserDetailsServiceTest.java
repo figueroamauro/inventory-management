@@ -1,9 +1,11 @@
 package ar.com.old.ms_users.security;
 
 import ar.com.old.ms_users.entities.User;
+import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -36,6 +38,20 @@ class CustomUserDetailsServiceTest {
         assertNotNull(userDetails);
         assertEquals(userName, userDetails.getUsername());
         assertEquals("pass1234", userDetails.getPassword());
+    }
+
+    @Test
+    void shouldThrowExceptionFetchingUser_whenUserNotFound(){
+        //GIVEN
+        when(repository.findByUserNameAndEnabledTrue("test"))
+                .thenThrow(new UserNotFoundException("User not found"));
+
+        //WHEN
+        Executable executable = () -> userDetailsService.loadUserByUsername("test");
+
+        //THEN
+        UserNotFoundException e = assertThrows(UserNotFoundException.class, executable);
+        assertEquals("User not found", e.getMessage());
     }
 
 }
