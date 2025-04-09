@@ -34,6 +34,22 @@ class UserMapperTest {
             assertEquals("test@mail.com", result.email());
         }
 
+        @Test
+        void shouldMapToUser(){
+            //GIVEN
+            UserRequestDTO userRequestDTO = new UserRequestDTO(1L, "test", "pass1234", "test@mail.com");
+
+            //WHEN
+            User result = userRequestMapper.toEntity(userRequestDTO);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals(1L, result.getId());
+            assertEquals("test", result.getUserName());
+            assertEquals("pass1234", result.getPassword());
+            assertEquals("test@mail.com", result.getEmail());
+        }
+
     }
 
 }
