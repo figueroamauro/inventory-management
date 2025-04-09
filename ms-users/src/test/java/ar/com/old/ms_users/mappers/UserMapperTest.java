@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class UserMapperTest {
 
     private final UserRequestMapper userRequestMapper = Mappers.getMapper(UserRequestMapper.class);
-    private final UserUpdateRequestMapper userUpdateRequestMapper = Mappers.getMapper(UserUpdateRequestMapper.class);
 
     @Nested
     class RequestMapper {
@@ -52,42 +51,23 @@ class UserMapperTest {
             assertEquals("test@mail.com", result.getEmail());
         }
 
-        @Nested
-        class UpdateRequestMapper {
+        @Test
+        void shouldMapToUserUpdating(){
+            //GIVEN
+            UserUpdateRequestDTO userRequestDTO = new UserUpdateRequestDTO(1L, "newTest", "newEmail@mail.com");
 
-            @Test
-            void shouldMapToDTO(){
-                //GIVEN
-                User user = new User(1L, "test", "pass1234", "test@mail.com");
+            //WHEN
+            User result = new User(1L, "test", "pass1234", "test@mail.com");
+            userRequestMapper.updateUserFromDto(userRequestDTO, result);
 
-                //WHEN
-                UserUpdateRequestDTO result = userUpdateRequestMapper.toDto(user);
-
-                //THEN
-                assertNotNull(result);
-                assertEquals(1L, result.id());
-                assertEquals("test", result.userName());
-                assertEquals("test@mail.com", result.email());
-            }
-
-            @Test
-            void shouldMapToUser(){
-                //GIVEN
-                UserUpdateRequestDTO userRequestDTO = new UserUpdateRequestDTO(1L, "test", "test@mail.com");
-
-                //WHEN
-                User result = new User(1L, "test", "pass1234", "test@mail.com");
-                userUpdateRequestMapper.updateUserFromDto(userRequestDTO, result);
-
-                //THEN
-                assertNotNull(result);
-                assertEquals(1L, result.getId());
-                assertEquals("test", result.getUserName());
-                assertEquals("pass1234", result.getPassword());
-                assertEquals("test@mail.com", result.getEmail());
-            }
-
+            //THEN
+            assertNotNull(result);
+            assertEquals(1L, result.getId());
+            assertEquals("newTest", result.getUserName());
+            assertEquals("pass1234", result.getPassword());
+            assertEquals("newEmail@mail.com", result.getEmail());
         }
+
 
     }
 

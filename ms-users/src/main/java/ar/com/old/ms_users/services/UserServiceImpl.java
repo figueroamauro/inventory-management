@@ -6,7 +6,6 @@ import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
-import ar.com.old.ms_users.mappers.UserUpdateRequestMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +17,10 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserRequestMapper mapper;
-    private final UserUpdateRequestMapper updateRequestMapper;
 
-    public UserServiceImpl(UserRepository userRepository, UserRequestMapper mapper, UserUpdateRequestMapper updateRequestMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserRequestMapper mapper) {
         this.userRepository = userRepository;
         this.mapper = mapper;
-        this.updateRequestMapper = updateRequestMapper;
     }
 
     @Override
@@ -38,7 +35,7 @@ public class UserServiceImpl implements UserService {
         validateNull(id, "Id can not be null");
 
         return userRepository.findByIdAndEnabledTrue(id)
-                .orElseThrow(()-> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Override
@@ -57,7 +54,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Role role = user.getRole();
-        user = updateRequestMapper.toEntity(dto);
+        mapper.updateUserFromDto(dto, user);
         user.setRole(role);
 
         return userRepository.save(user);
@@ -69,7 +66,7 @@ public class UserServiceImpl implements UserService {
     public void delete(Long id) {
         validateNull(id, "Id can not be null");
         userRepository.findByIdAndEnabledTrue(id)
-                .orElseThrow(()-> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         userRepository.deleteLogicById(id);
 

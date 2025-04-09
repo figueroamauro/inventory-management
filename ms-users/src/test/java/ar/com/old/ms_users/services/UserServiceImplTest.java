@@ -6,7 +6,6 @@ import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
-import ar.com.old.ms_users.mappers.UserUpdateRequestMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -43,8 +42,6 @@ class UserServiceImplTest {
     private UserRepository userRepository;
     @Mock
     private UserRequestMapper mapper;
-    @Mock
-    UserUpdateRequestMapper updateRequestMapper;
 
 
     @BeforeEach
@@ -192,7 +189,6 @@ class UserServiceImplTest {
             //GIVEN
             userWithId.setRole(Role.USER);
             when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.ofNullable(userWithId));
-            when(updateRequestMapper.toEntity(updateRequestDTO)).thenReturn(userWithId);
             when(userRepository.save(any(User.class))).thenReturn(userWithId);
 
             //WHEN
