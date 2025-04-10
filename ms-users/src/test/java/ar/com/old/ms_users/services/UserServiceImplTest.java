@@ -172,7 +172,6 @@ class UserServiceImplTest {
         void shouldThrowExceptionCreatingUser_whenEmailAlreadyExists() {
             //GIVEN
 
-
             //WHEN
 
 

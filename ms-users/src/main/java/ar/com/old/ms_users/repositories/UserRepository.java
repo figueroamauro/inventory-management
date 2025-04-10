@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("UPDATE User u SET u.enabled = false WHERE u.id = :id")
     void deleteLogicById(Long id);
+
+    Optional<User> findByEmailAndEnabledTrue(String email);
 }

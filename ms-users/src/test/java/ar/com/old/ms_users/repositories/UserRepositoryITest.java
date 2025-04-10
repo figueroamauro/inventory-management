@@ -78,4 +78,14 @@ class UserRepositoryITest {
         assertEquals("test1@mail.com", foundUser.get().getEmail());
 
     }
+
+    @Test
+    void shouldFindByEmail_whenIsEnabled(){
+        //WHEN
+        Optional<User> foundUser = userRepository.findByEmailAndEnabledTrue("test1@mail.com");
+
+        //THEN
+        assertTrue(foundUser.isPresent());
+        assertEquals("test1@mail.com",foundUser.get().getEmail());
+    }
 }

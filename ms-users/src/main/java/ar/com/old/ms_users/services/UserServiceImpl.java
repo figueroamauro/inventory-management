@@ -71,7 +71,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
     private static void validateNull(Object obj, String errorMessage) {
         if (obj == null) {
             throw new IllegalArgumentException(errorMessage);
