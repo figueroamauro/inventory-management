@@ -4,7 +4,6 @@ import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
-import ar.com.old.ms_users.exceptions.EmailAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
@@ -136,7 +135,7 @@ class UserServiceImplTest {
     class CreateTest {
 
         @Test
-        void shouldCreateAndReturnAnUser() {
+        void shouldCreateAndReturnUser() {
             //GIVEN
             when(mapper.toEntity(dto)).thenReturn(user);
 
@@ -182,6 +181,16 @@ class UserServiceImplTest {
             UserAlreadyExistException e = assertThrows(UserAlreadyExistException.class, executable);
             assertEquals("User already exist", e.getMessage());
         }
+
+        @Test
+        void shouldThrowExceptionCreatingUser_whenDtoIsNull(){
+            //WHEN
+            Executable executable = () -> userService.create(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("DTO can not be null", e.getMessage());
+        }
     }
 
     @Nested
@@ -215,6 +224,16 @@ class UserServiceImplTest {
             assertEquals("User not found", e.getMessage());
 
             verify(userRepository, never()).save(any(User.class));
+        }
+
+        @Test
+        void shouldThrowExceptionUpdatingUser_whenDtoIsNull(){
+            //WHEN
+            Executable executable = () -> userService.update(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("DTO can not be null", e.getMessage());
         }
     }
 

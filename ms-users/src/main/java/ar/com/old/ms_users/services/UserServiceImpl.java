@@ -43,6 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(UserRequestDTO dto) {
+        validateNull(dto,"DTO can not be null");
         Optional<User> foundUser = userRepository.findByEmailAndEnabledTrue(dto.email());
         if (foundUser.isPresent()) {
             throw new UserAlreadyExistException("User already exist");
@@ -56,6 +57,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(UserUpdateRequestDTO dto) {
+        validateNull(dto,"DTO can not be null");
         User user = userRepository.findByIdAndEnabledTrue(dto.id())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
