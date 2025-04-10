@@ -4,6 +4,8 @@ import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
+import ar.com.old.ms_users.exceptions.EmailAlreadyExistException;
+import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
@@ -171,12 +173,14 @@ class UserServiceImplTest {
         @Test
         void shouldThrowExceptionCreatingUser_whenEmailAlreadyExists() {
             //GIVEN
+            when(userRepository.findByEmailAndEnabledTrue("test@mail.com")).thenReturn(Optional.ofNullable(userWithId));
 
             //WHEN
-
+            Executable executable = () -> userService.create(dto);
 
             //THEN
-
+            UserAlreadyExistException e = assertThrows(UserAlreadyExistException.class, executable);
+            assertEquals("User already exist", e.getMessage());
         }
     }
 

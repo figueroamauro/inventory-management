@@ -4,12 +4,15 @@ import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
+import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 
 @Service
@@ -40,6 +43,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(UserRequestDTO dto) {
+        Optional<User> foundUser = userRepository.findByEmailAndEnabledTrue(dto.email());
+        if (foundUser.isPresent()) {
+            throw new UserAlreadyExistException("User already exist");
+        }
         User user = mapper.toEntity(dto);
         user.setId(null);
         user.setRole(Role.USER);
