@@ -172,7 +172,7 @@ class UserServiceImplTest {
         @Test
         void shouldThrowExceptionCreatingUser_whenEmailOrUserNameAlreadyExists() {
             //GIVEN
-            when(userRepository.findByEmailAndUserNameAndEnabledTrue("test@mail.com", "test")).thenReturn(Optional.ofNullable(userWithId));
+            when(userRepository.findByEmailOrUserNameAndEnabledTrue("test@mail.com", "test")).thenReturn(Optional.ofNullable(userWithId));
 
             //WHEN
             Executable executable = () -> userService.create(dto);

@@ -19,9 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUserNameAndEnabledTrue(String userName);
 
+    Optional<User> findByEmailAndEnabledTrue(String email);
+
     @Modifying
     @Query("UPDATE User u SET u.enabled = false WHERE u.id = :id")
     void deleteLogicById(Long id);
 
-    Optional<User> findByEmailAndUserNameAndEnabledTrue(String email, String userName);
+    Optional<User> findByEmailOrUserNameAndEnabledTrue(String email, String userName);
 }

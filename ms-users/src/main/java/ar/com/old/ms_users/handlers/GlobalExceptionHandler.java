@@ -1,5 +1,7 @@
 package ar.com.old.ms_users.handlers;
 
+import ar.com.old.ms_users.exceptions.ChangeUserNameException;
+import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class})
+    @ExceptionHandler({
+            IllegalArgumentException.class,
+            UserAlreadyExistException.class,
+            ChangeUserNameException.class
+    })
     public ResponseEntity<Map<String, Object>> handleBadRequestException(Exception ex) {
         Map<String, Object> response = new HashMap<>();
         response.put("error", ex.getMessage());
