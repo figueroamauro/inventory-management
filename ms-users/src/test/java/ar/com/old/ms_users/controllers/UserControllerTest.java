@@ -8,6 +8,7 @@ import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
 import ar.com.old.ms_users.security.SecurityConfig;
 import ar.com.old.ms_users.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,6 +57,22 @@ class UserControllerTest {
         requestDTO = new UserRequestDTO(1L, "test", "password123", "test@mail.com");
         requestUpdateDTO = new UserUpdateRequestDTO(1L, "test", "test@mail.com");
     }
+
+    @Test
+    void shouldThrowException_whenHasInvalidFields_status400() throws Exception {
+        //GIVEN
+        requestDTO = new UserRequestDTO(1L, "bad name", "pas1231232,", "email@@mail.com");
+
+        //WHEN
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+
+                //THEN
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").isNotEmpty());
+    }
+
 
     @Nested
     class FindAllTest {
