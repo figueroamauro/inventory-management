@@ -71,6 +71,17 @@ class UserMapperTest {
             assertEquals("newEmail@mail.com", result.getEmail());
         }
 
+        @Test
+        void shouldReturnNull_whenInputIsNull(){
+            //WHEN
+            UserRequestDTO result1 = userRequestMapper.toDto(null);
+            User result2 = userRequestMapper.toEntity(null);
+
+            //THEN
+            assertNull(result1);
+            assertNull(result2);
+        }
+
     }
 
     @Nested
