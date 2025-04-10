@@ -32,7 +32,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAllByEnabledTrue(pageable);
     }
 
-
     @Override
     public User findOne(Long id) {
         validateNull(id, "Id can not be null");

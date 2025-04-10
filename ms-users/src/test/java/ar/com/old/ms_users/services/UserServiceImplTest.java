@@ -4,6 +4,7 @@ import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
+import ar.com.old.ms_users.exceptions.ChangeUserNameException;
 import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
@@ -235,6 +236,19 @@ class UserServiceImplTest {
             IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
             assertEquals("DTO can not be null", e.getMessage());
         }
+
+        @Test
+        void shouldThrowExceptionUpdatingUser_whenUserNameIsDifferent(){
+            UserUpdateRequestDTO updateDTO = new UserUpdateRequestDTO(1L, "anotherUsername", "mail@mail.com");
+            when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.ofNullable(userWithId));
+
+            //WHEN
+            Executable executable = () -> userService.update(updateDTO);
+
+            //THEN
+            ChangeUserNameException e = assertThrows(ChangeUserNameException.class, executable);
+            assertEquals("Username can not be changed", e.getMessage());
+        }
     }
 
     @Nested
@@ -276,5 +290,7 @@ class UserServiceImplTest {
 
             verify(userRepository, never()).delete(any(User.class));
         }
+
+
     }
 }
