@@ -26,7 +26,7 @@ class UserMapperTest {
     class RequestMapper {
 
         @Test
-        void shouldMapToDTO(){
+        void shouldMapToDTO() {
             //WHEN
             UserRequestDTO result = userRequestMapper.toDto(user);
 
@@ -39,7 +39,7 @@ class UserMapperTest {
         }
 
         @Test
-        void shouldMapToUser(){
+        void shouldMapToUser() {
             //GIVEN
             UserRequestDTO userRequestDTO = new UserRequestDTO(1L, "test", "pass1234", "test@mail.com");
 
@@ -55,7 +55,7 @@ class UserMapperTest {
         }
 
         @Test
-        void shouldMapToUserUpdating(){
+        void shouldMapToUserUpdating() {
             //GIVEN
             UserUpdateRequestDTO userRequestDTO = new UserUpdateRequestDTO(1L, "newTest", "newEmail@mail.com");
 
@@ -72,7 +72,7 @@ class UserMapperTest {
         }
 
         @Test
-        void shouldReturnNull_whenInputIsNull(){
+        void shouldReturnNull_whenInputIsNull() {
             //WHEN
             UserRequestDTO result1 = userRequestMapper.toDto(null);
             User result2 = userRequestMapper.toEntity(null);
@@ -82,13 +82,35 @@ class UserMapperTest {
             assertNull(result2);
         }
 
+        @Test
+        void shouldUpdateOnlyNotNullInputs() {
+            //GIVEN
+            UserUpdateRequestDTO dto1 = new UserUpdateRequestDTO(null, "newTest", "newEmail@mail.com");
+            UserUpdateRequestDTO dto2 = new UserUpdateRequestDTO(1L, null, null);
+            user = new User(2L, "test", "pass1234", "email@mail.com");
+            User user2 = new User(3L, "test2", "pass1234", "email2@mail.com");
+
+            //WHEN
+            userRequestMapper.updateUserFromDto(dto1, user);
+            userRequestMapper.updateUserFromDto(dto2, user2);
+
+            //THEN
+            assertEquals(2L, user.getId());
+            assertEquals("newTest", user.getUserName());
+            assertEquals("newEmail@mail.com", user.getEmail());
+
+            assertEquals(1L, user2.getId());
+            assertEquals("test2", user2.getUserName());
+            assertEquals("email2@mail.com", user2.getEmail());
+        }
+
     }
 
     @Nested
     class ResponseMapper {
 
         @Test
-        void shouldMapToDto(){
+        void shouldMapToDto() {
             //WHEN
             UserResponseDTO result = userResponseMapper.toDto(user);
 
@@ -96,7 +118,7 @@ class UserMapperTest {
             assertNotNull(result);
             assertEquals(1L, result.id());
             assertEquals("test", result.userName());
-            assertEquals("test@mail.com",result.email());
+            assertEquals("test@mail.com", result.email());
         }
 
     }
