@@ -44,9 +44,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User create(UserRequestDTO dto) {
         validateNull(dto,"DTO can not be null");
-        Optional<User> foundUser = userRepository.findByEmailAndEnabledTrue(dto.email());
+        Optional<User> foundUser = userRepository.findByEmailAndUserNameAndEnabledTrue(dto.email(), dto.userName());
         if (foundUser.isPresent()) {
-            throw new UserAlreadyExistException("User already exist");
+            throw new UserAlreadyExistException("Username or email already exist");
         }
         User user = mapper.toEntity(dto);
         user.setId(null);

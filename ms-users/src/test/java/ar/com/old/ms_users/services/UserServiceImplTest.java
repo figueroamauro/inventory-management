@@ -170,16 +170,16 @@ class UserServiceImplTest {
         }
 
         @Test
-        void shouldThrowExceptionCreatingUser_whenEmailAlreadyExists() {
+        void shouldThrowExceptionCreatingUser_whenEmailOrUserNameAlreadyExists() {
             //GIVEN
-            when(userRepository.findByEmailAndEnabledTrue("test@mail.com")).thenReturn(Optional.ofNullable(userWithId));
+            when(userRepository.findByEmailAndUserNameAndEnabledTrue("test@mail.com", "test")).thenReturn(Optional.ofNullable(userWithId));
 
             //WHEN
             Executable executable = () -> userService.create(dto);
 
             //THEN
             UserAlreadyExistException e = assertThrows(UserAlreadyExistException.class, executable);
-            assertEquals("User already exist", e.getMessage());
+            assertEquals("Username or email already exist", e.getMessage());
         }
 
         @Test
