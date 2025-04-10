@@ -5,6 +5,7 @@ import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.ChangeUserNameException;
+import ar.com.old.ms_users.exceptions.EmailAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
@@ -102,7 +103,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> userFound = userRepository.findByEmailAndEnabledTrue(dto.email());
         if (userFound.isPresent()) {
             if (!userFound.get().getEmail().equals(user.getEmail())) {
-                throw new UserAlreadyExistException("Email already exist");
+                throw new EmailAlreadyExistException("Email already exist");
             }
         }
     }

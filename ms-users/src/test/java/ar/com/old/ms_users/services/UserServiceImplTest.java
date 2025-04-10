@@ -5,6 +5,7 @@ import ar.com.old.ms_users.enumerations.Role;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.ChangeUserNameException;
+import ar.com.old.ms_users.exceptions.EmailAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserRequestMapper;
@@ -238,7 +239,8 @@ class UserServiceImplTest {
         }
 
         @Test
-        void shouldThrowExceptionUpdatingUser_whenUserNameIsDifferent(){
+        void shouldThrowExceptionUpdatingUser_whenUserNameAlreadyExist(){
+            //GIVEN
             UserUpdateRequestDTO updateDTO = new UserUpdateRequestDTO(1L, "anotherUsername", "mail@mail.com");
             when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.ofNullable(userWithId));
 
@@ -248,6 +250,21 @@ class UserServiceImplTest {
             //THEN
             ChangeUserNameException e = assertThrows(ChangeUserNameException.class, executable);
             assertEquals("Username can not be changed", e.getMessage());
+        }
+
+        @Test
+        void shouldThrowExceptionUpdatingUser_whenEmailAlreadyExist(){
+            //GIVEN
+            when(userRepository.findByIdAndEnabledTrue(1L)).thenReturn(Optional.ofNullable(userWithId));
+            when(userRepository.findByEmailAndEnabledTrue("test@mail.com"))
+                    .thenReturn(Optional.of(new User(2L, "test", "pass1234", "anotherEmail@mail.com")));
+
+            //WHEN
+            Executable executable = () -> userService.update(updateRequestDTO);
+
+            //THEN
+            EmailAlreadyExistException e = assertThrows(EmailAlreadyExistException.class, executable);
+            assertEquals("Email already exist", e.getMessage());
         }
     }
 
