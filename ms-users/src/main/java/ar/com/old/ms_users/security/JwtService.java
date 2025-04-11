@@ -30,6 +30,15 @@ public class JwtService {
         return buildClaims(token, key).getSubject();
     }
 
+    public boolean isExpired(String token, SecretKey key) {
+        return buildClaims(token, key).getExpiration().before(new Date());
+    }
+
+    public boolean isExpired(String token) {
+        return isExpired(token, SECRET_KEY);
+    }
+
+
     private static Claims buildClaims(String token, SecretKey key) {
         try {
             return Jwts.parserBuilder()
@@ -50,5 +59,6 @@ public class JwtService {
     public String getSubject(String token) {
         return getSubject(token, SECRET_KEY);
     }
+
 
 }

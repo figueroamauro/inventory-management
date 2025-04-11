@@ -57,7 +57,22 @@ class JwtServiceTest {
         //THEN
         assertNotNull(result);
         assertEquals("username", result);
+    }
 
+    @Test
+    void shouldVerifyExpiredToken(){
+        //GIVEN
+        String expiredToken = jwtService.generateToken(userDetails, -1L, SECRET_KEY);
+        String validToken = jwtService.generateToken(userDetails);
+
+        //WHEN
+        boolean valid = jwtService.isExpired(validToken);
+        Executable executable = ()-> jwtService.isExpired(expiredToken, SECRET_KEY);
+
+        //THEN
+        JwtException e = assertThrows(JwtException.class, executable);
+        assertEquals("Expired token", e.getMessage());
+        assertFalse(valid);
     }
 
     @Test
