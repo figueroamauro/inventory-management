@@ -10,6 +10,7 @@ import java.util.Date;
 
 @Service
 public class JwtService {
+
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     private static final long EXPIRATION_TIME = 3600000;
 
@@ -28,6 +29,10 @@ public class JwtService {
 
     public String getSubject(String token, SecretKey key) {
         return buildClaims(token, key).getSubject();
+    }
+
+    public String getSubject(String token) {
+        return getSubject(token, SECRET_KEY);
     }
 
     public boolean isExpired(String token, SecretKey key) {
@@ -59,11 +64,6 @@ public class JwtService {
             throw new JwtException("Invalid token", e);
         }
     }
-
-    public String getSubject(String token) {
-        return getSubject(token, SECRET_KEY);
-    }
-
 
 
 }
