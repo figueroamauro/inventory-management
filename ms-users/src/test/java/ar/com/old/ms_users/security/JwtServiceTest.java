@@ -87,5 +87,18 @@ class JwtServiceTest {
         assertEquals("Invalid token signature", e.getMessage());
     }
 
+    @Test
+    void shouldThrowException_whenTokenHasInvalidToken() {
+        //GIVEN
+        String invalidToken = "invalid token";
+
+        //WHEN
+        Executable executable = () -> jwtService.getSubject(invalidToken,SECRET_KEY);
+
+        //THEN
+        JwtException e = assertThrows(JwtException.class, executable);
+        assertEquals("Invalid token", e.getMessage());
+    }
+
 
 }
