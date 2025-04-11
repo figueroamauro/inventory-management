@@ -11,7 +11,7 @@ import java.util.Date;
 @Service
 public class JwtService {
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION_TIME = 36000000;
+    private static final long EXPIRATION_TIME = 3600000;
 
     public String generateToken(CustomUserDetails userDetails, long expiration, SecretKey key) {
         return Jwts.builder()
@@ -38,6 +38,10 @@ public class JwtService {
         return isExpired(token, SECRET_KEY);
     }
 
+    public boolean isValid(String validToken, CustomUserDetails userDetails) {
+        return !isExpired(validToken) && getSubject(validToken).equals(userDetails.getUsername());
+    }
+
 
     private static Claims buildClaims(String token, SecretKey key) {
         try {
@@ -59,6 +63,7 @@ public class JwtService {
     public String getSubject(String token) {
         return getSubject(token, SECRET_KEY);
     }
+
 
 
 }

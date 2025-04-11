@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class JwtServiceTest {
 
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION_TIME = 36000000;
+    private static final long EXPIRATION_TIME = 36000000; //1h
 
     @Autowired
     private JwtService jwtService;
@@ -73,6 +73,18 @@ class JwtServiceTest {
         JwtException e = assertThrows(JwtException.class, executable);
         assertEquals("Expired token", e.getMessage());
         assertFalse(valid);
+    }
+
+    @Test
+    void shouldVerifyValidToken(){
+        //GIVEN
+        String validToken = jwtService.generateToken(userDetails);
+
+        //WHEN
+        boolean valid = jwtService.isValid(validToken, userDetails);
+
+        //THEN
+        assertTrue(valid);
     }
 
     @Test
