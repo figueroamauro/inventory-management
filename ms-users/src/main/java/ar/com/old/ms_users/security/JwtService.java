@@ -1,9 +1,8 @@
 package ar.com.old.ms_users.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -28,12 +27,20 @@ public class JwtService {
     }
 
     public String getSubject(String token, SecretKey key) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+        return buildClaims(token, key).getSubject();
+    }
+
+    private static Claims buildClaims(String token, SecretKey key) {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+        } catch (ExpiredJwtException e) {
+            throw new JwtException("Expired token", e);
+        }
     }
 
     public String getSubject(String token) {

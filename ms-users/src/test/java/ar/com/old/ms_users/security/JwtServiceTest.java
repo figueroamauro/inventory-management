@@ -1,9 +1,11 @@
 package ar.com.old.ms_users.security;
 
 import ar.com.old.ms_users.entities.User;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -50,5 +52,20 @@ class JwtServiceTest {
         assertNotNull(result);
         assertEquals("username", result);
 
+    }
+
+    @Test
+    void shouldThrowException_whenTokenIsExpired() {
+        //GIVEN
+        User user = new User(1L, "username", "pass1234", "test@mail.com");
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        String tokenMock = jwtService.generateToken(userDetails, -1L, SECRET_KEY);
+
+        //WHEN
+        Executable executable = () -> jwtService.getSubject(tokenMock, SECRET_KEY);
+
+        //THEN
+        JwtException e = assertThrows(JwtException.class, executable);
+        assertEquals("Expired token", e.getMessage());
     }
 }
