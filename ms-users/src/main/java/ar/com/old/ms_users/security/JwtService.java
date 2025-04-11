@@ -40,6 +40,8 @@ public class JwtService {
 
         } catch (ExpiredJwtException e) {
             throw new JwtException("Expired token", e);
+        } catch (SignatureException e) {
+            throw new JwtException("Invalid token signature", e);
         }
     }
 
