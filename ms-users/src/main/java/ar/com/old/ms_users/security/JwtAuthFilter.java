@@ -1,5 +1,6 @@
 package ar.com.old.ms_users.security;
 
+import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -51,6 +52,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             } catch (JwtException e) {
                 sendError(response, e.getMessage());
+            } catch (UserNotFoundException e) {
+                sendError(response, "Invalid token");
             }
         }
 
