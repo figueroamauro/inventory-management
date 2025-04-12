@@ -3,6 +3,7 @@ package ar.com.old.ms_users.security;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -27,13 +28,15 @@ public class JwtService {
         return generateToken(userDetails, EXPIRATION_TIME, SECRET_KEY);
     }
 
+    public String getSubject(String token) {
+        return getSubject(token, SECRET_KEY);
+    }
+
     public String getSubject(String token, SecretKey key) {
         return buildClaims(token, key).getSubject();
     }
 
-    public String getSubject(String token) {
-        return getSubject(token, SECRET_KEY);
-    }
+
 
     public boolean isExpired(String token, SecretKey key) {
         return buildClaims(token, key).getExpiration().before(new Date());
@@ -43,7 +46,7 @@ public class JwtService {
         return isExpired(token, SECRET_KEY);
     }
 
-    public boolean isValid(String validToken, CustomUserDetails userDetails) {
+    public boolean isValid(String validToken, UserDetails userDetails) {
         return !isExpired(validToken) && getSubject(validToken).equals(userDetails.getUsername());
     }
 
