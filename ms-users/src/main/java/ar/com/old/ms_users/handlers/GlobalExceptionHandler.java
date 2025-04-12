@@ -5,6 +5,7 @@ import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -28,7 +29,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
             IllegalArgumentException.class,
             UserAlreadyExistException.class,
-            ChangeUserNameException.class
+            ChangeUserNameException.class,
+            BadCredentialsException.class
     })
     public ResponseEntity<Map<String, Object>> handleBadRequestException(Exception ex) {
         Map<String, Object> response = new HashMap<>();

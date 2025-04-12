@@ -10,6 +10,7 @@ import ar.com.old.ms_users.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -63,7 +64,12 @@ public class AuthController {
 
 
     private Authentication authenticate(Authentication loginAuthentication) {
-        return authenticationManager.authenticate(loginAuthentication);
+        try {
+            return authenticationManager.authenticate(loginAuthentication);
+
+        } catch (Exception e) {
+            throw new BadCredentialsException("Bad credentials");
+        }
     }
 
     private static CustomUserDetails getUserDetails(Authentication authentication) {
