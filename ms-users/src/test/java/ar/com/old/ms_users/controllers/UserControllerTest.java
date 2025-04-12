@@ -58,21 +58,6 @@ class UserControllerTest {
         requestUpdateDTO = new UserUpdateRequestDTO(1L, "test", "test@mail.com");
     }
 
-    @Test
-    void shouldThrowException_whenHasInvalidFields_status400() throws Exception {
-        //GIVEN
-        requestDTO = new UserRequestDTO(1L, "bad name", "pas1231232,", "email@@mail.com");
-
-        //WHEN
-        mockMvc.perform(post("/api/users")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDTO)))
-
-                //THEN
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").isNotEmpty());
-    }
-
 
     @Nested
     class FindAllTest {
@@ -138,30 +123,6 @@ class UserControllerTest {
                     .andExpect(jsonPath("$.error").value("User not found"));
 
             verify(userService).findOne(1L);
-        }
-    }
-
-    @Nested
-    class CreateTest {
-
-        @Test
-        void shouldCreateUser_status201() throws Exception {
-            //GIVEN
-            when(userService.create(requestDTO)).thenReturn(new User(1L, "test", "123123", "test@mail.com"));
-            verifyMapToDTOMock();
-
-            //WHEN
-            mockMvc.perform(post("/api/users")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(
-                                    requestDTO)))
-
-                    //THEN
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$").isMap())
-                    .andExpect(jsonPath("$.userName").value("test"));
-
-            verify(userService).create(any(UserRequestDTO.class));
         }
     }
 

@@ -14,7 +14,6 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 
 
 @RestController
@@ -42,15 +41,6 @@ public class UserController {
         User user = userService.findOne(id);
 
         return ResponseEntity.ok(mapper.toDto(user));
-    }
-
-    @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserRequestDTO dto) {
-        User user = userService.create(dto);
-
-        return ResponseEntity.created(
-                        URI.create("/api/users/" + user.getId()))
-                .body(mapper.toDto(user));
     }
 
     @PutMapping
