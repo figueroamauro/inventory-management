@@ -1,5 +1,6 @@
 package ar.com.old.ms_users.security;
 
+import ar.com.old.ms_users.entities.User;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,7 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -37,6 +39,8 @@ class JwtAuthFilterTest {
     private FilterChain filterChain;
     @Mock
     private JwtService jwtService;
+    @Mock
+    private CustomUserDetailsService userDetailsService;
 
     @Test
     void shouldSkipAuthentication_whenHasAuthEndpoint() throws ServletException, IOException {
@@ -72,6 +76,24 @@ class JwtAuthFilterTest {
         when(request.getHeader(AUTHORIZATION)).thenReturn("Bearer xxx");
         when(response.getWriter()).thenReturn(new PrintWriter(Writer.nullWriter()));
         when(jwtService.getSubject(anyString())).thenThrow(new JwtException("test exception"));
+
+        //WHEN
+        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+
+        //THEN
+        verify(response).getWriter();
+        verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldReturnErrorValidatingToken_whenHasInvalidToken() throws ServletException, IOException {
+        //GIVEN
+        when(request.getRequestURI()).thenReturn("/api/test");
+        when(request.getHeader(AUTHORIZATION)).thenReturn("Bearer xxx");
+        when(response.getWriter()).thenReturn(new PrintWriter(Writer.nullWriter()));
+        when(jwtService.getSubject(anyString())).thenReturn("username");
+        when(userDetailsService.loadUserByUsername("username")).thenReturn(new CustomUserDetails(new User()));
+        when(jwtService.isValid(anyString(),any(UserDetails.class))).thenThrow(new JwtException("test exception"));
 
         //WHEN
         jwtAuthFilter.doFilterInternal(request, response, filterChain);

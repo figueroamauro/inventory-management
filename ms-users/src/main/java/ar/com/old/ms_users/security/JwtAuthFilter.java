@@ -36,6 +36,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (token != null) {
             try {
                 String username = jwtService.getSubject(token);
+                UserDetails currentUser = customUserDetailsService.loadUserByUsername(username);
+                boolean isValidToken = jwtService.isValid(token, currentUser);
+
+                if (isValidToken) {
+
+                }
 
             } catch (JwtException e) {
                 sendError(response,e.getMessage());
