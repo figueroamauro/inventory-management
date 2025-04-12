@@ -5,8 +5,11 @@ import ar.com.old.ms_users.dto.UserResponseDTO;
 import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
+import ar.com.old.ms_users.security.CustomUserDetails;
+import ar.com.old.ms_users.security.JwtService;
 import ar.com.old.ms_users.security.SecurityConfig;
 import ar.com.old.ms_users.services.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,13 +37,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(SecurityConfig.class)
 class AuthControllerTest {
 
-
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
     private UserService userService;
     @MockitoBean
     private UserResponseMapper mapper;
+    @MockitoBean
+    AuthenticationManager authenticationManager;
+    @MockitoBean
+    private JwtService jwtService;
+    @MockitoBean
+    Authentication authentication;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     private User user;
     private UserRequestDTO requestDTO;
@@ -81,5 +93,25 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.userName").value("test"));
 
         verify(userService).create(any(UserRequestDTO.class));
+    }
+
+    @Test
+    void shouldLogin_whenHasCorrectCredentials() throws Exception {
+        //GIVEN
+        CustomUserDetails customUserDetails = new CustomUserDetails(user);
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(customUserDetails);
+        when(jwtService.generateToken(customUserDetails)).thenReturn("test-token");
+
+
+        //WHEN
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.token").value("test-token"));
     }
 }
