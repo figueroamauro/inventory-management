@@ -5,12 +5,18 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
+
+    public static final String AUTHORIZATION = "Authorization";
+    public static final String BEARER = "Bearer ";
 
     private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
@@ -40,34 +46,41 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 boolean isValidToken = jwtService.isValid(token, currentUser);
 
                 if (isValidToken) {
-
+                    authenticate(request, token, (CustomUserDetails) currentUser);
                 }
 
             } catch (JwtException e) {
-                sendError(response,e.getMessage());
+                sendError(response, e.getMessage());
             }
-        } else {
-
-        filterChain.doFilter(request,response);
         }
 
+        filterChain.doFilter(request, response);
+    }
+
+    private static boolean isAuthEndpoint(HttpServletRequest request) {
+        return request.getRequestURI().contains("/api/auth");
     }
 
     private String getToken(HttpServletRequest request) {
         if (hasToken(request)) {
-            return request.getHeader("Authorization");
+            return request.getHeader(AUTHORIZATION);
         } else {
             return null;
         }
     }
 
     private boolean hasToken(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        return authHeader != null && authHeader.startsWith("Bearer ");
+        String authHeader = request.getHeader(AUTHORIZATION);
+        return authHeader != null && authHeader.startsWith(BEARER);
     }
 
-    private static boolean isAuthEndpoint(HttpServletRequest request) {
-        return request.getRequestURI().contains("/api/auth");
+    private void authenticate(HttpServletRequest request, String token, CustomUserDetails userDetails) {
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     private void sendError(HttpServletResponse response, String message) throws IOException {
@@ -75,4 +88,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().write("{\"error\": \"" + message + "\"}");
     }
+
 }

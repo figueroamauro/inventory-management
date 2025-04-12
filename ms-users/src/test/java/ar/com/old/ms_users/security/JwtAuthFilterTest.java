@@ -1,6 +1,7 @@
 package ar.com.old.ms_users.security;
 
 import ar.com.old.ms_users.entities.User;
+import ar.com.old.ms_users.enumerations.Role;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,14 +9,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -51,6 +49,8 @@ class JwtAuthFilterTest {
         jwtAuthFilter.doFilterInternal(request,response,filterChain);
 
         //THEN
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+
         verify(filterChain).doFilter(request,response);
     }
 
@@ -81,6 +81,8 @@ class JwtAuthFilterTest {
         jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
         //THEN
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+
         verify(response).getWriter();
         verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
@@ -99,8 +101,32 @@ class JwtAuthFilterTest {
         jwtAuthFilter.doFilterInternal(request, response, filterChain);
 
         //THEN
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+
         verify(response).getWriter();
         verify(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    }
+
+    @Test
+    void shouldAuthenticateUser_whenTokenIsValid() throws ServletException, IOException {
+        //GIVEN
+        User user = new User(1L, "test", "pass1234", "mail@mail.com");
+        user.setRole(Role.USER);
+        CustomUserDetails customUserDetails = new CustomUserDetails(user);
+
+        when(request.getRequestURI()).thenReturn("/api/test");
+        when(request.getHeader(AUTHORIZATION)).thenReturn("Bearer xxx");
+        when(jwtService.getSubject(anyString())).thenReturn("username");
+        when(userDetailsService.loadUserByUsername("username")).thenReturn(customUserDetails);
+        when(jwtService.isValid(anyString(), any(UserDetails.class))).thenReturn(true);
+
+        //WHEN
+        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+
+        //THEN
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
+
+        verify(filterChain).doFilter(request,response);
     }
 
 }
