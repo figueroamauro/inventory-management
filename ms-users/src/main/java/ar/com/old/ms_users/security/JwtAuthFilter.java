@@ -17,8 +17,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (isAuthEndpoint(request)) {
             filterChain.doFilter(request, response);
+            return;
         }
 
+        String token = getToken(request);
+
+        filterChain.doFilter(request,response);
+    }
+
+    private String getToken(HttpServletRequest request) {
+        if (hasToken(request)) {
+            return request.getHeader("Authorization");
+        } else {
+            return null;
+        }
+    }
+
+    private boolean hasToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        return authHeader != null && authHeader.startsWith("Bearer ");
     }
 
     private static boolean isAuthEndpoint(HttpServletRequest request) {

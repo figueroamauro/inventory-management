@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
 
@@ -37,6 +38,21 @@ class JwtAuthFilterTest {
         jwtAuthFilter.doFilterInternal(request,response,filterChain);
 
         //THEN
+        verify(filterChain).doFilter(request,response);
+    }
+
+    @Test
+    void shouldNotAuthenticate_whenTokenIsMissing() throws ServletException, IOException {
+        //GIVEN
+        when(request.getRequestURI()).thenReturn("/api/test");
+        when(request.getHeader("Authorization")).thenReturn(null);
+
+        //WHEN
+        jwtAuthFilter.doFilterInternal(request, response, filterChain);
+
+        //THEN
+        assertNull(SecurityContextHolder.getContext().getAuthentication());
+
         verify(filterChain).doFilter(request,response);
     }
 
