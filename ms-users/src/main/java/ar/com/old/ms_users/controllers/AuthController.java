@@ -1,5 +1,6 @@
 package ar.com.old.ms_users.controllers;
 
+import ar.com.old.ms_users.dto.UserLoginDTO;
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.dto.UserResponseDTO;
 import ar.com.old.ms_users.entities.User;
@@ -49,7 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody UserRequestDTO dto) {
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody UserLoginDTO dto) {
         Authentication loginAuthentication = new UsernamePasswordAuthenticationToken(dto.userName(), dto.password());
         Authentication authentication = authenticate(loginAuthentication);
 
