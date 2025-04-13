@@ -12,6 +12,7 @@ import ar.com.old.ms_users.mappers.UserRequestMapper;
 import ar.com.old.ms_users.repositories.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,10 +22,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserRequestMapper mapper;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, UserRequestMapper mapper) {
+    public UserServiceImpl(UserRepository userRepository, UserRequestMapper mapper, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.mapper = mapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class UserServiceImpl implements UserService {
         User user = mapper.toEntity(dto);
         user.setId(null);
         user.setRole(Role.USER);
-
+        user.setPassword(passwordEncoder.encode(dto.password()));
         return userRepository.save(user);
     }
 
