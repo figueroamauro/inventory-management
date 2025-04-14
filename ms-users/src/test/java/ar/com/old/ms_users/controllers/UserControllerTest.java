@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -108,6 +109,7 @@ class UserControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "USER")
         void shouldReturnErrorFindingById_whenUserNotFound_status404() throws Exception {
             //GIVEN
             when(userService.findOne(1L))
@@ -130,6 +132,7 @@ class UserControllerTest {
     class UpdateTest {
 
         @Test
+        @WithMockUser(roles = "USER")
         void shouldUpdateUser_status200() throws Exception {
             //GIVEN
 
@@ -151,6 +154,7 @@ class UserControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "USER")
         void shouldReturnErrorUpdatingUser_whenIdIsNull_status400() throws Exception {
             //GIVEN
             when(userService.update(requestUpdateDTO))
@@ -171,6 +175,7 @@ class UserControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "USER")
         void shouldReturnErrorUpdatingUser_whenUserNotFound_status400() throws Exception {
             //GIVEN
             when(userService.update(requestUpdateDTO))
@@ -195,6 +200,7 @@ class UserControllerTest {
     class DeleteTest {
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void shouldDeleteUser_status204() throws Exception {
             //WHEN
             mockMvc.perform(delete("/api/users/1")
@@ -207,6 +213,7 @@ class UserControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void shouldReturnErrorDeletingUser_whenNotFound_status404() throws Exception {
             //GIVEN
             doThrow(new UserNotFoundException("User not found")).when(userService).delete(1L);
@@ -224,6 +231,7 @@ class UserControllerTest {
         }
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void shouldReturnErrorDeletingUser_whenIdIsNull_status400() throws Exception {
             //GIVEN
             doThrow(new IllegalArgumentException("Id can not be null")).when(userService).delete(1L);
