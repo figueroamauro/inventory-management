@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -45,6 +46,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User create(UserRequestDTO dto) {
         validateNull(dto,"DTO can not be null");
         validateDuplicatedUserNameOrEmail(dto);
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User update(UserUpdateRequestDTO dto) {
         validateNull(dto,"DTO can not be null");
         User user = findUser(dto);
@@ -69,6 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         validateNull(id, "Id can not be null");
         userRepository.findByIdAndEnabledTrue(id)
