@@ -1,11 +1,15 @@
 package ar.com.old.ms_users;
 
-import org.springframework.boot.SpringApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.test.context.SpringBootTest;
 
+@SpringBootTest
 public class TestMsUsersApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.from(MsUsersApplication::main).with(TestcontainersConfiguration.class).run(args);
+		new SpringApplicationBuilder(MsUsersApplication.class)
+				.profiles("integration")
+				.initializers(new TestcontainersConfiguration())
+				.run(args);
 	}
-
 }
