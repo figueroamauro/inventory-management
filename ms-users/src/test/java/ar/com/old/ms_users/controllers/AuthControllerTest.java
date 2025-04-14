@@ -2,25 +2,19 @@ package ar.com.old.ms_users.controllers;
 
 import ar.com.old.ms_users.dto.UserRequestDTO;
 import ar.com.old.ms_users.dto.UserResponseDTO;
-import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
-import ar.com.old.ms_users.security.CustomUserDetails;
-import ar.com.old.ms_users.security.JwtService;
-import ar.com.old.ms_users.security.SecurityConfig;
+import ar.com.old.ms_users.security.*;
 import ar.com.old.ms_users.services.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -35,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest
 @ActiveProfiles("test")
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, JwtAuthFilter.class})
 class AuthControllerTest {
 
     @Autowired
@@ -50,6 +44,8 @@ class AuthControllerTest {
     private JwtService jwtService;
     @MockitoBean
     Authentication authentication;
+    @MockitoBean
+    CustomUserDetailsService userDetailsService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private User user;

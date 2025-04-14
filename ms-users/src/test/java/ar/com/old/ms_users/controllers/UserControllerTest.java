@@ -6,6 +6,8 @@ import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
+import ar.com.old.ms_users.security.CustomUserDetailsService;
+import ar.com.old.ms_users.security.JwtService;
 import ar.com.old.ms_users.security.SecurityConfig;
 import ar.com.old.ms_users.services.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -47,6 +49,10 @@ class UserControllerTest {
     private UserService userService;
     @MockitoBean
     private UserResponseMapper mapper;
+    @MockitoBean
+    CustomUserDetailsService userDetailsService;
+    @MockitoBean
+    private JwtService jwtService;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private User user;
     private UserRequestDTO requestDTO;
