@@ -54,8 +54,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
             } catch (JwtException e) {
                 sendError(response, e.getMessage());
+                return;
             } catch (UserNotFoundException e) {
                 sendError(response, "Invalid token");
+                return;
             }
         }
 
