@@ -2,10 +2,12 @@ package ar.com.old.ms_products.services;
 
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
+import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CategoryServiceImpl implements CategoryService{
@@ -18,8 +20,11 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public Category create(CategoryDTO dto) {
-        Category category = new Category(dto.id(),dto.name());
+        checkExistingCategory(dto);
+
+        Category category = new Category(dto.id(), dto.name());
         return categoryRepository.save(category);
+
     }
 
     @Override
@@ -35,5 +40,13 @@ public class CategoryServiceImpl implements CategoryService{
     @Override
     public void delete(Long id) {
 
+    }
+
+
+    private void checkExistingCategory(CategoryDTO dto) {
+        Optional<Category> categoryOpt = categoryRepository.findByName(dto.name());
+        if (categoryOpt.isPresent()) {
+            throw new ExistingCategoryException("Category already exist");
+        }
     }
 }

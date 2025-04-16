@@ -2,13 +2,18 @@ package ar.com.old.ms_products.services;
 
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
+import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,13 +24,21 @@ class CategoryServiceTest {
     private CategoryServiceImpl categoryService;
     @Mock
     private CategoryRepository categoryRepository;
+    private Category category;
+    private CategoryDTO dto;
+
+    @BeforeEach
+    void init() {
+        category = new Category(1L, "Electro");
+        dto = new CategoryDTO(null, "Electro");
+    }
 
 
     @Test
     void shouldCreateCategory_whenDTOHasValidParams(){
         //GIVEN
-        CategoryDTO dto = new CategoryDTO(null, "Electro");
-        when(categoryRepository.save(any(Category.class))).thenReturn(new Category(1L, "Electro"));
+        when(categoryRepository.findByName(any())).thenReturn(Optional.empty());
+        when(categoryRepository.save(any(Category.class))).thenReturn(category);
 
         //WHEN
         Category result = categoryService.create(dto);
@@ -36,5 +49,20 @@ class CategoryServiceTest {
         assertEquals("Electro", result.getName());
 
         verify(categoryRepository).save(any(Category.class));
+    }
+
+    @Test
+    void shouldThrowExceptionCreatingCategory_whenNameAlreadyExist(){
+        //GIVEN
+        when(categoryRepository.findByName("Electro")).thenReturn(Optional.of(category));
+
+        //WHEN
+        Executable executable = () -> categoryService.create(dto);
+
+        //THEN
+        ExistingCategoryException e = assertThrows(ExistingCategoryException.class, executable);
+        assertEquals("Category already exist", e.getMessage());
+
+        verify(categoryRepository, never()).save(any());
     }
 }
