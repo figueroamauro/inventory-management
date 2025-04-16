@@ -32,9 +32,19 @@ class CategoryRepositoryTest {
         Optional<Category> result = repository.findByName("Electro");
 
         //THEN
+        //View dataset category.json
         assertTrue(result.isPresent());
         assertEquals("Electro", result.get().getName());
         assertEquals(1L, result.get().getId());
         assertEquals(1L, result.get().getWarehouse().getId());
+    }
+    @Test
+    void shouldReturnEmptyOptional_whenNameIsNotFound(){
+        //WHEN
+        Optional<Category> result = repository.findByName("test");
+
+        //THEN
+        //View dataset category.json
+        assertTrue(result.isEmpty());
     }
 }
