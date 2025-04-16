@@ -1,4 +1,4 @@
-package ar.com.old.ms_users;
+package ar.com.old.ms_products;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
