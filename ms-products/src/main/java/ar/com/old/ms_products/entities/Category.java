@@ -3,7 +3,7 @@ package ar.com.old.ms_products.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "category")
+@Table(name = "categories")
 public class Category {
 
     @Id
@@ -13,12 +13,18 @@ public class Category {
     @Column(name = "name")
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id", referencedColumnName = "id")
+    private Warehouse warehouse;
+
     public Category() {
+
     }
 
-    public Category(Long id, String name) {
+    public Category(Long id, String name, Warehouse warehouse) {
         this.id = id;
         this.name = name;
+        this.warehouse = warehouse;
     }
 
     public Long getId() {
@@ -35,5 +41,13 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Warehouse getWarehouse() {
+        return warehouse;
+    }
+
+    public void setWarehouse(Warehouse warehouse) {
+        this.warehouse = warehouse;
     }
 }

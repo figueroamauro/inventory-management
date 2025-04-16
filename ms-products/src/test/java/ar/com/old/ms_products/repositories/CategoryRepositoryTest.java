@@ -35,5 +35,6 @@ class CategoryRepositoryTest {
         assertTrue(result.isPresent());
         assertEquals("Electro", result.get().getName());
         assertEquals(1L, result.get().getId());
+        assertEquals(1L, result.get().getWarehouse().getId());
     }
 }

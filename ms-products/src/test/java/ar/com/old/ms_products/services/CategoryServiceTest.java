@@ -2,6 +2,7 @@ package ar.com.old.ms_products.services;
 
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
+import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +30,7 @@ class CategoryServiceTest {
 
     @BeforeEach
     void init() {
-        category = new Category(1L, "Electro");
+        category = new Category(1L, "Electro",new Warehouse(1L,"Central",1L));
         dto = new CategoryDTO(null, "Electro");
     }
 

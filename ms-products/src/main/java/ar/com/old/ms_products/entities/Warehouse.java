@@ -16,6 +16,8 @@ public class Warehouse {
     @Column(name = "user_id")
     private Long userId;
 
+    public Warehouse() {
+    }
 
     public Warehouse(Long id, String name, Long userId) {
         this.id = id;
