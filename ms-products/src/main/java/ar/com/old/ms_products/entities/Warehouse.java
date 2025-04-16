@@ -3,7 +3,7 @@ package ar.com.old.ms_products.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "warehouse")
+@Table(name = "warehouses")
 public class Warehouse {
 
     @Id
