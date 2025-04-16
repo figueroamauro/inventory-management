@@ -21,6 +21,7 @@ public class CategoryServiceImpl implements CategoryService{
 
     @Override
     public Category create(CategoryDTO dto) {
+        validateNull(dto, "DTO can not be null");
         checkExistingCategory(dto);
 
         Category category = new Category(dto.id(), dto.name(),new Warehouse(1L,"Central",1L));
@@ -48,6 +49,12 @@ public class CategoryServiceImpl implements CategoryService{
         Optional<Category> categoryOpt = categoryRepository.findByName(dto.name());
         if (categoryOpt.isPresent()) {
             throw new ExistingCategoryException("Category already exist");
+        }
+    }
+
+    private void validateNull(Object obj, String message) {
+        if (obj == null) {
+            throw new IllegalArgumentException(message);
         }
     }
 }

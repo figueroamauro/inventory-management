@@ -66,4 +66,16 @@ class CategoryServiceTest {
 
         verify(categoryRepository, never()).save(any());
     }
+
+    @Test
+    void shouldThrowExceptionCreatingCategory_whenDTOisNUll(){
+        //WHEN
+        Executable executable = () -> categoryService.create(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("DTO can not be null", e.getMessage());
+
+        verify(categoryRepository, never()).save(any(Category.class));
+    }
 }
