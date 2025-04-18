@@ -95,6 +95,7 @@ class UserControllerTest {
     class FindByIdTest {
 
         @Test
+        @WithMockUser(roles = "ADMIN")
         void shouldFindUserById_status200() throws Exception {
             //GIVEN
             when(userService.findOne(1L)).thenReturn(user);
@@ -115,7 +116,7 @@ class UserControllerTest {
         }
 
         @Test
-        @WithMockUser(roles = "USER")
+        @WithMockUser(roles = "ADMIN")
         void shouldReturnErrorFindingById_whenUserNotFound_status404() throws Exception {
             //GIVEN
             when(userService.findOne(1L))

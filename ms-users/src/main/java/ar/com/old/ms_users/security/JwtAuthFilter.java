@@ -7,6 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -14,12 +16,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER = "Bearer ";
+    public static final String SECRET_TOKEN = "MITOKENSECRETO";
 
     private final JwtService jwtService;
     private final CustomUserDetailsService customUserDetailsService;
@@ -49,7 +54,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 boolean isValidToken = jwtService.isValid(token, currentUser);
 
                 if (isValidToken) {
-                    authenticate(request, token, (CustomUserDetails) currentUser);
+                    authenticate(request, (CustomUserDetails) currentUser);
                 }
 
             } catch (JwtException e) {
@@ -81,13 +86,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return authHeader != null && authHeader.startsWith(BEARER);
     }
 
-    private void authenticate(HttpServletRequest request, String token, CustomUserDetails userDetails) {
+    private void authenticate(HttpServletRequest request, CustomUserDetails userDetails) {
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        verifySecretToken(request, authorities);
+        authorities.addAll(userDetails.getAuthorities());
+
         UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
 
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private static void verifySecretToken(HttpServletRequest request, List<GrantedAuthority> authorities) {
+        if (request.getHeader("Secret") != null && request.getHeader("Secret").equals(SECRET_TOKEN)) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ACCESS"));
+        }
     }
 
     private void sendError(HttpServletResponse response, String message) throws IOException {
