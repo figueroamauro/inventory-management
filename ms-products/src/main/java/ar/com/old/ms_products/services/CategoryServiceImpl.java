@@ -48,7 +48,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category findOne(Long id) {
-        return null;
+        validateNull(id, "Id can not be null");
+        Optional<Category> category = categoryRepository.findById(id);
+        return category.get();
     }
 
     @Override

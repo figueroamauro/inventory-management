@@ -10,14 +10,16 @@ import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
-import it.unibo.tuprolog.solve.stdlib.primitive.Op;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.*;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -41,85 +43,105 @@ class CategoryServiceTest {
 
     @BeforeEach
     void init() {
-        category = new Category(1L, "Electro",new Warehouse(1L,"Central",1L));
+        category = new Category(1L, "Electro", new Warehouse(1L, "Central", 1L));
         dto = new CategoryDTO(null, "Electro");
     }
 
+    @Nested
+    class Create {
 
-    @Test
-    void shouldCreateCategory_whenDTOHasValidParams(){
-        //GIVEN
-        when(categoryRepository.findByName(any())).thenReturn(Optional.empty());
-        when(categoryRepository.save(any(Category.class))).thenReturn(category);
-        when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
-        when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
-        //WHEN
-        Category result = categoryService.create(dto);
+        @Test
+        void shouldCreateCategory_whenDTOHasValidParams() {
+            //GIVEN
+            when(categoryRepository.findByName(any())).thenReturn(Optional.empty());
+            when(categoryRepository.save(any(Category.class))).thenReturn(category);
+            when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
-        //THEN
-        assertNotNull(result);
-        assertNotNull(result.getId());
-        assertEquals("Electro", result.getName());
+            //WHEN
+            Category result = categoryService.create(dto);
 
-        verify(categoryRepository).save(any(Category.class));
+            //THEN
+            assertNotNull(result);
+            assertNotNull(result.getId());
+            assertEquals("Electro", result.getName());
+
+            verify(categoryRepository).save(any(Category.class));
+        }
+
+        @Test
+        void shouldThrowExceptionCreatingCategory_whenNameAlreadyExist() {
+            //GIVEN
+            when(categoryRepository.findByName("Electro")).thenReturn(Optional.of(category));
+
+            //WHEN
+            Executable executable = () -> categoryService.create(dto);
+
+            //THEN
+            ExistingCategoryException e = assertThrows(ExistingCategoryException.class, executable);
+            assertEquals("Category already exist", e.getMessage());
+
+            verify(categoryRepository, never()).save(any());
+        }
+
+        @Test
+        void shouldThrowExceptionCreatingCategory_whenDTOisNUll() {
+            //WHEN
+            Executable executable = () -> categoryService.create(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("DTO can not be null", e.getMessage());
+
+            verify(categoryRepository, never()).save(any(Category.class));
+        }
+
+        @Test
+        void shouldThrowExceptionCreatingCategory_whenUserNotFound() {
+            //GIVEN
+            when(userClient.findOne(1L)).thenReturn(null);
+
+            //WHEN
+            Executable executable = () -> categoryService.create(dto);
+
+            //THEN
+            ConnectionFeignException e = assertThrows(ConnectionFeignException.class, executable);
+            assertEquals("Can not connect to another service", e.getMessage());
+
+            verify(categoryRepository, never()).save(any());
+        }
+
+        @Test
+        void shouldThrowExceptionCreatingCategory_whenWarehouseNotFound() {
+            //GIVEN
+            when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "username", "email@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.empty());
+
+            //WHEN
+            Executable executable = () -> categoryService.create(dto);
+
+            //THEN
+            WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
+            assertEquals("Warehouse not found", e.getMessage());
+
+            verify(categoryRepository, never()).save(any());
+        }
     }
 
-    @Test
-    void shouldThrowExceptionCreatingCategory_whenNameAlreadyExist(){
-        //GIVEN
-        when(categoryRepository.findByName("Electro")).thenReturn(Optional.of(category));
+    @Nested
+    class FindOne {
 
-        //WHEN
-        Executable executable = () -> categoryService.create(dto);
+        @Test
+        void shouldThrowExceptionFindingCategory_whenIdIsNull(){
+            //WHEN
+            Executable executable = () -> categoryService.findOne(null);
 
-        //THEN
-        ExistingCategoryException e = assertThrows(ExistingCategoryException.class, executable);
-        assertEquals("Category already exist", e.getMessage());
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
 
-        verify(categoryRepository, never()).save(any());
-    }
-
-    @Test
-    void shouldThrowExceptionCreatingCategory_whenDTOisNUll(){
-        //WHEN
-        Executable executable = () -> categoryService.create(null);
-
-        //THEN
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("DTO can not be null", e.getMessage());
-
-        verify(categoryRepository, never()).save(any(Category.class));
-    }
-
-    @Test
-    void shouldThrowExceptionCreatingCategory_whenUserNotFound(){
-        //GIVEN
-        when(userClient.findOne(1L)).thenReturn(null);
-
-        //WHEN
-        Executable executable = () -> categoryService.create(dto);
-
-        //THEN
-        ConnectionFeignException e = assertThrows(ConnectionFeignException.class, executable);
-        assertEquals("Can not connect to another service", e.getMessage());
-
-        verify(categoryRepository, never()).save(any());
-    }
-
-    @Test
-    void shouldThrowExceptionCreatingCategory_whenWarehouseNotFound(){
-        //GIVEN
-        when(userClient.findOne(1L)).thenReturn(new UserDTO(1L,"username","email@mail.com"));
-        when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.empty());
-
-        //WHEN
-        Executable executable = () -> categoryService.create(dto);
-
-        //THEN
-        WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
-        assertEquals("Warehouse not found", e.getMessage());
-
-        verify(categoryRepository, never()).save(any());
+            verify(categoryRepository, never()).findOne(any());
+        }
     }
 }
