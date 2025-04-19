@@ -7,8 +7,10 @@ import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.ConnectionFeignException;
 import ar.com.old.ms_products.exceptions.ExistingCategoryException;
+import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
+import it.unibo.tuprolog.solve.stdlib.primitive.Op;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,6 +103,22 @@ class CategoryServiceTest {
         //THEN
         ConnectionFeignException e = assertThrows(ConnectionFeignException.class, executable);
         assertEquals("Can not connect to another service", e.getMessage());
+
+        verify(categoryRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionCreatingCategory_whenWarehouseNotFound(){
+        //GIVEN
+        when(userClient.findOne(1L)).thenReturn(new UserDTO(1L,"username","email@mail.com"));
+        when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.empty());
+
+        //WHEN
+        Executable executable = () -> categoryService.create(dto);
+
+        //THEN
+        WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
+        assertEquals("Warehouse not found", e.getMessage());
 
         verify(categoryRepository, never()).save(any());
     }
