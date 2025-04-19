@@ -5,8 +5,10 @@ import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.ConnectionFeignException;
 import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
+import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +31,8 @@ class CategoryServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     UserClient userClient;
+    @Mock
+    WarehouseRepository warehouseRepository;
     private Category category;
     private CategoryDTO dto;
 
@@ -46,6 +50,7 @@ class CategoryServiceTest {
         when(categoryRepository.findByName(any())).thenReturn(Optional.empty());
         when(categoryRepository.save(any(Category.class))).thenReturn(category);
         when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+        when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
         //WHEN
         Category result = categoryService.create(dto);
@@ -83,5 +88,20 @@ class CategoryServiceTest {
         assertEquals("DTO can not be null", e.getMessage());
 
         verify(categoryRepository, never()).save(any(Category.class));
+    }
+
+    @Test
+    void shouldThrowExceptionCreatingCategory_whenUserNotFound(){
+        //GIVEN
+        when(userClient.findOne(1L)).thenReturn(null);
+
+        //WHEN
+        Executable executable = () -> categoryService.create(dto);
+
+        //THEN
+        ConnectionFeignException e = assertThrows(ConnectionFeignException.class, executable);
+        assertEquals("Can not connect to another service", e.getMessage());
+
+        verify(categoryRepository, never()).save(any());
     }
 }
