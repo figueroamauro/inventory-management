@@ -5,6 +5,7 @@ import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
 import ar.com.old.ms_products.exceptions.ConnectionFeignException;
 import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
@@ -142,6 +143,21 @@ class CategoryServiceTest {
             assertEquals("Id can not be null", e.getMessage());
 
             verify(categoryRepository, never()).findOne(any());
+        }
+
+        @Test
+        void shouldThrowExceptionFindingCategory_whenCategoryNotFound(){
+            //GIVEN
+            when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+
+            //WHEN
+            Executable executable = () -> categoryService.findOne(1L);
+
+            //THEN
+            CategoryNotFoundException e = assertThrows(CategoryNotFoundException.class, executable);
+            assertEquals("Category not found", e.getMessage());
+
+            verify(categoryRepository).findById(1L);
         }
     }
 }

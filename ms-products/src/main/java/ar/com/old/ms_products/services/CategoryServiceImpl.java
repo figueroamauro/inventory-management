@@ -5,6 +5,7 @@ import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
 import ar.com.old.ms_products.exceptions.ConnectionFeignException;
 import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
@@ -49,8 +50,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category findOne(Long id) {
         validateNull(id, "Id can not be null");
-        Optional<Category> category = categoryRepository.findById(id);
-        return category.get();
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
     }
 
     @Override
