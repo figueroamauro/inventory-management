@@ -132,6 +132,18 @@ class CategoryServiceTest {
 
     @Nested
     class FindOne {
+        @Test
+        void shouldFindCategoryById(){
+            //GIVEN
+            when(categoryRepository.findById(1L)).thenReturn(Optional.ofNullable(category));
+
+            //WHEN
+            Category result = categoryService.findOne(1L);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals("Electro", result.getName());
+        }
 
         @Test
         void shouldThrowExceptionFindingCategory_whenIdIsNull(){
