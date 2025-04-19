@@ -1,5 +1,7 @@
 package ar.com.old.ms_products.services;
 
+import ar.com.old.ms_products.clients.UserClient;
+import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Warehouse;
@@ -25,8 +27,11 @@ class CategoryServiceTest {
     private CategoryServiceImpl categoryService;
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    UserClient userClient;
     private Category category;
     private CategoryDTO dto;
+
 
     @BeforeEach
     void init() {
@@ -40,6 +45,7 @@ class CategoryServiceTest {
         //GIVEN
         when(categoryRepository.findByName(any())).thenReturn(Optional.empty());
         when(categoryRepository.save(any(Category.class))).thenReturn(category);
+        when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
 
         //WHEN
         Category result = categoryService.create(dto);

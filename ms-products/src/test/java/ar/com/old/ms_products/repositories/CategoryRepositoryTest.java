@@ -1,5 +1,8 @@
 package ar.com.old.ms_products.repositories;
 
+import ar.com.old.ms_products.MsProductsApplication;
+import ar.com.old.ms_products.clients.UserClient;
+import ar.com.old.ms_products.config.FeignConfig;
 import ar.com.old.ms_products.entities.Category;
 import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.configuration.Orthography;
@@ -9,6 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.context.ImportTestcontainers;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
