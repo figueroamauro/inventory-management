@@ -39,6 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         UserDTO userDTO = userClient.findOne(1L);
         Warehouse warehouse = getWarehouse(userDTO);
+
         checkExistingCategory(dto, warehouse.getId());
 
         Category category = new Category(dto.id(), dto.name(), warehouse);

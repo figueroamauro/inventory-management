@@ -33,7 +33,7 @@ class CategoryRepositoryTest {
     private CategoryRepository repository;
 
     @Test
-    void shouldFindCategoryById(){
+    void shouldFindCategoryByName(){
         //WHEN
         Optional<Category> result = repository.findByNameAndWarehouseId("Electro",1L);
 
@@ -52,5 +52,17 @@ class CategoryRepositoryTest {
         //THEN
         //View dataset category.json
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldFindCategoryByIdAndWarehouseId(){
+        //WHEN
+        Optional<Category> result = repository.findByIdAndWarehouseId(1L, 1L);
+
+        //THEN
+        assertTrue(result.isPresent());
+        assertEquals("Electro", result.get().getName());
+        assertEquals(1L, result.get().getId());
+        assertEquals(1L, result.get().getWarehouse().getId());
     }
 }
