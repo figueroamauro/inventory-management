@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
         UserDTO userDTO = userClient.findOne(1L);
         Warehouse warehouse = getWarehouse(userDTO);
 
-        return categoryRepository.findById(id)
+        return categoryRepository.findByIdAndWarehouseId(id, warehouse.getId())
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
     }
 

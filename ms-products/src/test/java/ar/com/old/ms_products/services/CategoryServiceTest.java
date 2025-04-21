@@ -140,7 +140,7 @@ class CategoryServiceTest {
             when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
-            when(categoryRepository.findById(1L)).thenReturn(Optional.ofNullable(category));
+            when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.ofNullable(category));
 
             //WHEN
             Category result = categoryService.findOne(1L);
@@ -168,7 +168,7 @@ class CategoryServiceTest {
             when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
-            when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
+            when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.empty());
 
             //WHEN
             Executable executable = () -> categoryService.findOne(1L);
@@ -177,7 +177,7 @@ class CategoryServiceTest {
             CategoryNotFoundException e = assertThrows(CategoryNotFoundException.class, executable);
             assertEquals("Category not found", e.getMessage());
 
-            verify(categoryRepository).findById(1L);
+            verify(categoryRepository).findByIdAndWarehouseId(1L,1L);
         }
     }
 }
