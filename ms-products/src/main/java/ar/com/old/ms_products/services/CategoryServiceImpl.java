@@ -36,10 +36,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category create(CategoryDTO dto) {
         validateNull(dto, "DTO can not be null");
-        checkExistingCategory(dto);
 
         UserDTO userDTO = userClient.findOne(1L);
         Warehouse warehouse = getWarehouse(userDTO);
+        checkExistingCategory(dto, warehouse.getId());
 
         Category category = new Category(dto.id(), dto.name(), warehouse);
         return categoryRepository.save(category);
@@ -50,6 +50,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category findOne(Long id) {
         validateNull(id, "Id can not be null");
+
+        UserDTO userDTO = userClient.findOne(1L);
+        Warehouse warehouse = getWarehouse(userDTO);
+
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
     }
@@ -65,8 +69,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
 
-    private void checkExistingCategory(CategoryDTO dto) {
-        Optional<Category> categoryOpt = categoryRepository.findByName(dto.name());
+    private void checkExistingCategory(CategoryDTO dto, Long warehouseId) {
+        Optional<Category> categoryOpt = categoryRepository.findByNameAndWarehouseId(dto.name(),warehouseId);
         if (categoryOpt.isPresent()) {
             throw new ExistingCategoryException("Category already exist");
         }

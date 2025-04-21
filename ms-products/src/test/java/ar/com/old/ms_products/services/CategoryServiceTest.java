@@ -55,7 +55,7 @@ class CategoryServiceTest {
         @Test
         void shouldCreateCategory_whenDTOHasValidParams() {
             //GIVEN
-            when(categoryRepository.findByName(any())).thenReturn(Optional.empty());
+            when(categoryRepository.findByNameAndWarehouseId("Electro",1L)).thenReturn(Optional.empty());
             when(categoryRepository.save(any(Category.class))).thenReturn(category);
             when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
@@ -74,7 +74,9 @@ class CategoryServiceTest {
         @Test
         void shouldThrowExceptionCreatingCategory_whenNameAlreadyExist() {
             //GIVEN
-            when(categoryRepository.findByName("Electro")).thenReturn(Optional.of(category));
+            when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
+            when(categoryRepository.findByNameAndWarehouseId("Electro",1L)).thenReturn(Optional.of(category));
 
             //WHEN
             Executable executable = () -> categoryService.create(dto);
@@ -135,6 +137,9 @@ class CategoryServiceTest {
         @Test
         void shouldFindCategoryById(){
             //GIVEN
+            when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
+
             when(categoryRepository.findById(1L)).thenReturn(Optional.ofNullable(category));
 
             //WHEN
@@ -160,6 +165,9 @@ class CategoryServiceTest {
         @Test
         void shouldThrowExceptionFindingCategory_whenCategoryNotFound(){
             //GIVEN
+            when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
+
             when(categoryRepository.findById(1L)).thenReturn(Optional.empty());
 
             //WHEN

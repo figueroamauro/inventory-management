@@ -35,7 +35,7 @@ class CategoryRepositoryTest {
     @Test
     void shouldFindCategoryById(){
         //WHEN
-        Optional<Category> result = repository.findByName("Electro");
+        Optional<Category> result = repository.findByNameAndWarehouseId("Electro",1L);
 
         //THEN
         //View dataset category.json
@@ -47,7 +47,7 @@ class CategoryRepositoryTest {
     @Test
     void shouldReturnEmptyOptional_whenNameIsNotFound(){
         //WHEN
-        Optional<Category> result = repository.findByName("test");
+        Optional<Category> result = repository.findByNameAndWarehouseId("test",1L);
 
         //THEN
         //View dataset category.json
