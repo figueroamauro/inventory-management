@@ -62,6 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<Category> findAll(Pageable pageable) {
+        validateNull(pageable, "Pageable can not be null");
         UserDTO userDTO = userClient.findOne(1L);
         Warehouse warehouse = getWarehouse(userDTO);
         return categoryRepository.findAllByWarehouseId(pageable,warehouse.getId());

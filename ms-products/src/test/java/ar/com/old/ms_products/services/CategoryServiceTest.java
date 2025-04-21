@@ -199,8 +199,6 @@ class CategoryServiceTest {
             when(categoryRepository.findAllByWarehouseId(pageable, 1L)).thenReturn(page);
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
-
-
             //WHEN
             Page<Category> result = categoryService.findAll(pageable);
 
@@ -208,6 +206,17 @@ class CategoryServiceTest {
             assertNotNull(result);
             assertEquals(5, result.getTotalElements());
 
+            verify(categoryRepository).findAllByWarehouseId(any(), anyLong());
+        }
+
+        @Test
+        void shouldThrowExceptionFindingAllCategories_whenPageableIsNull(){
+            //WHEN
+            Executable executable = () -> categoryService.findAll(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Pageable can not be null", e.getMessage());
         }
     }
 }
