@@ -22,7 +22,12 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -178,6 +183,27 @@ class CategoryServiceTest {
             assertEquals("Category not found", e.getMessage());
 
             verify(categoryRepository).findByIdAndWarehouseId(1L,1L);
+        }
+    }
+
+    @Nested
+    class FindAll {
+
+        @Test
+        void shouldReturnPageOfCategories(){
+            //GIVEN
+            Pageable pageable = PageRequest.of(0, 10);
+            List<Category> list = List.of(category, category, category, category, category);
+            Page<Category> page = new PageImpl<>(list, pageable, list.size());
+            when(categoryRepository.findAll(pageable)).thenReturn(page);
+
+            //WHEN
+            Page<Category> result = categoryService.findAll(pageable);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals(5, result.getTotalElements());
+
         }
     }
 }
