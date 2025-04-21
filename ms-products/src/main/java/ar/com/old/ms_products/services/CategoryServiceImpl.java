@@ -62,7 +62,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Page<Category> findAll(Pageable pageable) {
-        return categoryRepository.findAll(pageable);
+        UserDTO userDTO = userClient.findOne(1L);
+        Warehouse warehouse = getWarehouse(userDTO);
+        return categoryRepository.findAllByWarehouseId(pageable,warehouse.getId());
     }
 
     @Override

@@ -190,12 +190,16 @@ class CategoryServiceTest {
     class FindAll {
 
         @Test
-        void shouldReturnPageOfCategories(){
+        void shouldReturnPageOfCategories_withCurrentWarehouse(){
             //GIVEN
             Pageable pageable = PageRequest.of(0, 10);
             List<Category> list = List.of(category, category, category, category, category);
             Page<Category> page = new PageImpl<>(list, pageable, list.size());
-            when(categoryRepository.findAll(pageable)).thenReturn(page);
+            when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(categoryRepository.findAllByWarehouseId(pageable, 1L)).thenReturn(page);
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
+
+
 
             //WHEN
             Page<Category> result = categoryService.findAll(pageable);
