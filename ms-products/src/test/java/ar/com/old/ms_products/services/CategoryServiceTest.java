@@ -236,6 +236,18 @@ class CategoryServiceTest {
                 //THEN
                 verify(categoryRepository).deleteById(1L);
             }
+
+            @Test
+            void shouldThrowExceptionDeletingCategory_whenIdIsNull(){
+                //WHEN
+                Executable executable = () -> categoryService.delete(null);
+
+                //THEN
+                IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+                assertEquals("Id can not be null", e.getMessage());
+
+                verify(categoryRepository, never()).findOne(any());
+            }
         }
     }
 }

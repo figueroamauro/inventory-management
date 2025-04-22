@@ -70,6 +70,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(Long id) {
+        validateNull(id, "Id can not be null");
+
         UserDTO userDTO = userClient.findOne(1L);
         Warehouse warehouse = getWarehouse(userDTO);
         Optional<Category> category = categoryRepository.findByIdAndWarehouseId(id, warehouse.getId());
