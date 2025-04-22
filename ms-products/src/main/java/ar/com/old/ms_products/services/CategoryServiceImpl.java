@@ -65,7 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
         validateNull(pageable, "Pageable can not be null");
         UserDTO userDTO = userClient.findOne(1L);
         Warehouse warehouse = getWarehouse(userDTO);
-        return categoryRepository.findAllByWarehouseId(pageable,warehouse.getId());
+        return categoryRepository.findAllByWarehouseId(pageable, warehouse.getId());
     }
 
     @Override
@@ -74,14 +74,15 @@ public class CategoryServiceImpl implements CategoryService {
 
         UserDTO userDTO = userClient.findOne(1L);
         Warehouse warehouse = getWarehouse(userDTO);
-        Optional<Category> category = categoryRepository.findByIdAndWarehouseId(id, warehouse.getId());
-        categoryRepository.deleteById(category.get().getId());
+        Category category = categoryRepository.findByIdAndWarehouseId(id, warehouse.getId())
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
+        categoryRepository.deleteById(category.getId());
 
     }
 
 
     private void checkExistingCategory(CategoryDTO dto, Long warehouseId) {
-        Optional<Category> categoryOpt = categoryRepository.findByNameAndWarehouseId(dto.name(),warehouseId);
+        Optional<Category> categoryOpt = categoryRepository.findByNameAndWarehouseId(dto.name(), warehouseId);
         if (categoryOpt.isPresent()) {
             throw new ExistingCategoryException("Category already exist");
         }

@@ -226,9 +226,9 @@ class CategoryServiceTest {
             @Test
             void shouldDeleteById_whenUserIsOwner(){
                 //GIVEN
-                when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.ofNullable(category));
                 when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
                 when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
+                when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.ofNullable(category));
 
                 //WHEN
                 categoryService.delete(1L);
@@ -245,6 +245,23 @@ class CategoryServiceTest {
                 //THEN
                 IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
                 assertEquals("Id can not be null", e.getMessage());
+
+                verify(categoryRepository, never()).findOne(any());
+            }
+
+            @Test
+            void shouldThrowExceptionDeletingCategory_whenCategoryOrWarehouseNotFound(){
+                //GIVEN
+                when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+                when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
+                when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.empty());
+
+                //WHEN
+                Executable executable = () -> categoryService.delete(1L);
+
+                //THEN
+                CategoryNotFoundException e = assertThrows(CategoryNotFoundException.class, executable);
+                assertEquals("Category not found", e.getMessage());
 
                 verify(categoryRepository, never()).findOne(any());
             }
