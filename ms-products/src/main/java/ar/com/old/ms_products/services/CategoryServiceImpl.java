@@ -70,6 +70,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(Long id) {
+        UserDTO userDTO = userClient.findOne(1L);
+        Warehouse warehouse = getWarehouse(userDTO);
+        Optional<Category> category = categoryRepository.findByIdAndWarehouseId(id, warehouse.getId());
+        categoryRepository.deleteById(category.get().getId());
 
     }
 

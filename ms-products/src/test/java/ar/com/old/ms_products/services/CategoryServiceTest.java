@@ -218,5 +218,24 @@ class CategoryServiceTest {
             IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
             assertEquals("Pageable can not be null", e.getMessage());
         }
+
+
+        @Nested
+        class Delete {
+
+            @Test
+            void shouldDeleteById_whenUserIsOwner(){
+                //GIVEN
+                when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.ofNullable(category));
+                when(userClient.findOne(1L)).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+                when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
+
+                //WHEN
+                categoryService.delete(1L);
+
+                //THEN
+                verify(categoryRepository).deleteById(1L);
+            }
+        }
     }
 }
