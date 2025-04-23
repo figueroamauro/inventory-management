@@ -11,6 +11,7 @@ import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category create(CategoryDTO dto) {
         validateNull(dto, "DTO can not be null");
 
-        UserDTO userDTO = userClient.getCurrentUser();
+        UserDTO userDTO = getUser();
         Warehouse warehouse = getWarehouse(userDTO);
 
         checkExistingCategory(dto, warehouse.getId());
@@ -49,11 +50,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
 
+
     @Override
     public Category findOne(Long id) {
         validateNull(id, "Id can not be null");
 
-        UserDTO userDTO = userClient.getCurrentUser();
+        UserDTO userDTO = getUser();
         Warehouse warehouse = getWarehouse(userDTO);
 
         return categoryRepository.findByIdAndWarehouseId(id, warehouse.getId())
@@ -63,7 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Page<Category> findAll(Pageable pageable) {
         validateNull(pageable, "Pageable can not be null");
-        UserDTO userDTO = userClient.getCurrentUser();
+        UserDTO userDTO = getUser();
         Warehouse warehouse = getWarehouse(userDTO);
         return categoryRepository.findAllByWarehouseId(pageable, warehouse.getId());
     }
@@ -72,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Long id) {
         validateNull(id, "Id can not be null");
 
-        UserDTO userDTO = userClient.getCurrentUser();
+        UserDTO userDTO = getUser();
         Warehouse warehouse = getWarehouse(userDTO);
         Category category = categoryRepository.findByIdAndWarehouseId(id, warehouse.getId())
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
@@ -100,6 +102,14 @@ public class CategoryServiceImpl implements CategoryService {
                     .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
         }
         throw new ConnectionFeignException("Can not connect to another service");
-
     }
+
+    private UserDTO getUser() {
+        try {
+            return userClient.getCurrentUser();
+        } catch (FeignException e) {
+            throw new ConnectionFeignException("Can not connect to another service");
+        }
+    }
+
 }

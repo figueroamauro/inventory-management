@@ -1,6 +1,7 @@
 package ar.com.old.ms_products.handler;
 
 import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
+import ar.com.old.ms_products.exceptions.ConnectionFeignException;
 import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +36,13 @@ public class GlobalHandler {
 
         error.put("error", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(ConnectionFeignException.class)
+    public ResponseEntity<Map<String, String>> handlerInternalError(Exception e) {
+        Map<String, String> error = new HashMap<>();
+
+        error.put("error", e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 }
