@@ -1,0 +1,19 @@
+{
+  "warehouses": [
+    {
+      "id": 1,
+      "name": "deposito",
+      "user_id": 1
+    },
+    {
+      "id": 2,
+      "name": "deposito",
+      "user_id": 2
+    },
+    {
+      "id": 3,
+      "name": "deposito",
+      "user_id": 3
+    }
+  ]
+}
