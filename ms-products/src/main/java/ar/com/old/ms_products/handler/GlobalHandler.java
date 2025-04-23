@@ -16,33 +16,27 @@ public class GlobalHandler {
 
     @ExceptionHandler(ExistingCategoryException.class)
     public ResponseEntity<Map<String, String>> handlerConflict(Exception e) {
-        Map<String, String> error = new HashMap<>();
-
-        error.put("error", e.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        return buildResponseError(e, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handlerBadRequest(Exception e) {
-        Map<String, String> error = new HashMap<>();
-
-        error.put("error", e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return buildResponseError(e, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<Map<String, String>> handlerNotFound(Exception e) {
-        Map<String, String> error = new HashMap<>();
-
-        error.put("error", e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return buildResponseError(e, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConnectionFeignException.class)
     public ResponseEntity<Map<String, String>> handlerInternalError(Exception e) {
-        Map<String, String> error = new HashMap<>();
+        return buildResponseError(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
+    private static ResponseEntity<Map<String, String>> buildResponseError(Exception e, HttpStatus status) {
+        Map<String, String> error = new HashMap<>();
         error.put("error", e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        return ResponseEntity.status(status).body(error);
     }
 }
