@@ -36,4 +36,13 @@ class WarehouseRepositoryTest {
         assertEquals(1L, result.get().getId());
         assertEquals("deposito", result.get().getName());
     }
+
+    @Test
+    void shouldReturnEmptyOptionalFindingWarehouseByUserId_whenNotFound(){
+        //WHEN
+        Optional<Warehouse> result = repository.findByUserId(10L);
+
+        //THEN
+        assertTrue(result.isEmpty());
+    }
 }
