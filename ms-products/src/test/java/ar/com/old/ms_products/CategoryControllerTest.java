@@ -64,7 +64,7 @@ class CategoryControllerTest {
     }
 
     @Test
-    void shouldThrowExceptionFindingAllCategories_status400() throws Exception {
+    void shouldThrowExceptionFindingAllCategories_withoutPageable_status400() throws Exception {
         //WHEN
         mockMvc.perform(get("/api/categories")
                         .contentType(MediaType.APPLICATION_JSON))
@@ -140,14 +140,27 @@ class CategoryControllerTest {
 
     @Test
     void shouldDeleteCategory_status204() throws Exception {
-        //GIVEN
-
         //WHEN
         mockMvc.perform(delete("/api/categories/1")
                         .contentType(MediaType.APPLICATION_JSON))
 
                 //THEN
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldThrowExceptionDeletingCategory_whenCategoryIsNotPresent_status404() throws Exception {
+        //GIVEN
+        doThrow(new CategoryNotFoundException("Category not found")).when(categoryService).delete(1L);
+
+        //WHEN
+        mockMvc.perform(delete("/api/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Category not found"));
     }
 
 
