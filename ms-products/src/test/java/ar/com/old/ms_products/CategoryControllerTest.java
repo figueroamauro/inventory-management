@@ -7,7 +7,6 @@ import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.services.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
@@ -60,6 +59,18 @@ class CategoryControllerTest {
                 //THEN
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap());
+    }
+
+    @Test
+    void shouldThrowExceptionFindingAllCategories_status400() throws Exception {
+        //WHEN
+        mockMvc.perform(get("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Page must not be null"));
     }
 
     @Test
