@@ -3,6 +3,7 @@ package ar.com.old.ms_products;
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.services.CategoryService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -44,5 +45,23 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("indumentaria"));
+    }
+
+    @Test
+    void shouldFailCreatingCategory_status409() throws Exception {
+        //GIVEN
+        CategoryDTO dto = new CategoryDTO(null, "indumentaria");
+        when(categoryService.create(dto)).thenThrow(new ExistingCategoryException("Category already exist"));
+
+        //WHEN
+        mockMvc.perform(post("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Category already exist"));
+
     }
 }
