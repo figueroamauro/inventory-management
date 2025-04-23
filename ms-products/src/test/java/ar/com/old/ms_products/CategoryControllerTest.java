@@ -138,6 +138,19 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.error").value("Category already exist"));
     }
 
+    @Test
+    void shouldDeleteCategory_status204() throws Exception {
+        //GIVEN
+
+        //WHEN
+        mockMvc.perform(delete("/api/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNoContent());
+    }
+
+
     private @NotNull Page<Category> buildPage() {
         List<Category> list = List.of(category,category,category);
         Pageable pageable = PageRequest.of(0, 10);

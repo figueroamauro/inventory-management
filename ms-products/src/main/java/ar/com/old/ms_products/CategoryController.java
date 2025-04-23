@@ -6,7 +6,6 @@ import ar.com.old.ms_products.services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
@@ -33,7 +32,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> findOne(@PathVariable Long id) {
+    public ResponseEntity<Category> getOne(@PathVariable Long id) {
         Category category = categoryService.findOne(id);
         return ResponseEntity.ok(category);
     }
@@ -44,5 +43,11 @@ public class CategoryController {
         Category category = categoryService.create(categoryDTO);
 
         return ResponseEntity.created(URI.create("/api/categories/" + category.getId())).body(category);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Category> delete(@PathVariable Long id) {
+        categoryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
