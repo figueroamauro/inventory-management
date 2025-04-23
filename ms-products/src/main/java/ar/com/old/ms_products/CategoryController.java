@@ -32,6 +32,13 @@ public class CategoryController {
         return assembler.toModel(page);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> findOne(@PathVariable Long id) {
+        Category category = categoryService.findOne(id);
+        return ResponseEntity.ok(category);
+    }
+
+
     @PostMapping
     public ResponseEntity<Category> create(@Valid @RequestBody CategoryDTO categoryDTO) {
         Category category = categoryService.create(categoryDTO);

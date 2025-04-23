@@ -74,6 +74,21 @@ class CategoryControllerTest {
     }
 
     @Test
+    void shouldFindById_status200() throws Exception {
+        //GIVEN
+        when(categoryService.findOne(1L)).thenReturn(category);
+
+        //WHEN
+        mockMvc.perform(get("/api/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.name").value("indumentaria"));
+    }
+
+    @Test
     void shouldCreateCategory_status201() throws Exception {
         //GIVEN
         when(categoryService.create(dto)).thenReturn(category);
