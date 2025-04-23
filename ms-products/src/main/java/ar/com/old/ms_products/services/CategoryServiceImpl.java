@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category create(CategoryDTO dto) {
         validateNull(dto, "DTO can not be null");
 
-        UserDTO userDTO = userClient.findOne(1L);
+        UserDTO userDTO = userClient.getCurrentUser();
         Warehouse warehouse = getWarehouse(userDTO);
 
         checkExistingCategory(dto, warehouse.getId());
@@ -53,7 +53,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category findOne(Long id) {
         validateNull(id, "Id can not be null");
 
-        UserDTO userDTO = userClient.findOne(1L);
+        UserDTO userDTO = userClient.getCurrentUser();
         Warehouse warehouse = getWarehouse(userDTO);
 
         return categoryRepository.findByIdAndWarehouseId(id, warehouse.getId())
@@ -63,7 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Page<Category> findAll(Pageable pageable) {
         validateNull(pageable, "Pageable can not be null");
-        UserDTO userDTO = userClient.findOne(1L);
+        UserDTO userDTO = userClient.getCurrentUser();
         Warehouse warehouse = getWarehouse(userDTO);
         return categoryRepository.findAllByWarehouseId(pageable, warehouse.getId());
     }
@@ -72,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Long id) {
         validateNull(id, "Id can not be null");
 
-        UserDTO userDTO = userClient.findOne(1L);
+        UserDTO userDTO = userClient.getCurrentUser();
         Warehouse warehouse = getWarehouse(userDTO);
         Category category = categoryRepository.findByIdAndWarehouseId(id, warehouse.getId())
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
