@@ -14,7 +14,7 @@ class TestcontainersConfiguration implements ApplicationContextInitializer<Confi
 			new MySQLContainer<>("mysql:8.0.33")
 					.withUsername("test")
 					.withPassword("test")
-					.withDatabaseName("inventory");
+					.withDatabaseName("inventory_products");
 
 	static {
 		mysqlContainer.start();
