@@ -20,6 +20,9 @@ public class WarehouseServiceImpl implements WarehouseService{
 
     @Override
     public Page<Warehouse> findAll(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable can not be null");
+        }
         return warehouseRepository.findAll(pageable);
     }
 

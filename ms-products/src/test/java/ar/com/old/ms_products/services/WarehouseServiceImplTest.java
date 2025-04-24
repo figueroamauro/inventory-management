@@ -4,6 +4,7 @@ import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -44,5 +45,17 @@ class WarehouseServiceImplTest {
         //THEN
         assertNotNull(result);
         assertEquals(3, result.getTotalElements());
+    }
+
+    @Test
+    void shouldThrowExceptionFindingCallWarehouses_whenPageableIsNull(){
+        //WHEN
+        Executable executable = () -> warehouseService.findAll(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Pageable can not be null", e.getMessage());
+
+        verify(warehouseRepository,never()).findAll(any(Pageable.class));
     }
 }
