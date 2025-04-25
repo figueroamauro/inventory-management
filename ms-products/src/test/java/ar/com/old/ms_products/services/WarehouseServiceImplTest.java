@@ -4,6 +4,7 @@ import ar.com.old.ms_products.clients.UserClientService;
 import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.WarehouseDTO;
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.WarehouseAlreadyExistException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.junit.jupiter.api.Test;
@@ -137,14 +138,26 @@ class WarehouseServiceImplTest {
 
     @Test
     void shouldThrowExceptionCreatingWarehouse_whenDTOIsNull(){
-        //GIVEN
-
-
         //WHEN
         Executable executable = () -> warehouseService.create(null);
 
         //THEN
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("You must provide a valid request body", e.getMessage());
+    }
+
+    @Test
+    void shouldThrowExceptionCreatingWarehouse_whenAlreadyExist(){
+        //GIVEN
+        WarehouseDTO dto = new WarehouseDTO(1L, "deposito");
+        when(warehouseRepository.findByName("deposito")).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
+        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+        //WHEN
+        Executable executable = () -> warehouseService.create(dto);
+
+        //THEN
+        WarehouseAlreadyExistException e = assertThrows(WarehouseAlreadyExistException.class, executable);
+        assertEquals("Warehouse already exist", e.getMessage());
     }
 }
