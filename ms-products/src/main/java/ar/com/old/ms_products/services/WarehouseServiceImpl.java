@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public class WarehouseServiceImpl implements WarehouseService{
@@ -21,17 +20,13 @@ public class WarehouseServiceImpl implements WarehouseService{
 
     @Override
     public Page<Warehouse> findAll(Pageable pageable) {
-        if (pageable == null) {
-            throw new IllegalArgumentException("Pageable can not be null");
-        }
+    validateNull(pageable, "Pageable can not be null");
         return warehouseRepository.findAll(pageable);
     }
 
     @Override
     public Warehouse findOne(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Id can not be null");
-        }
+     validateNull(id, "Id can not be null");
         return warehouseRepository.findById(id)
                 .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
     }
@@ -49,5 +44,11 @@ public class WarehouseServiceImpl implements WarehouseService{
     @Override
     public void delete(Long id) {
 
+    }
+
+    private void validateNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
     }
 }
