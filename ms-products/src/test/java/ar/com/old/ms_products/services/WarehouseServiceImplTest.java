@@ -1,6 +1,7 @@
 package ar.com.old.ms_products.services;
 
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,12 +68,14 @@ class WarehouseServiceImplTest {
         when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
 
         //WHEN
-        Optional<Warehouse> result = warehouseService.findOne(1L);
+        Warehouse result = warehouseService.findOne(1L);
 
         //THEN
-        assertTrue(result.isPresent());
-        assertNotNull(result.get().getId());
-        assertEquals("warehouse", result.get().getName());
+        assertNotNull(result.getId());
+        assertEquals("warehouse", result.getName());
 
+        verify(warehouseRepository).findById(1L);
     }
+
+
 }

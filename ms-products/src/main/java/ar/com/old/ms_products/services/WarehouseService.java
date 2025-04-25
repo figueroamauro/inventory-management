@@ -13,7 +13,7 @@ public interface WarehouseService {
 
     Page<Warehouse> findAll(Pageable pageable);
 
-    Optional<Warehouse> findOne(Long id);
+    Warehouse findOne(Long id);
 
     Warehouse create(WarehouseDTO dto);
 
