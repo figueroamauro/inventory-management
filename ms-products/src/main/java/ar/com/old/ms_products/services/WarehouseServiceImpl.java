@@ -40,6 +40,7 @@ public class WarehouseServiceImpl implements WarehouseService{
 
     @Override
     public Warehouse create(WarehouseDTO dto) {
+        validateNull(dto,"You must provide a valid request body");
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = new Warehouse(dto.id(), dto.name(), userDTO.id());
         return warehouseRepository.save(warehouse);

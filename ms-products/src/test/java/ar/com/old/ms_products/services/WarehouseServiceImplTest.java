@@ -134,4 +134,17 @@ class WarehouseServiceImplTest {
         assertNotNull(result);
         assertEquals("warehouse", result.getName());
     }
+
+    @Test
+    void shouldThrowExceptionCreatingWarehouse_whenDTOIsNull(){
+        //GIVEN
+
+
+        //WHEN
+        Executable executable = () -> warehouseService.create(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("You must provide a valid request body", e.getMessage());
+    }
 }
