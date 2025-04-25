@@ -1,5 +1,7 @@
 package ar.com.old.ms_products.services;
 
+import ar.com.old.ms_products.clients.UserClientService;
+import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.WarehouseDTO;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
@@ -13,9 +15,11 @@ import org.springframework.stereotype.Service;
 public class WarehouseServiceImpl implements WarehouseService{
 
     private final WarehouseRepository warehouseRepository;
+    private final UserClientService clientService;
 
-    public WarehouseServiceImpl(WarehouseRepository warehouseRepository) {
+    public WarehouseServiceImpl(WarehouseRepository warehouseRepository, UserClientService clientService) {
         this.warehouseRepository = warehouseRepository;
+        this.clientService = clientService;
     }
 
     @Override
@@ -27,8 +31,14 @@ public class WarehouseServiceImpl implements WarehouseService{
     @Override
     public Warehouse findOne(Long id) {
      validateNull(id, "Id can not be null");
-        return warehouseRepository.findById(id)
+        UserDTO userDTO = clientService.getUser();
+        Warehouse warehouse= warehouseRepository.findById(id)
                 .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
+        if (warehouse.getUserId().equals(userDTO.id())) {
+            return warehouse;
+        } else {
+            throw new WarehouseNotFoundException("Warehouse not found");
+        }
     }
 
     @Override

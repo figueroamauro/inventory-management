@@ -1,5 +1,7 @@
 package ar.com.old.ms_products.services;
 
+import ar.com.old.ms_products.clients.UserClientService;
+import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
@@ -27,6 +29,8 @@ class WarehouseServiceImplTest {
     private WarehouseServiceImpl warehouseService;
     @Mock
     private WarehouseRepository warehouseRepository;
+    @Mock
+    private UserClientService clientService;
 
 
     @Test
@@ -66,6 +70,7 @@ class WarehouseServiceImplTest {
         //GIVEN
         Warehouse warehouse = new Warehouse(1L, "warehouse", 1L);
         when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
 
         //WHEN
         Warehouse result = warehouseService.findOne(1L);
@@ -90,7 +95,7 @@ class WarehouseServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionFindingById_whenIdIsNUll(){
+    void shouldThrowExceptionFindingById_whenIdIsNull(){
         //WHEN
         Executable executable = () -> warehouseService.findOne(null);
 
@@ -99,5 +104,18 @@ class WarehouseServiceImplTest {
         assertEquals("Id can not be null", e.getMessage());
 
         verify(warehouseRepository, never()).findById(anyLong());
+    }
+
+    @Test
+    void shouldThrowExceptionFindingById_whenCurrentUserIsDifferentToWarehouseOwner(){
+        //WHEN
+        Executable executable = () -> warehouseService.findOne(2L);
+        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+        //THEN
+        WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
+        assertEquals("Warehouse not found", e.getMessage());
+
+        verify(warehouseRepository).findById(anyLong());
     }
 }
