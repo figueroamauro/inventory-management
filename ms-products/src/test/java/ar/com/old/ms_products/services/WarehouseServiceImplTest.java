@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -57,5 +58,21 @@ class WarehouseServiceImplTest {
         assertEquals("Pageable can not be null", e.getMessage());
 
         verify(warehouseRepository,never()).findAll(any(Pageable.class));
+    }
+
+    @Test
+    void shouldFindOneWarehouse(){
+        //GIVEN
+        Warehouse warehouse = new Warehouse(1L, "warehouse", 1L);
+        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+
+        //WHEN
+        Optional<Warehouse> result = warehouseService.findOne(1L);
+
+        //THEN
+        assertTrue(result.isPresent());
+        assertNotNull(result.get().getId());
+        assertEquals("warehouse", result.get().getName());
+
     }
 }
