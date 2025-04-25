@@ -2,6 +2,7 @@ package ar.com.old.ms_products.services;
 
 import ar.com.old.ms_products.dto.WarehouseDTO;
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ public class WarehouseServiceImpl implements WarehouseService{
     public Warehouse findOne(Long id) {
 
         return warehouseRepository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
     }
 
     @Override

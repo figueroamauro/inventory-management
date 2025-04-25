@@ -77,5 +77,15 @@ class WarehouseServiceImplTest {
         verify(warehouseRepository).findById(1L);
     }
 
+    @Test
+    void shouldThrowExceptionFindingById_whenNotFound(){
+        //WHEN
+        Executable executable = () -> warehouseService.findOne(1L);
 
+        //THEN
+        WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
+        assertEquals("Warehouse not found", e.getMessage());
+
+        verify(warehouseRepository).findById(1L);
+    }
 }
