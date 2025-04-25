@@ -34,16 +34,15 @@ public class WarehouseServiceImpl implements WarehouseService{
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse= warehouseRepository.findById(id)
                 .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
-        if (warehouse.getUserId().equals(userDTO.id())) {
-            return warehouse;
-        } else {
-            throw new WarehouseNotFoundException("Warehouse not found");
-        }
+        return validateWarehouseOwner(warehouse, userDTO);
     }
+
 
     @Override
     public Warehouse create(WarehouseDTO dto) {
-        return null;
+        UserDTO userDTO = clientService.getUser();
+        Warehouse warehouse = new Warehouse(dto.id(), dto.name(), userDTO.id());
+        return warehouseRepository.save(warehouse);
     }
 
     @Override
@@ -59,6 +58,14 @@ public class WarehouseServiceImpl implements WarehouseService{
     private void validateNull(Object object, String message) {
         if (object == null) {
             throw new IllegalArgumentException(message);
+        }
+    }
+
+    private static Warehouse validateWarehouseOwner(Warehouse warehouse, UserDTO userDTO) {
+        if (warehouse.getUserId().equals(userDTO.id())) {
+            return warehouse;
+        } else {
+            throw new WarehouseNotFoundException("Warehouse not found");
         }
     }
 }

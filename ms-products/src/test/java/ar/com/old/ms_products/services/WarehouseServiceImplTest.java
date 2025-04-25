@@ -2,6 +2,7 @@ package ar.com.old.ms_products.services;
 
 import ar.com.old.ms_products.clients.UserClientService;
 import ar.com.old.ms_products.clients.dto.UserDTO;
+import ar.com.old.ms_products.dto.WarehouseDTO;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
@@ -117,5 +118,20 @@ class WarehouseServiceImplTest {
         assertEquals("Warehouse not found", e.getMessage());
 
         verify(warehouseRepository).findById(anyLong());
+    }
+
+    @Test
+    void shouldCreateWarehouse(){
+        //GIVEN
+        WarehouseDTO dto = new WarehouseDTO(1L, "deposito");
+        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        when(warehouseRepository.save(any(Warehouse.class))).thenReturn(new Warehouse(1L, "warehouse", 1L));
+
+        //WHEN
+        Warehouse result = warehouseService.create(dto);
+
+        //THEN
+        assertNotNull(result);
+        assertEquals("warehouse", result.getName());
     }
 }
