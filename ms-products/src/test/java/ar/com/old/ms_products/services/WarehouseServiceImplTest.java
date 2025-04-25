@@ -7,6 +7,7 @@ import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.WarehouseAlreadyExistException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -33,16 +34,21 @@ class WarehouseServiceImplTest {
     private WarehouseRepository warehouseRepository;
     @Mock
     private UserClientService clientService;
+    private Warehouse warehouse;
+    private  WarehouseDTO dto;
+
+
+    @BeforeEach
+    void init() {
+        warehouse = new Warehouse(1L, "warehouse", 1L);
+        dto = new WarehouseDTO(1L, "deposito");
+    }
 
 
     @Test
     void shouldFindAllWarehouses(){
         //GIVEN
-        List<Warehouse> list = List.of(
-                new Warehouse(1L, "warehouse1", 1L),
-                new Warehouse(2L, "warehouse2", 2L),
-                new Warehouse(3L, "warehouse3", 3L)
-        );
+        List<Warehouse> list = List.of(warehouse,warehouse,warehouse);
         Pageable pageable = PageRequest.of(0, 10);
         Page<Warehouse> page = new PageImpl<>(list, pageable, list.size());
         when(warehouseRepository.findAll(pageable)).thenReturn(page);
@@ -70,7 +76,6 @@ class WarehouseServiceImplTest {
     @Test
     void shouldFindOneWarehouse(){
         //GIVEN
-        Warehouse warehouse = new Warehouse(1L, "warehouse", 1L);
         when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
         when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
 
@@ -124,7 +129,6 @@ class WarehouseServiceImplTest {
     @Test
     void shouldCreateWarehouse(){
         //GIVEN
-        WarehouseDTO dto = new WarehouseDTO(1L, "deposito");
         when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
         when(warehouseRepository.save(any(Warehouse.class))).thenReturn(new Warehouse(1L, "warehouse", 1L));
 
@@ -134,6 +138,8 @@ class WarehouseServiceImplTest {
         //THEN
         assertNotNull(result);
         assertEquals("warehouse", result.getName());
+
+        verify(warehouseRepository).save(any(Warehouse.class));
     }
 
     @Test
@@ -144,12 +150,13 @@ class WarehouseServiceImplTest {
         //THEN
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("You must provide a valid request body", e.getMessage());
+
+        verify(warehouseRepository,never()).save(any(Warehouse.class));
     }
 
     @Test
     void shouldThrowExceptionCreatingWarehouse_whenAlreadyExist(){
         //GIVEN
-        WarehouseDTO dto = new WarehouseDTO(1L, "deposito");
         when(warehouseRepository.findByName("deposito")).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
         when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
 
@@ -159,5 +166,8 @@ class WarehouseServiceImplTest {
         //THEN
         WarehouseAlreadyExistException e = assertThrows(WarehouseAlreadyExistException.class, executable);
         assertEquals("Warehouse already exist", e.getMessage());
+
+        verify(warehouseRepository).findByName(anyString());
+        verify(warehouseRepository,never()).save(any(Warehouse.class));
     }
 }
