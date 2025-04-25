@@ -1,6 +1,6 @@
 package ar.com.old.ms_products.services;
 
-import ar.com.old.ms_products.clients.UserClient;
+import ar.com.old.ms_products.clients.UserClientService;
 import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
@@ -40,7 +40,7 @@ class CategoryServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
     @Mock
-    UserClient userClient;
+    UserClientService userClientService;
     @Mock
     WarehouseRepository warehouseRepository;
     private Category category;
@@ -62,7 +62,7 @@ class CategoryServiceTest {
             //GIVEN
             when(categoryRepository.findByNameAndWarehouseId("Electro",1L)).thenReturn(Optional.empty());
             when(categoryRepository.save(any(Category.class))).thenReturn(category);
-            when(userClient.getCurrentUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(userClientService.getUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
             //WHEN
@@ -79,7 +79,7 @@ class CategoryServiceTest {
         @Test
         void shouldThrowExceptionCreatingCategory_whenNameAlreadyExist() {
             //GIVEN
-            when(userClient.getCurrentUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(userClientService.getUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
             when(categoryRepository.findByNameAndWarehouseId("Electro",1L)).thenReturn(Optional.of(category));
 
@@ -108,7 +108,7 @@ class CategoryServiceTest {
         @Test
         void shouldThrowExceptionCreatingCategory_whenUserNotFound() {
             //GIVEN
-            when(userClient.getCurrentUser()).thenReturn(null);
+            when(userClientService.getUser()).thenReturn(null);
 
             //WHEN
             Executable executable = () -> categoryService.create(dto);
@@ -123,7 +123,7 @@ class CategoryServiceTest {
         @Test
         void shouldThrowExceptionCreatingCategory_whenWarehouseNotFound() {
             //GIVEN
-            when(userClient.getCurrentUser()).thenReturn(new UserDTO(1L, "username", "email@mail.com"));
+            when(userClientService.getUser()).thenReturn(new UserDTO(1L, "username", "email@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.empty());
 
             //WHEN
@@ -142,7 +142,7 @@ class CategoryServiceTest {
         @Test
         void shouldFindCategoryById(){
             //GIVEN
-            when(userClient.getCurrentUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(userClientService.getUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
             when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.ofNullable(category));
@@ -170,7 +170,7 @@ class CategoryServiceTest {
         @Test
         void shouldThrowExceptionFindingCategory_whenCategoryNotFound(){
             //GIVEN
-            when(userClient.getCurrentUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(userClientService.getUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
             when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.empty());
@@ -195,7 +195,7 @@ class CategoryServiceTest {
             Pageable pageable = PageRequest.of(0, 10);
             List<Category> list = List.of(category, category, category, category, category);
             Page<Category> page = new PageImpl<>(list, pageable, list.size());
-            when(userClient.getCurrentUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+            when(userClientService.getUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
             when(categoryRepository.findAllByWarehouseId(pageable, 1L)).thenReturn(page);
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
 
@@ -226,7 +226,7 @@ class CategoryServiceTest {
             @Test
             void shouldDeleteById_whenUserIsOwner(){
                 //GIVEN
-                when(userClient.getCurrentUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+                when(userClientService.getUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
                 when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
                 when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.ofNullable(category));
 
@@ -252,7 +252,7 @@ class CategoryServiceTest {
             @Test
             void shouldThrowExceptionDeletingCategory_whenCategoryOrWarehouseNotFound(){
                 //GIVEN
-                when(userClient.getCurrentUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
+                when(userClientService.getUser()).thenReturn(new UserDTO(1L, "test", "test@mail.com"));
                 when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(new Warehouse(1L, "Central", 1L)));
                 when(categoryRepository.findByIdAndWarehouseId(1L,1L)).thenReturn(Optional.empty());
 

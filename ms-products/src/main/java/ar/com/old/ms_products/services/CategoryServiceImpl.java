@@ -1,6 +1,7 @@
 package ar.com.old.ms_products.services;
 
 import ar.com.old.ms_products.clients.UserClient;
+import ar.com.old.ms_products.clients.UserClientService;
 import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
@@ -23,15 +24,14 @@ import java.util.Optional;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final UserClient userClient;
+    private final UserClientService clientService;
     private final WarehouseRepository warehouseRepository;
 
     @Autowired
-    public CategoryServiceImpl(CategoryRepository categoryRepository,
-                               UserClient userClient,
+    public CategoryServiceImpl(CategoryRepository categoryRepository, UserClientService clientService,
                                WarehouseRepository warehouseRepository) {
         this.categoryRepository = categoryRepository;
-        this.userClient = userClient;
+        this.clientService = clientService;
         this.warehouseRepository = warehouseRepository;
     }
 
@@ -39,7 +39,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category create(CategoryDTO dto) {
         validateNull(dto, "DTO can not be null");
 
-        UserDTO userDTO = getUser();
+        UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO);
 
         checkExistingCategory(dto, warehouse.getId());
@@ -55,7 +55,7 @@ public class CategoryServiceImpl implements CategoryService {
     public Category findOne(Long id) {
         validateNull(id, "Id can not be null");
 
-        UserDTO userDTO = getUser();
+        UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO);
 
         return categoryRepository.findByIdAndWarehouseId(id, warehouse.getId())
@@ -65,7 +65,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Page<Category> findAll(Pageable pageable) {
         validateNull(pageable, "Pageable can not be null");
-        UserDTO userDTO = getUser();
+        UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO);
         return categoryRepository.findAllByWarehouseId(pageable, warehouse.getId());
     }
@@ -74,7 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Long id) {
         validateNull(id, "Id can not be null");
 
-        UserDTO userDTO = getUser();
+        UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO);
         Category category = categoryRepository.findByIdAndWarehouseId(id, warehouse.getId())
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
@@ -104,12 +104,6 @@ public class CategoryServiceImpl implements CategoryService {
         throw new ConnectionFeignException("Can not connect to another service");
     }
 
-    private UserDTO getUser() {
-        try {
-            return userClient.getCurrentUser();
-        } catch (FeignException e) {
-            throw new ConnectionFeignException("Can not connect to another service");
-        }
-    }
+
 
 }
