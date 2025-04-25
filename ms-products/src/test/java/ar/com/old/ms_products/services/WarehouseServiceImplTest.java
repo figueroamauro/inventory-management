@@ -88,4 +88,16 @@ class WarehouseServiceImplTest {
 
         verify(warehouseRepository).findById(1L);
     }
+
+    @Test
+    void shouldThrowExceptionFindingById_whenIdIsNUll(){
+        //WHEN
+        Executable executable = () -> warehouseService.findOne(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Id can not be null", e.getMessage());
+
+        verify(warehouseRepository, never()).findById(anyLong());
+    }
 }

@@ -29,7 +29,9 @@ public class WarehouseServiceImpl implements WarehouseService{
 
     @Override
     public Warehouse findOne(Long id) {
-
+        if (id == null) {
+            throw new IllegalArgumentException("Id can not be null");
+        }
         return warehouseRepository.findById(id)
                 .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
     }
