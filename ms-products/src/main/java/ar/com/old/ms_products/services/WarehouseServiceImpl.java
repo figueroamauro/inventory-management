@@ -67,7 +67,11 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public void delete(Long id) {
+        UserDTO userDTO = clientService.getUser();
+        Warehouse warehouse = warehouseRepository.findByIdAndUserId(id, userDTO.id())
+                .orElseThrow();
 
+        warehouseRepository.deleteById(id);
     }
 
     private void validateNull(Object object, String message) {

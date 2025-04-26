@@ -82,7 +82,6 @@ class WarehouseServiceImplTest {
     @Nested
     class findOne {
 
-
         @Test
         void shouldFindOneWarehouse() {
             //GIVEN
@@ -252,6 +251,23 @@ class WarehouseServiceImplTest {
             assertEquals("Warehouse not found", e.getMessage());
 
             verify(warehouseRepository, never()).save(any(Warehouse.class));
+        }
+    }
+
+    @Nested
+    class Delete {
+
+        @Test
+        void shouldDeleteWarehouse(){
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+            when(warehouseRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.ofNullable(warehouse));
+
+            //WHEN
+            warehouseService.delete(1L);
+
+            //THEN
+            verify(warehouseRepository).deleteById(1L);
         }
     }
 }
