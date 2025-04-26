@@ -67,6 +67,8 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public void delete(Long id) {
+        validateNull(id,"Id can not be null");
+
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = warehouseRepository.findByIdAndUserId(id, userDTO.id())
                 .orElseThrow();

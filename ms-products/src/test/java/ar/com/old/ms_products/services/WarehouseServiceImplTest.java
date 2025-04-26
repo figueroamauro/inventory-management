@@ -269,5 +269,17 @@ class WarehouseServiceImplTest {
             //THEN
             verify(warehouseRepository).deleteById(1L);
         }
+
+        @Test
+        void shouldThrowExceptionDeletingWarehouse_whenIdIsNull() {
+            //WHEN
+            Executable executable = () -> warehouseService.delete(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(warehouseRepository, never()).save(any(Warehouse.class));
+        }
     }
 }
