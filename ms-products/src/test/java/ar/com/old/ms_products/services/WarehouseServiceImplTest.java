@@ -224,6 +224,21 @@ class WarehouseServiceImplTest {
         }
 
         @Test
+        void shouldThrowExceptionUpdatingWarehouse_whenIdIsNull() {
+            //GIVEN
+            dto = new WarehouseDTO(null, "deposito");
+
+            //WHEN
+            Executable executable = () -> warehouseService.update(dto);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(warehouseRepository, never()).save(any(Warehouse.class));
+        }
+
+        @Test
         void shouldThrowExceptionUpdatingWarehouse_whenNotFoundWarehouse() {
             //GIVEN
             when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));

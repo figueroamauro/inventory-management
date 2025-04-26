@@ -57,6 +57,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public Warehouse update(WarehouseDTO dto) {
         validateNull(dto,"You must provide a valid request body");
+        validateNull(dto.id(),"Id can not be null");
 
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(dto.name(), userDTO.id());
