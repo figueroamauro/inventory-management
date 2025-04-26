@@ -7,11 +7,12 @@ import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.WarehouseAlreadyExistException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -48,10 +49,18 @@ public class WarehouseServiceImpl implements WarehouseService {
         validateNull(dto, "You must provide a valid request body");
 
         UserDTO userDTO = clientService.getUser();
+        hasWarehouse(userDTO);
         Warehouse warehouse = new Warehouse(dto.id(), dto.name(), userDTO.id());
         verifyExistentWarehouse(warehouse);
 
         return warehouseRepository.save(warehouse);
+    }
+
+    private void hasWarehouse(UserDTO userDTO) {
+        List<Warehouse> list = warehouseRepository.findAll();
+        if (!list.isEmpty()) {
+            throw new WarehouseAlreadyExistException("you already have a registered warehouse");
+        }
     }
 
     @Override
