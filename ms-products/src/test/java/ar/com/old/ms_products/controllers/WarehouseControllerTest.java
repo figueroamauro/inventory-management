@@ -92,4 +92,19 @@ class WarehouseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap());
     }
+
+    @Test
+    void shouldFailFindingAllWarehouses_whenPageableIsNull_status400() throws Exception {
+        //GIVEN
+        when(warehouseService.findAll(null)).thenThrow(new IllegalArgumentException("Pageable can not be null"));
+
+        //WHEN
+        mockMvc.perform(get("/api/warehouses")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Page must not be null"));
+    }
 }
