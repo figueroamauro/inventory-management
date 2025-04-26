@@ -7,6 +7,7 @@ import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.WarehouseAlreadyExistException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,11 +40,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         UserDTO userDTO = clientService.getUser();
        return warehouseRepository.findByIdAndUserId(id, userDTO.id())
                 .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
-
     }
 
-
     @Override
+    @Transactional
     public Warehouse create(WarehouseDTO dto) {
         validateNull(dto, "You must provide a valid request body");
 
@@ -55,6 +55,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Transactional
     public Warehouse update(WarehouseDTO dto) {
         validateNull(dto,"You must provide a valid request body");
         validateNull(dto.id(),"Id can not be null");
@@ -66,6 +67,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
         validateNull(id,"Id can not be null");
 
@@ -75,6 +77,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         warehouseRepository.deleteById(id);
     }
+
 
     private void validateNull(Object object, String message) {
         if (object == null) {

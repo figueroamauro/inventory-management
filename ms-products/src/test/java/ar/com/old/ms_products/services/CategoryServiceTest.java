@@ -106,9 +106,10 @@ class CategoryServiceTest {
         }
 
         @Test
-        void shouldThrowExceptionCreatingCategory_whenUserNotFound() {
+        void shouldThrowExceptionCreatingCategory_whenUserServiceNoConnect() {
             //GIVEN
-            when(userClientService.getUser()).thenReturn(null);
+            when(userClientService.getUser())
+                    .thenThrow(new ConnectionFeignException("Can not connect to another service"));
 
             //WHEN
             Executable executable = () -> categoryService.create(dto);
