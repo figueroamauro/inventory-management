@@ -205,5 +205,17 @@ class WarehouseServiceImplTest {
 
             verify(warehouseRepository).save(any(Warehouse.class));
         }
+
+        @Test
+        void shouldThrowExceptionUpdatingWarehouse_whenDTOIsNull() {
+            //WHEN
+            Executable executable = () -> warehouseService.update(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("You must provide a valid request body", e.getMessage());
+
+            verify(warehouseRepository, never()).save(any(Warehouse.class));
+        }
     }
 }

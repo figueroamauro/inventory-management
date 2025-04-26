@@ -55,17 +55,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         return warehouseRepository.save(warehouse);
     }
 
-    private void verifyExistentWarehouse(Warehouse warehouse) {
-        Optional<Warehouse> warehouseOpt = warehouseRepository
-                .findByNameAndUserId(warehouse.getName(),warehouse.getUserId());
-        if (warehouseOpt.isPresent()) {
-            throw new WarehouseAlreadyExistException("Warehouse already exist");
-        }
-
-    }
-
     @Override
     public Warehouse update(WarehouseDTO dto) {
+        validateNull(dto,"You must provide a valid request body");
 
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = warehouseRepository.findByNameAndUserId(dto.name(), userDTO.id())
@@ -90,6 +82,14 @@ public class WarehouseServiceImpl implements WarehouseService {
             return warehouse;
         } else {
             throw new WarehouseNotFoundException("Warehouse not found");
+        }
+    }
+
+    private void verifyExistentWarehouse(Warehouse warehouse) {
+        Optional<Warehouse> warehouseOpt = warehouseRepository
+                .findByNameAndUserId(warehouse.getName(),warehouse.getUserId());
+        if (warehouseOpt.isPresent()) {
+            throw new WarehouseAlreadyExistException("Warehouse already exist");
         }
     }
 }
