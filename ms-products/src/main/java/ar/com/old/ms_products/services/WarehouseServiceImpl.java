@@ -50,14 +50,15 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = new Warehouse(dto.id(), dto.name(), userDTO.id());
-        verifyExistentWarehouse(warehouse.getName());
+        verifyExistentWarehouse(warehouse);
 
         return warehouseRepository.save(warehouse);
     }
 
-    private void verifyExistentWarehouse(String name) {
-        Optional<Warehouse> warehouse = warehouseRepository.findByName(name);
-        if (warehouse.isPresent()) {
+    private void verifyExistentWarehouse(Warehouse warehouse) {
+        Optional<Warehouse> warehouseOpt = warehouseRepository
+                .findByNameAndUserId(warehouse.getName(),warehouse.getUserId());
+        if (warehouseOpt.isPresent()) {
             throw new WarehouseAlreadyExistException("Warehouse already exist");
         }
 

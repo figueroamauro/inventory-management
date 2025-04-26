@@ -12,4 +12,6 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, Long> {
     Optional<Warehouse> findByUserId(Long id);
 
     Optional<Warehouse> findByName(String name);
+
+    Optional<Warehouse> findByNameAndUserId(String name, Long id);
 }
