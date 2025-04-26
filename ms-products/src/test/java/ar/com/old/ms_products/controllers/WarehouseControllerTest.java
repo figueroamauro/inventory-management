@@ -11,10 +11,17 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -67,5 +74,22 @@ class WarehouseControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.error").value("Warehouse already exist"));
+    }
+
+    @Test
+    void shouldFindAllWarehouses() throws Exception {
+        //GIVEN
+        List<Warehouse> list = List.of(warehouse, warehouse, warehouse);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Warehouse> page = new PageImpl<>(list, pageable, list.size());
+        when(warehouseService.findAll(any(Pageable.class))).thenReturn(page);
+
+        //WHEN
+        mockMvc.perform(get("/api/warehouses")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap());
     }
 }
