@@ -8,12 +8,15 @@ import ar.com.old.ms_products.exceptions.WarehouseAlreadyExistException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.*;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -35,7 +38,7 @@ class WarehouseServiceImplTest {
     @Mock
     private UserClientService clientService;
     private Warehouse warehouse;
-    private  WarehouseDTO dto;
+    private WarehouseDTO dto;
 
 
     @BeforeEach
@@ -44,130 +47,163 @@ class WarehouseServiceImplTest {
         dto = new WarehouseDTO(1L, "deposito");
     }
 
+    @Nested
+    class FindAll {
 
-    @Test
-    void shouldFindAllWarehouses(){
-        //GIVEN
-        List<Warehouse> list = List.of(warehouse,warehouse,warehouse);
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Warehouse> page = new PageImpl<>(list, pageable, list.size());
-        when(warehouseRepository.findAll(pageable)).thenReturn(page);
+        @Test
+        void shouldFindAllWarehouses() {
+            //GIVEN
+            List<Warehouse> list = List.of(warehouse, warehouse, warehouse);
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<Warehouse> page = new PageImpl<>(list, pageable, list.size());
+            when(warehouseRepository.findAll(pageable)).thenReturn(page);
 
-        //WHEN
-        Page<Warehouse> result = warehouseService.findAll(pageable);
+            //WHEN
+            Page<Warehouse> result = warehouseService.findAll(pageable);
 
-        //THEN
-        assertNotNull(result);
-        assertEquals(3, result.getTotalElements());
+            //THEN
+            assertNotNull(result);
+            assertEquals(3, result.getTotalElements());
+        }
+
+        @Test
+        void shouldThrowExceptionFindingCallWarehouses_whenPageableIsNull() {
+            //WHEN
+            Executable executable = () -> warehouseService.findAll(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Pageable can not be null", e.getMessage());
+
+            verify(warehouseRepository, never()).findAll(any(Pageable.class));
+        }
     }
 
-    @Test
-    void shouldThrowExceptionFindingCallWarehouses_whenPageableIsNull(){
-        //WHEN
-        Executable executable = () -> warehouseService.findAll(null);
+    @Nested
+    class findOne {
 
-        //THEN
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("Pageable can not be null", e.getMessage());
 
-        verify(warehouseRepository,never()).findAll(any(Pageable.class));
+        @Test
+        void shouldFindOneWarehouse() {
+            //GIVEN
+            when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+            //WHEN
+            Warehouse result = warehouseService.findOne(1L);
+
+            //THEN
+            assertNotNull(result.getId());
+            assertEquals("warehouse", result.getName());
+
+            verify(warehouseRepository).findById(1L);
+        }
+
+        @Test
+        void shouldThrowExceptionFindingById_whenNotFound() {
+            //WHEN
+            Executable executable = () -> warehouseService.findOne(1L);
+
+            //THEN
+            WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
+            assertEquals("Warehouse not found", e.getMessage());
+
+            verify(warehouseRepository).findById(1L);
+        }
+
+        @Test
+        void shouldThrowExceptionFindingById_whenIdIsNull() {
+            //WHEN
+            Executable executable = () -> warehouseService.findOne(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(warehouseRepository, never()).findById(anyLong());
+        }
+
+        @Test
+        void shouldThrowExceptionFindingById_whenCurrentUserIsDifferentToWarehouseOwner() {
+            //WHEN
+            Executable executable = () -> warehouseService.findOne(2L);
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+            //THEN
+            WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
+            assertEquals("Warehouse not found", e.getMessage());
+
+            verify(warehouseRepository).findById(anyLong());
+        }
     }
 
-    @Test
-    void shouldFindOneWarehouse(){
-        //GIVEN
-        when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
-        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+    @Nested
+    class Create {
 
-        //WHEN
-        Warehouse result = warehouseService.findOne(1L);
+        @Test
+        void shouldCreateWarehouse() {
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+            when(warehouseRepository.save(any(Warehouse.class))).thenReturn(new Warehouse(1L, "warehouse", 1L));
 
-        //THEN
-        assertNotNull(result.getId());
-        assertEquals("warehouse", result.getName());
+            //WHEN
+            Warehouse result = warehouseService.create(dto);
 
-        verify(warehouseRepository).findById(1L);
+            //THEN
+            assertNotNull(result);
+            assertEquals("warehouse", result.getName());
+
+            verify(warehouseRepository).save(any(Warehouse.class));
+        }
+
+        @Test
+        void shouldThrowExceptionCreatingWarehouse_whenDTOIsNull() {
+            //WHEN
+            Executable executable = () -> warehouseService.create(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("You must provide a valid request body", e.getMessage());
+
+            verify(warehouseRepository, never()).save(any(Warehouse.class));
+        }
+
+        @Test
+        void shouldThrowExceptionCreatingWarehouse_whenAlreadyExist() {
+            //GIVEN
+            when(warehouseRepository.findByNameAndUserId("deposito", 1L)).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+            //WHEN
+            Executable executable = () -> warehouseService.create(dto);
+
+            //THEN
+            WarehouseAlreadyExistException e = assertThrows(WarehouseAlreadyExistException.class, executable);
+            assertEquals("Warehouse already exist", e.getMessage());
+
+            verify(warehouseRepository).findByNameAndUserId(anyString(), anyLong());
+            verify(warehouseRepository, never()).save(any(Warehouse.class));
+        }
     }
 
-    @Test
-    void shouldThrowExceptionFindingById_whenNotFound(){
-        //WHEN
-        Executable executable = () -> warehouseService.findOne(1L);
+    @Nested
+    class Update {
 
-        //THEN
-        WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
-        assertEquals("Warehouse not found", e.getMessage());
+        @Test
+        void shouldUpdateWarehouse(){
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+            when(warehouseRepository.findByNameAndUserId("deposito", 1L)).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
+            when(warehouseRepository.save(any(Warehouse.class))).thenReturn(new Warehouse(1L, "warehouse", 1L));
 
-        verify(warehouseRepository).findById(1L);
-    }
+            //WHEN
+            Warehouse result = warehouseService.update(dto);
 
-    @Test
-    void shouldThrowExceptionFindingById_whenIdIsNull(){
-        //WHEN
-        Executable executable = () -> warehouseService.findOne(null);
+            //THEN
+            assertNotNull(result);
+            assertEquals("warehouse", result.getName());
 
-        //THEN
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("Id can not be null", e.getMessage());
-
-        verify(warehouseRepository, never()).findById(anyLong());
-    }
-
-    @Test
-    void shouldThrowExceptionFindingById_whenCurrentUserIsDifferentToWarehouseOwner(){
-        //WHEN
-        Executable executable = () -> warehouseService.findOne(2L);
-        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-
-        //THEN
-        WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
-        assertEquals("Warehouse not found", e.getMessage());
-
-        verify(warehouseRepository).findById(anyLong());
-    }
-
-    @Test
-    void shouldCreateWarehouse(){
-        //GIVEN
-        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-        when(warehouseRepository.save(any(Warehouse.class))).thenReturn(new Warehouse(1L, "warehouse", 1L));
-
-        //WHEN
-        Warehouse result = warehouseService.create(dto);
-
-        //THEN
-        assertNotNull(result);
-        assertEquals("warehouse", result.getName());
-
-        verify(warehouseRepository).save(any(Warehouse.class));
-    }
-
-    @Test
-    void shouldThrowExceptionCreatingWarehouse_whenDTOIsNull(){
-        //WHEN
-        Executable executable = () -> warehouseService.create(null);
-
-        //THEN
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("You must provide a valid request body", e.getMessage());
-
-        verify(warehouseRepository,never()).save(any(Warehouse.class));
-    }
-
-    @Test
-    void shouldThrowExceptionCreatingWarehouse_whenAlreadyExist(){
-        //GIVEN
-        when(warehouseRepository.findByNameAndUserId("deposito",1L)).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
-        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-
-        //WHEN
-        Executable executable = () -> warehouseService.create(dto);
-
-        //THEN
-        WarehouseAlreadyExistException e = assertThrows(WarehouseAlreadyExistException.class, executable);
-        assertEquals("Warehouse already exist", e.getMessage());
-
-        verify(warehouseRepository).findByNameAndUserId(anyString(),anyLong());
-        verify(warehouseRepository,never()).save(any(Warehouse.class));
+            verify(warehouseRepository).save(any(Warehouse.class));
+        }
     }
 }

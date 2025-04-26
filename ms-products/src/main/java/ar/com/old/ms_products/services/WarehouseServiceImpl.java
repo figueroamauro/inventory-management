@@ -66,7 +66,12 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public Warehouse update(WarehouseDTO dto) {
-        return null;
+
+        UserDTO userDTO = clientService.getUser();
+        Warehouse warehouse = warehouseRepository.findByNameAndUserId(dto.name(), userDTO.id())
+                .orElseThrow();
+
+        return warehouseRepository.save(warehouse);
     }
 
     @Override
