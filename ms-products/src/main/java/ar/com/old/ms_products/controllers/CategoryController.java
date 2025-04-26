@@ -1,4 +1,4 @@
-package ar.com.old.ms_products;
+package ar.com.old.ms_products.controllers;
 
 import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
