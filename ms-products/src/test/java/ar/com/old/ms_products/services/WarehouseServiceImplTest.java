@@ -217,5 +217,21 @@ class WarehouseServiceImplTest {
 
             verify(warehouseRepository, never()).save(any(Warehouse.class));
         }
+
+        @Test
+        void shouldThrowExceptionUpdatingWarehouse_whenNotFoundWarehouse() {
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+            when(warehouseRepository.findByNameAndUserId("deposito", 1L)).thenReturn(Optional.empty());
+
+            //WHEN
+            Executable executable = () -> warehouseService.update(dto);
+
+            //THEN
+            WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
+            assertEquals("Warehouse not found", e.getMessage());
+
+            verify(warehouseRepository, never()).save(any(Warehouse.class));
+        }
     }
 }

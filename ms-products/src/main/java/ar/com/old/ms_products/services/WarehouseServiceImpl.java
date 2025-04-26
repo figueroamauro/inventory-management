@@ -61,7 +61,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = warehouseRepository.findByNameAndUserId(dto.name(), userDTO.id())
-                .orElseThrow();
+                .orElseThrow(()-> new WarehouseNotFoundException("Warehouse not found"));
 
         return warehouseRepository.save(warehouse);
     }
