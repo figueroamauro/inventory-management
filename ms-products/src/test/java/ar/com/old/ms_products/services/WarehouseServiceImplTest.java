@@ -86,7 +86,7 @@ class WarehouseServiceImplTest {
         @Test
         void shouldFindOneWarehouse() {
             //GIVEN
-            when(warehouseRepository.findById(1L)).thenReturn(Optional.of(warehouse));
+            when(warehouseRepository.findByIdAndUserId(1L,1L)).thenReturn(Optional.of(warehouse));
             when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
 
             //WHEN
@@ -96,11 +96,14 @@ class WarehouseServiceImplTest {
             assertNotNull(result.getId());
             assertEquals("warehouse", result.getName());
 
-            verify(warehouseRepository).findById(1L);
+            verify(warehouseRepository).findByIdAndUserId(1L,1L);
         }
 
         @Test
         void shouldThrowExceptionFindingById_whenNotFound() {
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
             //WHEN
             Executable executable = () -> warehouseService.findOne(1L);
 
@@ -108,7 +111,7 @@ class WarehouseServiceImplTest {
             WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
             assertEquals("Warehouse not found", e.getMessage());
 
-            verify(warehouseRepository).findById(1L);
+            verify(warehouseRepository).findByIdAndUserId(1L,1L);
         }
 
         @Test
@@ -125,15 +128,17 @@ class WarehouseServiceImplTest {
 
         @Test
         void shouldThrowExceptionFindingById_whenCurrentUserIsDifferentToWarehouseOwner() {
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
             //WHEN
             Executable executable = () -> warehouseService.findOne(2L);
-            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
 
             //THEN
             WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
             assertEquals("Warehouse not found", e.getMessage());
 
-            verify(warehouseRepository).findById(anyLong());
+            verify(warehouseRepository).findByIdAndUserId(anyLong(),anyLong());
         }
     }
 

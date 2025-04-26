@@ -37,10 +37,9 @@ public class WarehouseServiceImpl implements WarehouseService {
         validateNull(id, "Id can not be null");
 
         UserDTO userDTO = clientService.getUser();
-        Warehouse warehouse = warehouseRepository.findById(id)
+       return warehouseRepository.findByIdAndUserId(id, userDTO.id())
                 .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
 
-        return validateWarehouseOwner(warehouse, userDTO);
     }
 
 
@@ -60,8 +59,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         validateNull(dto,"You must provide a valid request body");
 
         UserDTO userDTO = clientService.getUser();
-        Warehouse warehouse = warehouseRepository.findByNameAndUserId(dto.name(), userDTO.id())
-                .orElseThrow(()-> new WarehouseNotFoundException("Warehouse not found"));
+        Warehouse warehouse = getWarehouse(dto.name(), userDTO.id());
 
         return warehouseRepository.save(warehouse);
     }
@@ -91,5 +89,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         if (warehouseOpt.isPresent()) {
             throw new WarehouseAlreadyExistException("Warehouse already exist");
         }
+    }
+
+    private Warehouse getWarehouse(String name, Long userId) {
+        return warehouseRepository.findByNameAndUserId(name, userId)
+                .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
     }
 }
