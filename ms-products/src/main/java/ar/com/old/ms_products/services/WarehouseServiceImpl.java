@@ -56,13 +56,6 @@ public class WarehouseServiceImpl implements WarehouseService {
         return warehouseRepository.save(warehouse);
     }
 
-    private void hasWarehouse(UserDTO userDTO) {
-        List<Warehouse> list = warehouseRepository.findAll();
-        if (!list.isEmpty()) {
-            throw new WarehouseAlreadyExistException("you already have a registered warehouse");
-        }
-    }
-
     @Override
     @Transactional
     public Warehouse update(WarehouseDTO dto) {
@@ -70,7 +63,10 @@ public class WarehouseServiceImpl implements WarehouseService {
         validateNull(dto.id(),"Id can not be null");
 
         UserDTO userDTO = clientService.getUser();
-        Warehouse warehouse = getWarehouse(dto.name(), userDTO.id());
+        Warehouse warehouse = warehouseRepository.findByIdAndUserId(dto.id(), userDTO.id())
+                .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
+
+        warehouse.setName(dto.name());
 
         return warehouseRepository.save(warehouse);
     }
@@ -94,14 +90,6 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
     }
 
-    private static Warehouse validateWarehouseOwner(Warehouse warehouse, UserDTO userDTO) {
-        if (warehouse.getUserId().equals(userDTO.id())) {
-            return warehouse;
-        } else {
-            throw new WarehouseNotFoundException("Warehouse not found");
-        }
-    }
-
     private void verifyExistentWarehouse(Warehouse warehouse) {
         Optional<Warehouse> warehouseOpt = warehouseRepository
                 .findByNameAndUserId(warehouse.getName(),warehouse.getUserId());
@@ -110,8 +98,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
     }
 
-    private Warehouse getWarehouse(String name, Long userId) {
-        return warehouseRepository.findByNameAndUserId(name, userId)
-                .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
+    private void hasWarehouse(UserDTO userDTO) {
+        List<Warehouse> list = warehouseRepository.findAll();
+        if (!list.isEmpty()) {
+            throw new WarehouseAlreadyExistException("you already have a registered warehouse");
+        }
     }
+
 }

@@ -197,7 +197,7 @@ class WarehouseServiceImplTest {
         void shouldUpdateWarehouse(){
             //GIVEN
             when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-            when(warehouseRepository.findByNameAndUserId("deposito", 1L)).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
+            when(warehouseRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
             when(warehouseRepository.save(any(Warehouse.class))).thenReturn(new Warehouse(1L, "warehouse", 1L));
 
             //WHEN
@@ -241,7 +241,7 @@ class WarehouseServiceImplTest {
         void shouldThrowExceptionUpdatingWarehouse_whenNotFoundWarehouse() {
             //GIVEN
             when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-            when(warehouseRepository.findByNameAndUserId("deposito", 1L)).thenReturn(Optional.empty());
+            when(warehouseRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.empty());
 
             //WHEN
             Executable executable = () -> warehouseService.update(dto);
