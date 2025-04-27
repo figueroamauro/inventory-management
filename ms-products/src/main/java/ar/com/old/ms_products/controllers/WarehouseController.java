@@ -35,4 +35,10 @@ public class WarehouseController {
         return ResponseEntity.ok(assembler.toModel(page));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Warehouse> findOne(@PathVariable Long id) {
+        Warehouse warehouse = warehouseService.findOne(id);
+        return ResponseEntity.ok(warehouse);
+    }
+
 }
