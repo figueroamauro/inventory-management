@@ -153,4 +153,20 @@ class WarehouseControllerTest {
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.name").value("deposito"));
     }
+
+    @Test
+    void shouldFailUpdatingWarehouse_whenNotFound_status404() throws Exception {
+        //GIVEN
+        when(warehouseService.update(any(WarehouseDTO.class))).thenThrow(new WarehouseNotFoundException("Warehouse not found"));
+
+        //WHEN
+        mockMvc.perform(put("/api/warehouses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Warehouse not found"));
+    }
 }
