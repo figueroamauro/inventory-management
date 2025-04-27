@@ -77,8 +77,8 @@ public class WarehouseServiceImpl implements WarehouseService {
         validateNull(id,"Id can not be null");
 
         UserDTO userDTO = clientService.getUser();
-        Warehouse warehouse = warehouseRepository.findByIdAndUserId(id, userDTO.id())
-                .orElseThrow();
+       warehouseRepository.findByIdAndUserId(id, userDTO.id())
+                .orElseThrow(()-> new WarehouseNotFoundException("Warehouse not found"));
 
         warehouseRepository.deleteById(id);
     }
