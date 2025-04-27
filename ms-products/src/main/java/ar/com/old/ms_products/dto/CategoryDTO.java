@@ -11,5 +11,5 @@ public record CategoryDTO(
         @Pattern(regexp = NAME_PATTERN,message = "Invalid category name pattern. Must contain only alphanumeric characters")
         String name) {
 
-    private final static String NAME_PATTERN = "^[a-zA-Z]{4,}$";
+    private final static String NAME_PATTERN = "^[A-Za-z0-9]+( [A-Za-z0-9]+)*$";
 }

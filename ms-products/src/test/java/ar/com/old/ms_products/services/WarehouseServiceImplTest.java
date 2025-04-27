@@ -172,6 +172,21 @@ class WarehouseServiceImplTest {
             verify(warehouseRepository, never()).save(any(Warehouse.class));
         }
 
+        @Test
+        void shouldThrowExceptionCreatingWarehouse_whenUserHasAWarehouse() {
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+            when(warehouseRepository.findAllByUserId(1L))
+                    .thenThrow(new WarehouseAlreadyExistException("You already have a registered warehouse"));
+            //WHEN
+            Executable executable = () -> warehouseService.create(dto);
+
+            //THEN
+            WarehouseAlreadyExistException e = assertThrows(WarehouseAlreadyExistException.class, executable);
+            assertEquals("You already have a registered warehouse", e.getMessage());
+
+            verify(warehouseRepository, never()).save(any(Warehouse.class));
+        }
+
         //TODO for multi-warehouses
 //        @Test
 //        void shouldThrowExceptionCreatingWarehouse_whenAlreadyExist() {

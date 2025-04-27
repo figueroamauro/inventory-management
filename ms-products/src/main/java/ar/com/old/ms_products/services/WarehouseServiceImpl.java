@@ -102,7 +102,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private void hasWarehouse(UserDTO userDTO) {
         List<Warehouse> list = warehouseRepository.findAllByUserId(userDTO.id());
         if (!list.isEmpty()) {
-            throw new WarehouseAlreadyExistException("you already have a registered warehouse");
+            throw new WarehouseAlreadyExistException("You already have a registered warehouse");
         }
     }
 
