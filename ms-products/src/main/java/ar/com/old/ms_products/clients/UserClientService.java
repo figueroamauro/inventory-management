@@ -18,7 +18,7 @@ public class UserClientService {
         try {
             return userClient.getCurrentUser();
         } catch (FeignException e) {
-            throw new ConnectionFeignException("Can not connect to another service");
+            throw new ConnectionFeignException("Can not connect to another service, verify you current token");
         }
     }
 }

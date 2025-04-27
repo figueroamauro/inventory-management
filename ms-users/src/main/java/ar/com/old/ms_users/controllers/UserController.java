@@ -8,6 +8,7 @@ import ar.com.old.ms_users.mappers.UserResponseMapper;
 import ar.com.old.ms_users.security.CustomUserDetails;
 import ar.com.old.ms_users.security.CustomUserDetailsService;
 import ar.com.old.ms_users.services.UserService;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,9 +64,11 @@ public class UserController {
 
     @GetMapping("/current")
     public ResponseEntity<?> getCurrentUser() {
-        CustomUserDetails userDetail = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        return ResponseEntity.ok(mapper.toDto(userDetail.getUser()));
-
+        try {
+            CustomUserDetails userDetail = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return ResponseEntity.ok(mapper.toDto(userDetail.getUser()));
+        } catch (ClassCastException e) {
+            throw new JwtException("Invalid or null token");
+        }
     }
 }
