@@ -1,9 +1,6 @@
 package ar.com.old.ms_products.handler;
 
-import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
-import ar.com.old.ms_products.exceptions.ConnectionFeignException;
-import ar.com.old.ms_products.exceptions.ExistingCategoryException;
-import ar.com.old.ms_products.exceptions.WarehouseAlreadyExistException;
+import ar.com.old.ms_products.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -32,7 +29,8 @@ public class GlobalHandler {
         return buildResponseError(e, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(CategoryNotFoundException.class)
+    @ExceptionHandler({CategoryNotFoundException.class,
+            WarehouseNotFoundException.class})
     public ResponseEntity<Map<String, String>> handlerNotFound(Exception e) {
         return buildResponseError(e, HttpStatus.NOT_FOUND);
     }

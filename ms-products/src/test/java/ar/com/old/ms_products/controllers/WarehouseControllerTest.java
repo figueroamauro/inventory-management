@@ -3,6 +3,7 @@ package ar.com.old.ms_products.controllers;
 import ar.com.old.ms_products.dto.WarehouseDTO;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.WarehouseAlreadyExistException;
+import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.services.WarehouseServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -108,7 +109,7 @@ class WarehouseControllerTest {
     }
 
     @Test
-    void shouldFindOneWarehouse() throws Exception {
+    void shouldFindOneWarehouse_status200() throws Exception {
         //GIVEN
         when(warehouseService.findOne(1L)).thenReturn(warehouse);
 
@@ -119,5 +120,20 @@ class WarehouseControllerTest {
                 //THEN
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap());
+    }
+
+    @Test
+    void shouldFailFindingOneWarehouse_whenNotFound_status404() throws Exception {
+        //GIVEN
+        when(warehouseService.findOne(1L)).thenThrow(new WarehouseNotFoundException("Warehouse not found"));
+
+        //WHEN
+        mockMvc.perform(get("/api/warehouses/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Warehouse not found"));
     }
 }
