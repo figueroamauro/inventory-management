@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
@@ -50,8 +49,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
         UserDTO userDTO = clientService.getUser();
         hasWarehouse(userDTO);
-        Warehouse warehouse = new Warehouse(dto.id(), dto.name(), userDTO.id());
-        verifyExistentWarehouse(warehouse);
+        Warehouse warehouse = new Warehouse(null, dto.name(), userDTO.id());
 
         return warehouseRepository.save(warehouse);
     }
@@ -90,16 +88,19 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
     }
 
-    private void verifyExistentWarehouse(Warehouse warehouse) {
-        Optional<Warehouse> warehouseOpt = warehouseRepository
-                .findByNameAndUserId(warehouse.getName(),warehouse.getUserId());
-        if (warehouseOpt.isPresent()) {
-            throw new WarehouseAlreadyExistException("Warehouse already exist");
-        }
-    }
+        //TODO for multi-warehouses
+//    private void verifyExistentWarehouse(Warehouse warehouse) {
+//        Optional<Warehouse> warehouseOpt = warehouseRepository
+//                .findByNameAndUserId(warehouse.getName(),warehouse.getUserId());
+//        if (warehouseOpt.isPresent()) {
+//            throw new WarehouseAlreadyExistException("Warehouse already exist");
+//        }
+//    }
 
+
+    @Transactional(readOnly = true)
     private void hasWarehouse(UserDTO userDTO) {
-        List<Warehouse> list = warehouseRepository.findAll();
+        List<Warehouse> list = warehouseRepository.findAllByUserId(userDTO.id());
         if (!list.isEmpty()) {
             throw new WarehouseAlreadyExistException("you already have a registered warehouse");
         }

@@ -40,6 +40,6 @@ FOREIGN KEY (warehouse_id)
 REFERENCES warehouses(id);
 
 -- FOR TESTING
-INSERT INTO warehouses(name, user_id) VALUES("deposito", 1);
-INSERT INTO warehouses(name, user_id) VALUES("deposito", 2);
-INSERT INTO warehouses(name, user_id) VALUES("deposito", 3);
+-- INSERT INTO warehouses(name, user_id) VALUES("deposito", 1);
+-- INSERT INTO warehouses(name, user_id) VALUES("deposito", 2);
+-- INSERT INTO warehouses(name, user_id) VALUES("deposito", 3);

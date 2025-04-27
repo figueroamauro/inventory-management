@@ -172,22 +172,23 @@ class WarehouseServiceImplTest {
             verify(warehouseRepository, never()).save(any(Warehouse.class));
         }
 
-        @Test
-        void shouldThrowExceptionCreatingWarehouse_whenAlreadyExist() {
-            //GIVEN
-            when(warehouseRepository.findByNameAndUserId("deposito", 1L)).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
-            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-
-            //WHEN
-            Executable executable = () -> warehouseService.create(dto);
-
-            //THEN
-            WarehouseAlreadyExistException e = assertThrows(WarehouseAlreadyExistException.class, executable);
-            assertEquals("Warehouse already exist", e.getMessage());
-
-            verify(warehouseRepository).findByNameAndUserId(anyString(), anyLong());
-            verify(warehouseRepository, never()).save(any(Warehouse.class));
-        }
+        //TODO for multi-warehouses
+//        @Test
+//        void shouldThrowExceptionCreatingWarehouse_whenAlreadyExist() {
+//            //GIVEN
+//            when(warehouseRepository.findByNameAndUserId("deposito", 1L)).thenReturn(Optional.of(new Warehouse(1L, "warehouse", 1L)));
+//            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+//
+//            //WHEN
+//            Executable executable = () -> warehouseService.create(dto);
+//
+//            //THEN
+//            WarehouseAlreadyExistException e = assertThrows(WarehouseAlreadyExistException.class, executable);
+//            assertEquals("Warehouse already exist", e.getMessage());
+//
+//            verify(warehouseRepository).findByNameAndUserId(anyString(), anyLong());
+//            verify(warehouseRepository, never()).save(any(Warehouse.class));
+//        }
     }
 
     @Nested
