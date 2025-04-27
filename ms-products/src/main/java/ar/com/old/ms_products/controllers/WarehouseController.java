@@ -41,4 +41,10 @@ public class WarehouseController {
         return ResponseEntity.ok(warehouse);
     }
 
+    @PutMapping
+    public ResponseEntity<Warehouse> update(@RequestBody WarehouseDTO dto) {
+        Warehouse warehouse = warehouseService.update(dto);
+        return ResponseEntity.ok(warehouse);
+    }
+
 }

@@ -5,6 +5,7 @@ import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.WarehouseAlreadyExistException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.services.WarehouseServiceImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,5 +136,21 @@ class WarehouseControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.error").value("Warehouse not found"));
+    }
+
+    @Test
+    void shouldUpdateWarehouse_status200() throws Exception {
+        //GIVEN
+        when(warehouseService.update(dto)).thenReturn(warehouse);
+
+        //WHEN
+        mockMvc.perform(put("/api/warehouses")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.name").value("deposito"));
     }
 }
