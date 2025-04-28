@@ -2,17 +2,17 @@
   "warehouses": [
     {
       "id": 1,
-      "name": "deposito",
+      "name": "deposito1",
       "user_id": 1
     },
     {
       "id": 2,
-      "name": "deposito",
+      "name": "deposito2",
       "user_id": 2
     },
     {
       "id": 3,
-      "name": "deposito",
+      "name": "deposito3",
       "user_id": 3
     }
   ]

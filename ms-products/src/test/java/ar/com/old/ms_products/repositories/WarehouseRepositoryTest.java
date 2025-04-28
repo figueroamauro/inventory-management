@@ -34,7 +34,7 @@ class WarehouseRepositoryTest {
         //THEN
         assertTrue(result.isPresent());
         assertEquals(1L, result.get().getId());
-        assertEquals("deposito", result.get().getName());
+        assertEquals("deposito1", result.get().getName());
     }
 
     @Test
@@ -45,4 +45,16 @@ class WarehouseRepositoryTest {
         //THEN
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void shouldFindWarehouseByIdAndUserId(){
+        //WHEN
+        Optional<Warehouse> result = repository.findByIdAndUserId(2L,2L);
+
+        //THEN
+        assertTrue(result.isPresent());
+        assertEquals(2L, result.get().getId());
+        assertEquals("deposito2", result.get().getName());
+    }
+
 }
