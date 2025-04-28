@@ -15,6 +15,7 @@ Aplicación web para registrar, actualizar y controlar el stock de productos en 
 
 - **Backend:** Java17 + Spring Boot 3.4
 - **Frontend:** (...)
+- **Seguridad:** Spring Security + JWT
 - **Base de datos:** MySQL
 - **Testing:** Junit5 + Mockito + Testcontainers + DatabaseRider
 - **Migraciones:** Flyway
