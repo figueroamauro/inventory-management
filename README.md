@@ -16,6 +16,8 @@ Aplicación web para registrar, actualizar y controlar el stock de productos en 
 - **Backend:** Java + Spring Boot
 - **Frontend:** (...)
 - **Base de datos:** MySQL
+- **Testing:** Junit5 + Mockito + Testcontainers + DatabaseRider
+- **Migraciones:** Flyway
 - **Contenedores:** Docker
 - **Comunicación entre microservicios:** REST APIs (Feign)
 - **Documentación de APIs:** Swagger / OpenAPI
