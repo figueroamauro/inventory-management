@@ -175,8 +175,7 @@ class WarehouseServiceImplTest {
         @Test
         void shouldThrowExceptionCreatingWarehouse_whenUserHasAWarehouse() {
             when(clientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-            when(warehouseRepository.findAllByUserId(1L))
-                    .thenThrow(new WarehouseAlreadyExistException("You already have a registered warehouse"));
+            when(warehouseRepository.findAllByUserId(1L)).thenReturn(List.of(warehouse));
             //WHEN
             Executable executable = () -> warehouseService.create(dto);
 
