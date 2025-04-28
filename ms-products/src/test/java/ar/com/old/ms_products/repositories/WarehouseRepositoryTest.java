@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,6 +56,18 @@ class WarehouseRepositoryTest {
         assertTrue(result.isPresent());
         assertEquals(2L, result.get().getId());
         assertEquals("deposito2", result.get().getName());
+    }
+
+    @Test
+    void shouldFindAllWarehousesByUserId(){
+        //WHEN
+        List<Warehouse> result = repository.findAllByUserId(1L);
+
+        //THEN
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals(1L, result.get(0).getUserId());
+        assertEquals("deposito1", result.get(0).getName());
     }
 
 }
