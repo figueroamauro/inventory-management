@@ -13,7 +13,7 @@ Aplicación web para registrar, actualizar y controlar el stock de productos en 
 
 ## Tecnologías utilizadas
 
-- **Backend:** Java + Spring Boot
+- **Backend:** Java17 + Spring Boot 3.4
 - **Frontend:** (...)
 - **Base de datos:** MySQL
 - **Testing:** Junit5 + Mockito + Testcontainers + DatabaseRider
