@@ -8,6 +8,7 @@ import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
 import ar.com.old.ms_products.exceptions.ConnectionFeignException;
+import ar.com.old.ms_products.exceptions.ProductAlreadyExistException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.ProductRepository;
@@ -126,6 +127,25 @@ class ProductServiceTest {
         //THEN
         CategoryNotFoundException e = assertThrows(CategoryNotFoundException.class, executable);
         assertEquals("Category not found", e.getMessage());
+
+        verify(clientService).getUser();
+        verify(warehouseRepository).findByUserId(anyLong());
+    }
+
+    @Test
+    void shouldFailCreatingProduct_whenProductAlreadyExist() {
+        //GIVEN
+        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+        when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+        when(categoryRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(category));
+        when(productRepository.findByNameAndWarehouseId("product1", 1L)).thenReturn(Optional.ofNullable(product));
+
+        //WHEN
+        Executable executable = () -> productService.create(dto);
+
+        //THEN
+        ProductAlreadyExistException e = assertThrows(ProductAlreadyExistException.class, executable);
+        assertEquals("Product already exist", e.getMessage());
 
         verify(clientService).getUser();
         verify(warehouseRepository).findByUserId(anyLong());

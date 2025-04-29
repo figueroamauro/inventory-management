@@ -7,6 +7,7 @@ import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
+import ar.com.old.ms_products.exceptions.ProductAlreadyExistException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.ProductRepository;
@@ -14,8 +15,7 @@ import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
-
+import java.util.Optional;
 
 public class ProductServiceImpl implements ProductService{
 
@@ -36,6 +36,8 @@ public class ProductServiceImpl implements ProductService{
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO.id());
         Category category = getCategory(dto.categoryId(), warehouse.getId());
+
+        validateExistingProduct(dto.name(), warehouse.getId());
         Product product = new Product(null, dto.name(), dto.description(),
                 dto.price(), category, warehouse);
 
@@ -71,5 +73,12 @@ public class ProductServiceImpl implements ProductService{
     private Warehouse getWarehouse(Long id) {
         return warehouseRepository.findByUserId(id)
                 .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
+    }
+
+    private void validateExistingProduct(String name, Long warehouseId) {
+        Optional<Product> productOpt = productRepository.findByNameAndWarehouseId(name, warehouseId);
+        if (productOpt.isPresent()) {
+            throw new ProductAlreadyExistException("Product already exist");
+        }
     }
 }
