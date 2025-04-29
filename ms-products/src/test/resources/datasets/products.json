@@ -1,0 +1,27 @@
+{
+  "warehouses": [
+    {
+      "id": 1,
+      "name": "Central",
+      "user_id": 1
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Electro",
+      "warehouse_id": 1
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "product1",
+      "description": "description",
+      "price": 100.00,
+      "created_at": "2025-04-29 17:00:00",
+      "category_id": 1,
+      "warehouse_id": 1
+    }
+  ]
+}

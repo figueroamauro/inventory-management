@@ -21,7 +21,7 @@ public class Product {
     @Column(name = "price")
     private Double price;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP")
     private LocalDateTime createdAt;
 
     @ManyToOne
@@ -31,6 +31,10 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "warehouse_id", referencedColumnName = "id")
     private Warehouse warehouse;
+
+    public Product() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public Product(Long id, String name, String description, Double price, Category category, Warehouse warehouse) {
         this.id = id;

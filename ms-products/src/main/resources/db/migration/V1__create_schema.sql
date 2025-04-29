@@ -6,7 +6,7 @@ id int AUTO_INCREMENT PRIMARY KEY,
 name varchar(50),
 description varchar(300),
 price decimal,
-created_at date,
+created_at timestamp,
 category_id int,
 warehouse_id int
 );
