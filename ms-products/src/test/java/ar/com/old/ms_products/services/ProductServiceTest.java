@@ -7,6 +7,7 @@ import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.ConnectionFeignException;
+import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.ProductRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
@@ -81,9 +82,11 @@ class ProductServiceTest {
 
     @Test
     void shouldFailCreatingProduct_whenUserNotFound() {
-        //WHEN
+        //GIVEN
         when(clientService.getUser())
                 .thenThrow(new ConnectionFeignException("Can not connect to another service, verify you current token"));
+
+        //WHEN
         Executable executable = () -> productService.create(dto);
 
         //THEN
@@ -92,5 +95,21 @@ class ProductServiceTest {
 
         verify(clientService).getUser();
         verify(warehouseRepository, never()).findByUserId(anyLong());
+    }
+
+    @Test
+    void shouldFailCreatingProduct_whenWarehouseNotFound() {
+        //GIVEN
+        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+
+        //WHEN
+        Executable executable = () -> productService.create(dto);
+
+        //THEN
+        WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
+        assertEquals("Warehouse not found", e.getMessage());
+
+        verify(clientService).getUser();
+        verify(warehouseRepository).findByUserId(anyLong());
     }
 }
