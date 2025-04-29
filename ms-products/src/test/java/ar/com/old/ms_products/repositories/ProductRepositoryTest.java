@@ -6,6 +6,8 @@ import com.github.database.rider.core.api.configuration.Orthography;
 import com.github.database.rider.core.api.dataset.DataSet;
 import com.github.database.rider.spring.api.DBRider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -36,6 +38,21 @@ class ProductRepositoryTest {
         assertTrue(result.isPresent());
         assertEquals("product1", result.get().getName());
         assertEquals("description",result.get().getDescription());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'invalid', 1",
+            "'product1', 10",
+            "'invalid', 10"
+    })
+    void shouldReturnOptionalEmpty_whenNotFound(String name, Long warehouseId){
+        //WHEN
+        Optional<Product> result = repository.findByNameAndWarehouseId(name,warehouseId);
+
+        //THEN
+        assertTrue(result.isEmpty());
+
     }
 
 }
