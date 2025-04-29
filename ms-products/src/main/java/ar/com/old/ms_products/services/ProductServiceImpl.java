@@ -34,13 +34,11 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public Product create(ProductDTO dto) {
         UserDTO userDTO = clientService.getUser();
-        Warehouse warehouse = warehouseRepository.findByUserId(userDTO.id())
-                .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
-        Category category = categoryRepository.findByIdAndWarehouseId(dto.categoryId(), warehouse.getId())
-                .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
-
+        Warehouse warehouse = getWarehouse(userDTO.id());
+        Category category = getCategory(dto.categoryId(), warehouse.getId());
         Product product = new Product(null, dto.name(), dto.description(),
-                dto.price(), LocalDateTime.now(), category, warehouse);
+                dto.price(), category, warehouse);
+
         return productRepository.save(product);
     }
 
@@ -62,5 +60,16 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public void delete(Long id) {
 
+    }
+
+
+    private Category getCategory(Long categoryId, Long warehouseId) {
+        return categoryRepository.findByIdAndWarehouseId(categoryId, warehouseId)
+                .orElseThrow(() -> new CategoryNotFoundException("Category not found"));
+    }
+
+    private Warehouse getWarehouse(Long id) {
+        return warehouseRepository.findByUserId(id)
+                .orElseThrow(() -> new WarehouseNotFoundException("Warehouse not found"));
     }
 }

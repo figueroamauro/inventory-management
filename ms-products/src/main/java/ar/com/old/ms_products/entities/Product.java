@@ -32,12 +32,12 @@ public class Product {
     @JoinColumn(name = "warehouse_id", referencedColumnName = "id")
     private Warehouse warehouse;
 
-    public Product(Long id, String name, String description, Double price, LocalDateTime createdAt, Category category, Warehouse warehouse) {
+    public Product(Long id, String name, String description, Double price, Category category, Warehouse warehouse) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.createdAt = createdAt;
+        this.createdAt = LocalDateTime.now();
         this.category = category;
         this.warehouse = warehouse;
     }
