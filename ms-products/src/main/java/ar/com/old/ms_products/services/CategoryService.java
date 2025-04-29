@@ -12,9 +12,9 @@ public interface CategoryService {
 
     Category create(CategoryDTO dto);
 
-    Category findOne(Long id);
-
     Page<Category> findAll(Pageable pageable);
+
+    Category findOne(Long id);
 
     void delete(Long id);
 }

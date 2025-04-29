@@ -6,16 +6,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 public interface WarehouseService {
 
+    Warehouse create(WarehouseDTO dto);
+
     Page<Warehouse> findAll(Pageable pageable);
 
     Warehouse findOne(Long id);
-
-    Warehouse create(WarehouseDTO dto);
 
     Warehouse update(WarehouseDTO dto);
 
