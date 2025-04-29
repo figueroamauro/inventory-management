@@ -11,6 +11,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
@@ -53,6 +56,19 @@ class ProductRepositoryTest {
         //THEN
         assertTrue(result.isEmpty());
 
+    }
+
+    @Test
+    void shouldFindAllByWarehouseId(){
+        //GIVEN
+        Pageable pageable = PageRequest.of(0, 10);
+
+        //WHEN
+        Page<Product> result = repository.findAllByWarehouseId(pageable,1L);
+
+        //THEN
+        assertNotNull(result);
+        assertEquals(3, result.getTotalElements());
     }
 
 }
