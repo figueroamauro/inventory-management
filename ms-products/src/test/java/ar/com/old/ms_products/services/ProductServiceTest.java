@@ -6,6 +6,7 @@ import ar.com.old.ms_products.dto.ProductDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
 import ar.com.old.ms_products.exceptions.ConnectionFeignException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
@@ -108,6 +109,23 @@ class ProductServiceTest {
         //THEN
         WarehouseNotFoundException e = assertThrows(WarehouseNotFoundException.class, executable);
         assertEquals("Warehouse not found", e.getMessage());
+
+        verify(clientService).getUser();
+        verify(warehouseRepository).findByUserId(anyLong());
+    }
+
+    @Test
+    void shouldFailCreatingProduct_whenCategoryNotFound() {
+        //GIVEN
+        when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+        when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+
+        //WHEN
+        Executable executable = () -> productService.create(dto);
+
+        //THEN
+        CategoryNotFoundException e = assertThrows(CategoryNotFoundException.class, executable);
+        assertEquals("Category not found", e.getMessage());
 
         verify(clientService).getUser();
         verify(warehouseRepository).findByUserId(anyLong());
