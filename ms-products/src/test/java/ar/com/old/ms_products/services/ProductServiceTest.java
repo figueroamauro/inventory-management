@@ -6,12 +6,14 @@ import ar.com.old.ms_products.dto.ProductDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
+import ar.com.old.ms_products.exceptions.ConnectionFeignException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.ProductRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -19,7 +21,6 @@ import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +42,7 @@ class ProductServiceTest {
     private Warehouse warehouse;
     private Category category;
     private ProductDTO dto;
-    private  Product product;
+    private Product product;
 
     @BeforeEach
     void init() {
@@ -51,6 +52,7 @@ class ProductServiceTest {
         product = new Product(1L, "product1", "product description", 100.00, category, warehouse);
 
     }
+
     @Test
     void shouldCreateProduct() {
         //GIVEN
@@ -75,5 +77,20 @@ class ProductServiceTest {
         verify(warehouseRepository).findByUserId(anyLong());
         verify(categoryRepository).findByIdAndWarehouseId(anyLong(), anyLong());
         verify(productRepository).save(any(Product.class));
+    }
+
+    @Test
+    void shouldFailCreatingProduct_whenUserNotFound() {
+        //WHEN
+        when(clientService.getUser())
+                .thenThrow(new ConnectionFeignException("Can not connect to another service, verify you current token"));
+        Executable executable = () -> productService.create(dto);
+
+        //THEN
+        ConnectionFeignException e = assertThrows(ConnectionFeignException.class, executable);
+        assertEquals("Can not connect to another service, verify you current token", e.getMessage());
+
+        verify(clientService).getUser();
+        verify(warehouseRepository, never()).findByUserId(anyLong());
     }
 }
