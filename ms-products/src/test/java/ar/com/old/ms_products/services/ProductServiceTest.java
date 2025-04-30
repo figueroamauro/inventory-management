@@ -24,7 +24,12 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -163,13 +168,19 @@ class ProductServiceTest {
         @Test
         void shouldFindAllProductsForTheCurrentUser(){
             //GIVEN
-        
-        
+            Pageable pageable = PageRequest.of(0, 10);
+            List<Product> list = List.of(product, product, product);
+            Page<Product> page = new PageImpl<>(list, pageable, list.size());
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+            when(productRepository.findAllByWarehouseId(pageable,1L)).thenReturn(page);
+
             //WHEN
-        
-        
+            Page<Product> result = productService.findAll(pageable);
+
             //THEN
-        
+            assertNotNull(result);
+            assertEquals(3, result.getTotalElements());
         }
     }
 }

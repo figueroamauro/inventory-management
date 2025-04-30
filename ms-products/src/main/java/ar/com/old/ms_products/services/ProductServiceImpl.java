@@ -46,7 +46,9 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Page<Product> findAll(Pageable pageable) {
-        return null;
+        UserDTO userDTO = clientService.getUser();
+        Warehouse warehouse = getWarehouse(userDTO.id());
+        return productRepository.findAllByWarehouseId(pageable, warehouse.getId());
     }
 
     @Override
