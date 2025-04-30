@@ -8,6 +8,7 @@ import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
 import ar.com.old.ms_products.exceptions.ProductAlreadyExistException;
+import ar.com.old.ms_products.exceptions.ProductNotFoundException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.ProductRepository;
@@ -59,7 +60,7 @@ public class ProductServiceImpl implements ProductService{
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO.id());
         return productRepository.findByIdAndWarehouseId(id, warehouse.getId())
-                .orElseThrow();
+                .orElseThrow(()-> new ProductNotFoundException("Product not found"));
     }
 
     @Override

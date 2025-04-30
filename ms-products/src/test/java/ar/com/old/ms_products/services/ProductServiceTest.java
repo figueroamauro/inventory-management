@@ -6,10 +6,7 @@ import ar.com.old.ms_products.dto.ProductDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
-import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
-import ar.com.old.ms_products.exceptions.ConnectionFeignException;
-import ar.com.old.ms_products.exceptions.ProductAlreadyExistException;
-import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
+import ar.com.old.ms_products.exceptions.*;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.ProductRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
@@ -212,6 +209,20 @@ class ProductServiceTest {
             assertEquals("product1", result.getName());
 
             verify(productRepository).findByIdAndWarehouseId(1L,1L);
+        }
+
+        @Test
+        void shouldFailFindingOneProductById_whenNotFound(){
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+
+            //WHEN
+            Executable executable = () -> productService.findOne(1L);
+
+            //THEN
+            ProductNotFoundException e = assertThrows(ProductNotFoundException.class, executable);
+            assertEquals("Product not found", e.getMessage());
         }
     }
 }
