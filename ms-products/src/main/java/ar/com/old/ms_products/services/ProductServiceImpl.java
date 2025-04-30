@@ -46,8 +46,11 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Page<Product> findAll(Pageable pageable) {
+        validateNull(pageable, "Pageable can not be null");
+
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO.id());
+
         return productRepository.findAllByWarehouseId(pageable, warehouse.getId());
     }
 
@@ -81,6 +84,12 @@ public class ProductServiceImpl implements ProductService{
         Optional<Product> productOpt = productRepository.findByNameAndWarehouseId(name, warehouseId);
         if (productOpt.isPresent()) {
             throw new ProductAlreadyExistException("Product already exist");
+        }
+    }
+
+    private void validateNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
         }
     }
 }

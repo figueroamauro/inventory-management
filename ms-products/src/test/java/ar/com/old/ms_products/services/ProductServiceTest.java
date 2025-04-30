@@ -182,5 +182,15 @@ class ProductServiceTest {
             assertNotNull(result);
             assertEquals(3, result.getTotalElements());
         }
+
+        @Test
+        void shouldFailFindingProducts_whenPageableIsNull(){
+            //WHEN
+            Executable executable = () -> productService.findAll(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Pageable can not be null", e.getMessage());
+        }
     }
 }
