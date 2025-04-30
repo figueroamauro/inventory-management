@@ -223,6 +223,20 @@ class ProductServiceTest {
             //THEN
             ProductNotFoundException e = assertThrows(ProductNotFoundException.class, executable);
             assertEquals("Product not found", e.getMessage());
+
+            verify(productRepository).findByIdAndWarehouseId(1L, 1L);
+        }
+
+        @Test
+        void shouldFailFindingOneProductById_whenIdIsNull(){
+            //WHEN
+            Executable executable = () -> productService.findOne(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(productRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
         }
     }
 }

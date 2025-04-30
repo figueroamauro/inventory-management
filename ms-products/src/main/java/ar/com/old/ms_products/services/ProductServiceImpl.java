@@ -57,8 +57,11 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product findOne(Long id) {
+        validateNull(id, "Id can not be null");
+
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO.id());
+
         return productRepository.findByIdAndWarehouseId(id, warehouse.getId())
                 .orElseThrow(()-> new ProductNotFoundException("Product not found"));
     }
