@@ -56,7 +56,10 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product findOne(Long id) {
-        return null;
+        UserDTO userDTO = clientService.getUser();
+        Warehouse warehouse = getWarehouse(userDTO.id());
+        return productRepository.findByIdAndWarehouseId(id, warehouse.getId())
+                .orElseThrow();
     }
 
     @Override

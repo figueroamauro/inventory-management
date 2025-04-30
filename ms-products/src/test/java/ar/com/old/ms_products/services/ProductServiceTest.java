@@ -193,4 +193,25 @@ class ProductServiceTest {
             assertEquals("Pageable can not be null", e.getMessage());
         }
     }
+
+    @Nested
+    class FindOne {
+
+        @Test
+        void shouldFindOneProductById(){
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+            when(productRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.ofNullable(product));
+
+            //WHEN
+            Product result = productService.findOne(1L);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals("product1", result.getName());
+
+            verify(productRepository).findByIdAndWarehouseId(1L,1L);
+        }
+    }
 }
