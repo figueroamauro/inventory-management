@@ -3,6 +3,7 @@ package ar.com.old.ms_products.services;
 import ar.com.old.ms_products.clients.UserClientService;
 import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.ProductDTO;
+import ar.com.old.ms_products.dto.ProductUpdateDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
@@ -48,6 +49,7 @@ class ProductServiceTest {
     private Warehouse warehouse;
     private Category category;
     private ProductDTO dto;
+    private ProductUpdateDTO updateDTO;
     private Product product;
 
     @BeforeEach
@@ -55,6 +57,7 @@ class ProductServiceTest {
         warehouse = new Warehouse(1L, "warehouse1", 1L);
         category = new Category(1L, "category1", warehouse);
         dto = new ProductDTO("product1", "product description", 100.00, 1L);
+        updateDTO = new ProductUpdateDTO(1L, "product1", "product description", 100.00, 1L);
         product = new Product(1L, "product1", "product description", 100.00, category, warehouse);
 
     }
@@ -237,6 +240,36 @@ class ProductServiceTest {
             assertEquals("Id can not be null", e.getMessage());
 
             verify(productRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
+        }
+    }
+
+    @Nested
+    class Update {
+
+        @Test
+        void shouldUpdateProduct(){
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+            when(categoryRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(category));
+            when(productRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.ofNullable(product));
+            when(productRepository.save(any(Product.class))).thenReturn(product);
+
+            //WHEN
+            Product result = productService.update(updateDTO);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals("product1", result.getName());
+            assertEquals("product description", result.getDescription());
+            assertEquals(100.00, result.getPrice());
+            assertEquals(1L, result.getCategory().getId());
+            assertEquals(1L, result.getWarehouse().getId());
+            assertNotNull(result.getCreatedAt());
+
+            verify(clientService).getUser();
+            verify(warehouseRepository).findByUserId(anyLong());
+            verify(categoryRepository).findByIdAndWarehouseId(anyLong(), anyLong());
+            verify(productRepository).save(any(Product.class));
         }
     }
 }

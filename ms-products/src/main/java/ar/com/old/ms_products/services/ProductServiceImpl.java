@@ -3,6 +3,7 @@ package ar.com.old.ms_products.services;
 import ar.com.old.ms_products.clients.UserClientService;
 import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.ProductDTO;
+import ar.com.old.ms_products.dto.ProductUpdateDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
@@ -15,6 +16,7 @@ import ar.com.old.ms_products.repositories.ProductRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -67,8 +69,24 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Product update(ProductDTO dto) {
-        return null;
+    @Transactional
+    public Product update(ProductUpdateDTO dto) {
+        UserDTO userDTO = clientService.getUser();
+        Warehouse warehouse = getWarehouse(userDTO.id());
+        Category category = getCategory(dto.categoryId(), warehouse.getId());
+
+        Product product = productRepository.findByIdAndWarehouseId(dto.id(), warehouse.getId())
+                .orElseThrow();
+
+        validateExistingProduct(dto.name(), warehouse.getId());
+
+        product.setName(dto.name());
+        product.setDescription(dto.description());
+        product.setPrice(dto.price());
+        product.setCategory(category);
+
+        return productRepository.save(product);
+
     }
 
     @Override

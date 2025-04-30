@@ -1,6 +1,7 @@
 package ar.com.old.ms_products.services;
 
 import ar.com.old.ms_products.dto.ProductDTO;
+import ar.com.old.ms_products.dto.ProductUpdateDTO;
 import ar.com.old.ms_products.entities.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ public interface ProductService {
 
     Product findOne(Long id);
 
-    Product update(ProductDTO dto);
+    Product update(ProductUpdateDTO dto);
 
     void delete(Long id);
 }
