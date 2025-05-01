@@ -271,5 +271,17 @@ class ProductServiceTest {
             verify(categoryRepository).findByIdAndWarehouseId(anyLong(), anyLong());
             verify(productRepository).save(any(Product.class));
         }
+
+        @Test
+        void shouldFailUpdatingOneProduct_whenDTOIsNull(){
+            //WHEN
+            Executable executable = () -> productService.update(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("DTO can not be null", e.getMessage());
+
+            verify(productRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
+        }
     }
 }
