@@ -36,6 +36,7 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Product create(ProductDTO dto) {
+        validateNull(dto,"DTO can not be null");
 
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO.id());

@@ -93,6 +93,18 @@ class ProductServiceTest {
         }
 
         @Test
+        void shouldFailCreatingProduct_whenDTOIsNull(){
+            //WHEN
+            Executable executable = () -> productService.create(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("DTO can not be null", e.getMessage());
+
+            verify(productRepository, never()).save(any(Product.class));
+        }
+
+        @Test
         void shouldFailCreatingProduct_whenUserNotFound() {
             //GIVEN
             when(clientService.getUser())
