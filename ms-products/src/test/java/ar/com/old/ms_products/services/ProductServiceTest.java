@@ -365,6 +365,19 @@ class ProductServiceTest {
 
             verify(clientService).getUser();
             verify(warehouseRepository).findByUserId(anyLong());
+            verify(productRepository,never()).deleteById(1L);
+        }
+
+        @Test
+        void shouldFailDeletingProduct_whenIdIsNull(){
+            //WHEN
+            Executable executable = () -> productService.delete(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(productRepository,never()).deleteById(1L);
         }
     }
 }

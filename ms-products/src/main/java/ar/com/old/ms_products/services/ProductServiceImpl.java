@@ -96,6 +96,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void delete(Long id) {
+        validateNull(id, "Id can not be null");
+
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO.id());
 
