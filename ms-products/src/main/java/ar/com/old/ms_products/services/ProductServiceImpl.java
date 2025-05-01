@@ -73,6 +73,7 @@ public class ProductServiceImpl implements ProductService{
     @Transactional
     public Product update(ProductUpdateDTO dto) {
         validateNull(dto,"DTO can not be null");
+        validateNull(dto.id(), "Id can not be null");
 
         UserDTO userDTO = clientService.getUser();
         Warehouse warehouse = getWarehouse(userDTO.id());

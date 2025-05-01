@@ -283,5 +283,20 @@ class ProductServiceTest {
 
             verify(productRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
         }
+
+        @Test
+        void shouldFailUpdatingOneProduct_whenDTOHasIdNull(){
+            //GIVEN
+            updateDTO = new ProductUpdateDTO(null, "product1", "descripion1", 100.00, 1L);
+
+            //WHEN
+            Executable executable = () -> productService.update(updateDTO);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(productRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
+        }
     }
 }
