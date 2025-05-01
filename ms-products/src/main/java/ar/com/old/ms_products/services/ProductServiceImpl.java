@@ -80,7 +80,7 @@ public class ProductServiceImpl implements ProductService{
         Category category = getCategory(dto.categoryId(), warehouse.getId());
 
         Product product = productRepository.findByIdAndWarehouseId(dto.id(), warehouse.getId())
-                .orElseThrow();
+                .orElseThrow(()-> new ProductNotFoundException("Product not found"));
 
         validateExistingProduct(dto.name(), warehouse.getId());
 

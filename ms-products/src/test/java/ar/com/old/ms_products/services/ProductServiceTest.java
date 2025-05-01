@@ -298,5 +298,24 @@ class ProductServiceTest {
 
             verify(productRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
         }
+
+        @Test
+        void shouldFailUpdatingOneProduct_whenDTONotFound(){
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+            when(categoryRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(category));
+
+            //WHEN
+            Executable executable = () -> productService.update(updateDTO);
+
+            //THEN
+            ProductNotFoundException e = assertThrows(ProductNotFoundException.class, executable);
+            assertEquals("Product not found", e.getMessage());
+
+            verify(clientService).getUser();
+            verify(warehouseRepository).findByUserId(anyLong());
+            verify(categoryRepository).findByIdAndWarehouseId(anyLong(), anyLong());
+        }
     }
 }
