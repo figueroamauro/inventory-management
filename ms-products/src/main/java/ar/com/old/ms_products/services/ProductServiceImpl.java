@@ -100,7 +100,7 @@ public class ProductServiceImpl implements ProductService {
         Warehouse warehouse = getWarehouse(userDTO.id());
 
         productRepository.findByIdAndWarehouseId(id, warehouse.getId())
-                .orElseThrow();
+                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 
         productRepository.deleteById(id);
     }

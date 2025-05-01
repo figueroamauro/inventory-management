@@ -345,7 +345,26 @@ class ProductServiceTest {
             productService.delete(1L);
 
             //THEN
+            verify(clientService).getUser();
+            verify(warehouseRepository).findByUserId(anyLong());
             verify(productRepository).deleteById(1L);
+        }
+
+        @Test
+        void shouldFailDeletingProduct_whenNotFound(){
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+
+            //WHEN
+            Executable executable = () -> productService.delete(1L);
+
+            //THEN
+            ProductNotFoundException e = assertThrows(ProductNotFoundException.class, executable);
+            assertEquals("Product not found", e.getMessage());
+
+            verify(clientService).getUser();
+            verify(warehouseRepository).findByUserId(anyLong());
         }
     }
 }
