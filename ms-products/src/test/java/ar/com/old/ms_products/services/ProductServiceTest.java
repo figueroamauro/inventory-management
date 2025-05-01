@@ -312,7 +312,7 @@ class ProductServiceTest {
         }
 
         @Test
-        void shouldFailUpdatingOneProduct_whenDTONotFound(){
+        void shouldFailUpdatingOneProduct_whenNotFound(){
             //GIVEN
             when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
             when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
@@ -328,6 +328,24 @@ class ProductServiceTest {
             verify(clientService).getUser();
             verify(warehouseRepository).findByUserId(anyLong());
             verify(categoryRepository).findByIdAndWarehouseId(anyLong(), anyLong());
+        }
+    }
+
+    @Nested
+    class Delete {
+
+        @Test
+        void shouldDeleteProductById(){
+            //GIVEN
+            when(clientService.getUser()).thenReturn(new UserDTO(1L, "user1", "email1@mail.com"));
+            when(warehouseRepository.findByUserId(1L)).thenReturn(Optional.of(warehouse));
+            when(productRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.ofNullable(product));
+
+            //WHEN
+            productService.delete(1L);
+
+            //THEN
+            verify(productRepository).deleteById(1L);
         }
     }
 }
