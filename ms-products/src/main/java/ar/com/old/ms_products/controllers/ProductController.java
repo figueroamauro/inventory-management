@@ -37,8 +37,8 @@ public class ProductController {
                                      PagedResourcesAssembler<ProductResponseDTO> assembler) {
 
         Page<Product> page = productService.findAll(pageable);
-
         Page<ProductResponseDTO> result = page.map(this::toResponseDTO);
+
         return ResponseEntity.ok(assembler.toModel(result));
     }
 
@@ -46,6 +46,7 @@ public class ProductController {
     public ResponseEntity<ProductResponseDTO> findOne(@PathVariable Long id) {
         Product product = productService.findOne(id);
         ProductResponseDTO response = toResponseDTO(product);
+
         return ResponseEntity.ok(response);
     }
 
@@ -53,11 +54,18 @@ public class ProductController {
     public ResponseEntity<ProductResponseDTO> update(@RequestBody ProductUpdateDTO dto) {
         Product product = productService.update(dto);
         ProductResponseDTO response = toResponseDTO(product);
+
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 
     private ProductResponseDTO toResponseDTO(Product product) {
+
         return new ProductResponseDTO(
                 product.getId(), product.getName(), product.getDescription(),
                 product.getPrice(), product.getCategory().getId(), product.getCreatedAt());

@@ -166,4 +166,16 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.error").value("Product not found"));
     }
 
+    @Test
+    void shouldDeleteProduct_status204() throws Exception {
+        //GIVEN
+
+        //WHEN
+        mockMvc.perform(delete("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNoContent());
+    }
+
 }
