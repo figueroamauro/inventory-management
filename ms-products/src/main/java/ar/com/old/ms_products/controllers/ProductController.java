@@ -6,6 +6,7 @@ import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.services.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedModel;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
@@ -28,22 +29,32 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductResponseDTO> create(@RequestBody ProductDTO dto) {
         Product product = productService.create(dto);
-        ProductResponseDTO responseDTO = new ProductResponseDTO(
-                product.getId(), product.getName(), product.getDescription(),
-                product.getPrice(), product.getCategory().getId(), product.getCreatedAt());
+        ProductResponseDTO responseDTO = toResponseDTO(product);
 
         return ResponseEntity.created(URI.create("/api/products/" + product.getId())).body(responseDTO);
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(Pageable pageable,
-                                              PagedResourcesAssembler<ProductResponseDTO> assembler) {
+    public ResponseEntity<?> findAll(@PageableDefault Pageable pageable,
+                                     PagedResourcesAssembler<ProductResponseDTO> assembler) {
+
         Page<Product> page = productService.findAll(pageable);
-        Page<ProductResponseDTO> result = page.map(product -> {
-            return new ProductResponseDTO(
-                    product.getId(), product.getName(), product.getDescription(),
-                    product.getPrice(), product.getCategory().getId(), product.getCreatedAt());
-        });
+
+        Page<ProductResponseDTO> result = page.map(this::toResponseDTO);
         return ResponseEntity.ok(assembler.toModel(result));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponseDTO> findOne(@PathVariable Long id) {
+        Product product = productService.findOne(id);
+        ProductResponseDTO response = toResponseDTO(product);
+        return ResponseEntity.ok(response);
+    }
+
+
+    private ProductResponseDTO toResponseDTO(Product product) {
+        return new ProductResponseDTO(
+                product.getId(), product.getName(), product.getDescription(),
+                product.getPrice(), product.getCategory().getId(), product.getCreatedAt());
     }
 }

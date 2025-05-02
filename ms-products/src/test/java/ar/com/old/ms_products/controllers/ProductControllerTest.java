@@ -99,4 +99,21 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$._embedded.productResponseDTOList[0].name").value("product"));
     }
+
+    @Test
+    void shouldFindOneProduct_status200() throws Exception {
+        //GIVEN
+        when(productService.findOne(1L)).thenReturn(product);
+
+        //WHEN
+        mockMvc.perform(get("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.name").value("product"));
+    }
+
+
 }
