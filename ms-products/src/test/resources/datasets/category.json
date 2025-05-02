@@ -1,0 +1,16 @@
+{
+  "warehouses": [
+    {
+      "id": 1,
+      "name": "Central",
+      "user_id": 1
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Electro",
+      "warehouse_id": 1
+    }
+  ]
+}

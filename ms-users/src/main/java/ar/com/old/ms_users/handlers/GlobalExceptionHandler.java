@@ -3,6 +3,7 @@ package ar.com.old.ms_users.handlers;
 import ar.com.old.ms_users.exceptions.ChangeUserNameException;
 import ar.com.old.ms_users.exceptions.UserAlreadyExistException;
 import ar.com.old.ms_users.exceptions.UserNotFoundException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -30,7 +31,8 @@ public class GlobalExceptionHandler {
             IllegalArgumentException.class,
             UserAlreadyExistException.class,
             ChangeUserNameException.class,
-            BadCredentialsException.class
+            BadCredentialsException.class,
+            JwtException.class
     })
     public ResponseEntity<Map<String, Object>> handleBadRequestException(Exception ex) {
         Map<String, Object> response = new HashMap<>();

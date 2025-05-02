@@ -18,6 +18,7 @@
 
     <modules>
         <module>ms-users</module>
+        <module>ms-products</module>
     </modules>
 
     <properties>

@@ -5,13 +5,18 @@ import ar.com.old.ms_users.dto.UserResponseDTO;
 import ar.com.old.ms_users.dto.UserUpdateRequestDTO;
 import ar.com.old.ms_users.entities.User;
 import ar.com.old.ms_users.mappers.UserResponseMapper;
+import ar.com.old.ms_users.security.CustomUserDetails;
+import ar.com.old.ms_users.security.CustomUserDetailsService;
 import ar.com.old.ms_users.services.UserService;
+import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -55,5 +60,15 @@ public class UserController {
         userService.delete(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/current")
+    public ResponseEntity<?> getCurrentUser() {
+        try {
+            CustomUserDetails userDetail = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return ResponseEntity.ok(mapper.toDto(userDetail.getUser()));
+        } catch (ClassCastException e) {
+            throw new JwtException("Invalid or null token");
+        }
     }
 }
