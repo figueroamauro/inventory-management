@@ -150,5 +150,20 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.name").value("product"));
     }
 
+    @Test
+    void shouldFailUpdatingProduct_whenNotFound_status404() throws Exception {
+        //GIVEN
+        when(productService.update(updateDTO)).thenThrow(new ProductNotFoundException("Product not found"));
+
+        //WHEN
+        mockMvc.perform(put("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDTO)))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Product not found"));
+    }
 
 }
