@@ -82,10 +82,6 @@ public class Product {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public Category getCategory() {
         return category;
     }
