@@ -30,8 +30,11 @@ public class GlobalHandler {
         return buildResponseError(e, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({CategoryNotFoundException.class,
-            WarehouseNotFoundException.class})
+    @ExceptionHandler({
+            CategoryNotFoundException.class,
+            WarehouseNotFoundException.class,
+            ProductNotFoundException.class
+    })
     public ResponseEntity<Map<String, String>> handlerNotFound(Exception e) {
         return buildResponseError(e, HttpStatus.NOT_FOUND);
     }

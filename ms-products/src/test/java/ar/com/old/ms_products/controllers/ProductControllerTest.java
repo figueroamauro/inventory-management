@@ -5,6 +5,7 @@ import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.ProductAlreadyExistException;
+import ar.com.old.ms_products.exceptions.ProductNotFoundException;
 import ar.com.old.ms_products.services.ProductServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,6 +114,21 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.name").value("product"));
+    }
+
+    @Test
+    void shouldFailFindingOneProduct_whenNotFound_status404() throws Exception {
+        //GIVEN
+        when(productService.findOne(1L)).thenThrow(new ProductNotFoundException("Product not found"));
+
+        //WHEN
+        mockMvc.perform(get("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Product not found"));
     }
 
 
