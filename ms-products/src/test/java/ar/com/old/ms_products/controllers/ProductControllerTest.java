@@ -1,6 +1,7 @@
 package ar.com.old.ms_products.controllers;
 
 import ar.com.old.ms_products.dto.ProductDTO;
+import ar.com.old.ms_products.dto.ProductUpdateDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
@@ -41,6 +42,7 @@ class ProductControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
     private ProductDTO productDTO;
     private Product product;
+    private ProductUpdateDTO updateDTO;
 
     @BeforeEach
     void init() {
@@ -48,6 +50,7 @@ class ProductControllerTest {
         Warehouse warehouse = new Warehouse(1L, "warehouse", 1L);
         Category category = new Category(1L, "category", warehouse);
         product = new Product(1L, "product", "description", 100.00, category, warehouse);
+        updateDTO = new ProductUpdateDTO(1L, "product", "description", 100.00, 1L);
     }
 
     @Test
@@ -129,6 +132,22 @@ class ProductControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.error").value("Product not found"));
+    }
+
+    @Test
+    void shouldUpdateProduct_status200() throws Exception {
+        //GIVEN
+        when(productService.update(updateDTO)).thenReturn(product);
+
+        //WHEN
+        mockMvc.perform(put("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDTO)))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.name").value("product"));
     }
 
 

@@ -2,19 +2,17 @@ package ar.com.old.ms_products.controllers;
 
 import ar.com.old.ms_products.dto.ProductDTO;
 import ar.com.old.ms_products.dto.ProductResponseDTO;
+import ar.com.old.ms_products.dto.ProductUpdateDTO;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.services.ProductService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.PagedModel;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/products")
@@ -47,6 +45,13 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> findOne(@PathVariable Long id) {
         Product product = productService.findOne(id);
+        ProductResponseDTO response = toResponseDTO(product);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping
+    public ResponseEntity<ProductResponseDTO> update(@RequestBody ProductUpdateDTO dto) {
+        Product product = productService.update(dto);
         ProductResponseDTO response = toResponseDTO(product);
         return ResponseEntity.ok(response);
     }
