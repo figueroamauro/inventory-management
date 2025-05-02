@@ -9,15 +9,23 @@ import ar.com.old.ms_products.services.ProductServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.mockito.Mockito.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,20 +37,21 @@ class ProductControllerTest {
     private MockMvc mockMvc;
     @MockitoBean
     private ProductServiceImpl productService;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private ProductDTO productDTO;
+    private Product product;
 
     @BeforeEach
     void init() {
         productDTO = new ProductDTO("product", "description", 100.00, 1L);
+        Warehouse warehouse = new Warehouse(1L, "warehouse", 1L);
+        Category category = new Category(1L, "category", warehouse);
+        product = new Product(1L, "product", "description", 100.00, category, warehouse);
     }
 
     @Test
     void shouldCreateProduct_status201() throws Exception {
         //GIVEN
-        Warehouse warehouse = new Warehouse(1L, "warehouse", 1L);
-        Category category = new Category(1L, "category", warehouse);
-        Product product = new Product(1L, "product", "description", 100.00, category, warehouse);
         when(productService.create(productDTO)).thenReturn(product);
 
         //WHEN
@@ -57,7 +66,7 @@ class ProductControllerTest {
     }
 
     @Test
-    void shouldFailCreatingProduct_whenAlreadyExist_status201() throws Exception {
+    void shouldFailCreatingProduct_whenAlreadyExist_status409() throws Exception {
         //GIVEN
         when(productService.create(productDTO))
                 .thenThrow(new ProductAlreadyExistException("Product already exist"));
@@ -71,5 +80,23 @@ class ProductControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.error").value("Product already exist"));
+    }
+
+    @Test
+    void shouldFindAllProducts_status200() throws Exception {
+        //GIVEN
+        List<Product> list = List.of(product, product, product);
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Product> page = new PageImpl<Product>(list, pageable, list.size());
+        when(productService.findAll(any(Pageable.class))).thenReturn(page);
+
+        //WHEN
+        mockMvc.perform(get("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$._embedded.productResponseDTOList[0].name").value("product"));
     }
 }
