@@ -5,6 +5,7 @@ import ar.com.old.ms_products.dto.ProductResponseDTO;
 import ar.com.old.ms_products.dto.ProductUpdateDTO;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.services.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -25,7 +26,7 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> create(@RequestBody ProductDTO dto) {
+    public ResponseEntity<ProductResponseDTO> create(@Valid @RequestBody ProductDTO dto) {
         Product product = productService.create(dto);
         ProductResponseDTO responseDTO = toResponseDTO(product);
 
@@ -51,7 +52,7 @@ public class ProductController {
     }
 
     @PutMapping
-    public ResponseEntity<ProductResponseDTO> update(@RequestBody ProductUpdateDTO dto) {
+    public ResponseEntity<ProductResponseDTO> update(@Valid @RequestBody ProductUpdateDTO dto) {
         Product product = productService.update(dto);
         ProductResponseDTO response = toResponseDTO(product);
 

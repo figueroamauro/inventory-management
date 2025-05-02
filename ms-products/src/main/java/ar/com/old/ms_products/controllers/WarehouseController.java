@@ -3,6 +3,7 @@ package ar.com.old.ms_products.controllers;
 import ar.com.old.ms_products.dto.WarehouseDTO;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.services.WarehouseService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -24,7 +25,7 @@ public class WarehouseController {
     }
 
     @PostMapping
-    public ResponseEntity<Warehouse> create(@RequestBody WarehouseDTO dto) {
+    public ResponseEntity<Warehouse> create(@Valid @RequestBody WarehouseDTO dto) {
         Warehouse warehouse = warehouseService.create(dto);
         return ResponseEntity.created(URI.create("/api/warehouses/" + warehouse.getId())).body(warehouse);
     }
@@ -42,7 +43,7 @@ public class WarehouseController {
     }
 
     @PutMapping
-    public ResponseEntity<Warehouse> update(@RequestBody WarehouseDTO dto) {
+    public ResponseEntity<Warehouse> update(@Valid @RequestBody WarehouseDTO dto) {
         Warehouse warehouse = warehouseService.update(dto);
         return ResponseEntity.ok(warehouse);
     }
