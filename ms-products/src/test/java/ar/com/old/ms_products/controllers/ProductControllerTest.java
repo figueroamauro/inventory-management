@@ -168,14 +168,27 @@ class ProductControllerTest {
 
     @Test
     void shouldDeleteProduct_status204() throws Exception {
-        //GIVEN
-
         //WHEN
         mockMvc.perform(delete("/api/products/1")
                         .contentType(MediaType.APPLICATION_JSON))
 
                 //THEN
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldFailDeletingProduct_whenNotFound_status404() throws Exception {
+        //GIVEN
+        doThrow(new ProductNotFoundException("Product not found")).when(productService).delete(1L);
+
+        //WHEN
+        mockMvc.perform(delete("/api/products/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Product not found"));
     }
 
 }
