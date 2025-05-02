@@ -4,7 +4,6 @@ import ar.com.old.ms_products.dto.ProductDTO;
 import ar.com.old.ms_products.dto.ProductResponseDTO;
 import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.services.ProductService;
-import feign.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
