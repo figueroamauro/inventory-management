@@ -5,8 +5,9 @@ import ar.com.old.ms_products.dto.ProductUpdateDTO;
 import ar.com.old.ms_products.entities.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
-
+@Service
 public interface ProductService {
 
     Product create(ProductDTO dto);

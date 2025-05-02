@@ -16,10 +16,11 @@ import ar.com.old.ms_products.repositories.ProductRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-
+@Service
 public class ProductServiceImpl implements ProductService {
 
     private final UserClientService clientService;
