@@ -19,6 +19,7 @@
     <modules>
         <module>ms-users</module>
         <module>ms-products</module>
+        <module>ms-stock</module>
     </modules>
 
     <properties>
