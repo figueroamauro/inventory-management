@@ -1,16 +1,30 @@
 package ar.com.old.ms_stock.services;
 
+import ar.com.old.ms_stock.clients.WarehouseClientService;
+import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
+import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
+import ar.com.old.ms_stock.repositories.LocationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LocationServiceImpl implements LocationService {
 
+    private final LocationRepository locationRepository;
+    private final WarehouseClientService clientService;
+
+    public LocationServiceImpl(LocationRepository locationRepository, WarehouseClientService clientService) {
+        this.locationRepository = locationRepository;
+        this.clientService = clientService;
+    }
 
     @Override
-    public Location create(Location location) {
-        return null;
+    public Location create(LocationDTO dto) {
+        WarehouseDTO warehouse = clientService.getWarehouse();
+        Location location = new Location(null, dto.name(), warehouse.id());
+
+        return locationRepository.save(location);
     }
 
     @Override

@@ -14,7 +14,7 @@ public class WarehouseClientService {
         this.warehouseClient = warehouseClient;
     }
 
-    WarehouseDTO getWarehouse() {
+    public WarehouseDTO getWarehouse() {
         try {
             return warehouseClient.findCurrent();
         } catch (FeignException e) {

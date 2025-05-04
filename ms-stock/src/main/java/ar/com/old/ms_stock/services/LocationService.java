@@ -1,5 +1,6 @@
 package ar.com.old.ms_stock.services;
 
+import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface LocationService {
 
-    Location create(Location location);
+    Location create(LocationDTO location);
 
     Page<Location> findAll();
 
