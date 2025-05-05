@@ -21,6 +21,9 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Location create(LocationDTO dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("DTO can not be null");
+        }
         WarehouseDTO warehouse = clientService.getWarehouse();
         Location location = new Location(null, dto.name(), warehouse.id());
 

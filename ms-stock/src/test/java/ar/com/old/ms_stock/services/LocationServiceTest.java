@@ -7,6 +7,7 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -43,5 +44,18 @@ class LocationServiceTest {
 
         verify(locationRepository).save(any(Location.class));
     }
+
+    @Test
+    void shouldFailCreatingLocation_whenDTOIsNull() {
+        //WHEN
+        Executable executable = () -> locationService.create(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("DTO can not be null", e.getMessage());
+
+        verify(locationRepository,never()).save(any(Location.class));
+    }
+
 
 }
