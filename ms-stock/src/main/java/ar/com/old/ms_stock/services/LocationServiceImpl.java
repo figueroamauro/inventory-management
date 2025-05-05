@@ -34,18 +34,7 @@ public class LocationServiceImpl implements LocationService {
         return locationRepository.save(location);
     }
 
-    private static void validateNull(Object obj, String message) {
-        if (obj == null) {
-            throw new IllegalArgumentException(message);
-        }
-    }
 
-    private void validateExistingLocation(String name, Long id) {
-        Optional<Location> locationOpt = locationRepository.findByNameAndWarehouseId(name, id);
-        if (locationOpt.isPresent()) {
-            throw new LocationAlreadyExistException("Location already exist");
-        }
-    }
     @Override
     public Page<Location> findAll() {
         return null;
@@ -64,5 +53,19 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public void delete(Long id) {
 
+    }
+
+
+    private static void validateNull(Object obj, String message) {
+        if (obj == null) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
+    private void validateExistingLocation(String name, Long id) {
+        Optional<Location> locationOpt = locationRepository.findByNameAndWarehouseId(name, id);
+        if (locationOpt.isPresent()) {
+            throw new LocationAlreadyExistException("Location already exist");
+        }
     }
 }
