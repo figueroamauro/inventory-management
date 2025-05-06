@@ -214,5 +214,20 @@ class LocationServiceTest {
 
             verify(locationRepository,never()).save(any(Location.class));
         }
+
+        @Test
+        void shouldFailUpdatingLocation_whenIdIsNull(){
+            //GIVEN
+            dto = new LocationDTO(null, "B2");
+
+            //WHEN
+            Executable executable = () -> locationService.update(dto);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(locationRepository,never()).save(any(Location.class));
+        }
     }
 }

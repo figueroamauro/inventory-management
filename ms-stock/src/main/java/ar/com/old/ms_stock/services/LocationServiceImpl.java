@@ -56,6 +56,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public Location update(LocationDTO dto) {
         validateNull(dto, "DTO can not be null");
+        validateNull(dto.id(), "Id can not be null");
 
         WarehouseDTO warehouse = clientService.getWarehouse();
 
