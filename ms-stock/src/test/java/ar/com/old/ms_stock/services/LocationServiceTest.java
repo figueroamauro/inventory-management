@@ -229,5 +229,21 @@ class LocationServiceTest {
 
             verify(locationRepository,never()).save(any(Location.class));
         }
+
+        @Test
+        void shouldFailUpdatingLocation_whenAlreadyExist(){
+            //GIVEN
+            when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
+            when(locationRepository.findByNameAndWarehouseId("B2", 1L)).thenReturn(Optional.ofNullable(location));
+
+            //WHEN
+            Executable executable = () -> locationService.update(dto);
+
+            //THEN
+            LocationAlreadyExistException e = assertThrows(LocationAlreadyExistException.class, executable);
+            assertEquals("Location already exist", e.getMessage());
+
+            verify(locationRepository,never()).save(any(Location.class));
+        }
     }
 }
