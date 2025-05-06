@@ -45,7 +45,10 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Location findOne(Long id) {
+        validateNull(id, "Id can not be null");
+
         WarehouseDTO warehouse = clientService.getWarehouse();
+
         return locationRepository.findByIdAndWarehouseId(id, warehouse.id())
                 .orElseThrow(()-> new LocationNotFoundException("Location not found"));
     }

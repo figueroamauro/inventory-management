@@ -135,22 +135,36 @@ class LocationServiceTest {
             //THEN
             assertNotNull(result);
             assertEquals("B2", result.getName());
+
+            verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
         }
     }
 
     @Test
-    void shouldFailFindingById_whenIdIsNull(){
+    void shouldFailFindingById_whenNotFound(){
         //GIVEN
         when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
 
-
         //WHEN
-        Executable executable = () -> locationService.findOne(null);
+        Executable executable = () -> locationService.findOne(1L);
 
         //THEN
         LocationNotFoundException e = assertThrows(LocationNotFoundException.class, executable);
         assertEquals("Location not found", e.getMessage());
 
+        verify(locationRepository).findByIdAndWarehouseId(anyLong(),anyLong());
+    }
+
+    @Test
+    void shouldFailFindingById_whenIdIsNull(){
+        //WHEN
+        Executable executable = () -> locationService.findOne(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Id can not be null", e.getMessage());
+
+        verify(locationRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
     }
 
 
