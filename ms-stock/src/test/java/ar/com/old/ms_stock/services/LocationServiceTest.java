@@ -7,15 +7,23 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
 import static org.mockito.Mockito.*;
+
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,50 +48,76 @@ class LocationServiceTest {
         dto = new LocationDTO(1L, "B2");
     }
 
-    @Test
-    void shouldCreateLocation() {
-        //GIVEN
-        when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
-        when(locationRepository.save(any(Location.class))).thenReturn(location);
+    @Nested
+    class Create {
 
-        //WHEN
-        Location result = locationService.create(dto);
+        @Test
+        void shouldCreateLocation() {
+            //GIVEN
+            when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
+            when(locationRepository.save(any(Location.class))).thenReturn(location);
 
-        //THEN
-        assertNotNull(result);
-        assertEquals("B2", result.getName());
+            //WHEN
+            Location result = locationService.create(dto);
 
-        verify(locationRepository).save(any(Location.class));
+            //THEN
+            assertNotNull(result);
+            assertEquals("B2", result.getName());
+
+            verify(locationRepository).save(any(Location.class));
+        }
+
+        @Test
+        void shouldFailCreatingLocation_whenDTOIsNull() {
+            //WHEN
+            Executable executable = () -> locationService.create(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("DTO can not be null", e.getMessage());
+
+            verify(locationRepository, never()).save(any(Location.class));
+        }
+
+        @Test
+        void shouldFailCreatingLocation_whenNameAlreadyExist() {
+            //GIVEN
+            when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
+            when(locationRepository.findByNameAndWarehouseId("B2", 1L)).thenReturn(Optional.ofNullable(location));
+
+            //WHEN
+            Executable executable = () -> locationService.create(dto);
+
+            //THEN
+            LocationAlreadyExistException e = assertThrows(LocationAlreadyExistException.class, executable);
+            assertEquals("Location already exist", e.getMessage());
+
+            verify(locationRepository, never()).save(any(Location.class));
+        }
     }
 
-    @Test
-    void shouldFailCreatingLocation_whenDTOIsNull() {
-        //WHEN
-        Executable executable = () -> locationService.create(null);
+    @Nested
+    class FindAll {
 
-        //THEN
-        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("DTO can not be null", e.getMessage());
+        @Test
+        void shouldFindAllLocations(){
+            //GIVEN
+            List<Location> list = List.of(location, location, location);
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<Location> page = new PageImpl<>(list, pageable, list.size());
+            when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
+            when(locationRepository.findAllByWarehouseId(pageable,1L)).thenReturn(page);
 
-        verify(locationRepository,never()).save(any(Location.class));
+            //WHEN
+            Page<Location> result = locationService.findAll(pageable);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals(3, result.getTotalElements());
+
+            verify(locationRepository).findAllByWarehouseId(pageable,1L);
+        }
     }
-
-    @Test
-    void shouldFailCreatingLocation_whenNameAlreadyExist() {
-        //GIVEN
-        when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
-        when(locationRepository.findByNameAndWarehouseId("B2", 1L)).thenReturn(Optional.ofNullable(location));
-
-        //WHEN
-        Executable executable = () -> locationService.create(dto);
-
-        //THEN
-        LocationAlreadyExistException e = assertThrows(LocationAlreadyExistException.class, executable);
-        assertEquals("Location already exist", e.getMessage());
-
-        verify(locationRepository,never()).save(any(Location.class));
-    }
-
 
 
 }

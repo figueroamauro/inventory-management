@@ -7,6 +7,7 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -36,8 +37,9 @@ public class LocationServiceImpl implements LocationService {
 
 
     @Override
-    public Page<Location> findAll() {
-        return null;
+    public Page<Location> findAll(Pageable pageable) {
+        WarehouseDTO warehouse = clientService.getWarehouse();
+        return locationRepository.findAllByWarehouseId(pageable, warehouse.id());
     }
 
     @Override
