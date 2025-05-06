@@ -119,5 +119,23 @@ class LocationServiceTest {
         }
     }
 
+    @Nested
+    class FindOne {
+
+        @Test
+        void shouldFindOne(){
+            //GIVEN
+            when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.ofNullable(location));
+
+            //WHEN
+            Location result = locationService.findOne(1L);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals("B2", result.getName());
+        }
+    }
+
 
 }

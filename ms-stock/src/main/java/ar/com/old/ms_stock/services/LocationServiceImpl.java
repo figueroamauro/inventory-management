@@ -44,7 +44,9 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public Location findOne(Long id) {
-        return null;
+        WarehouseDTO warehouse = clientService.getWarehouse();
+        return locationRepository.findByIdAndWarehouseId(id, warehouse.id())
+                .orElseThrow();
     }
 
     @Override
