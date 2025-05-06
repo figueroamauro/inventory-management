@@ -15,7 +15,7 @@ public interface LocationService {
 
     Location findOne(Long id);
 
-    Location update(Location location);
+    Location update(LocationDTO location);
 
     void delete(Long id);
 }

@@ -167,5 +167,25 @@ class LocationServiceTest {
         verify(locationRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
     }
 
+    @Nested
+    class Update {
 
+        @Test
+        void shouldUpdateLocation(){
+            //GIVEN
+            dto = new LocationDTO(1L, "new name");
+            when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.ofNullable(location));
+            when(locationRepository.save(any(Location.class))).thenReturn(location);
+
+            //WHEN
+            Location result = locationService.update(dto);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals("new name", result.getName());
+
+            verify(locationRepository).save(location);
+        }
+    }
 }

@@ -54,8 +54,16 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
-    public Location update(Location location) {
-        return null;
+    public Location update(LocationDTO dto) {
+        WarehouseDTO warehouse = clientService.getWarehouse();
+
+        Location location = locationRepository.findByIdAndWarehouseId(dto.id(), warehouse.id())
+                .orElseThrow();
+
+        location.setId(dto.id());
+        location.setName(dto.name());
+
+        return locationRepository.save(location);
     }
 
     @Override
