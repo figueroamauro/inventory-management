@@ -187,5 +187,20 @@ class LocationServiceTest {
 
             verify(locationRepository).save(location);
         }
+
+        @Test
+        void shouldFailUpdatingLocation(){
+            //GIVEN
+            when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
+
+            //WHEN
+            Executable executable = () -> locationService.update(dto);
+
+            //THEN
+            LocationNotFoundException e = assertThrows(LocationNotFoundException.class, executable);
+            assertEquals("Location not found", e.getMessage());
+
+            verify(locationRepository,never()).save(any(Location.class));
+        }
     }
 }

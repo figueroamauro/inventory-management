@@ -58,7 +58,7 @@ public class LocationServiceImpl implements LocationService {
         WarehouseDTO warehouse = clientService.getWarehouse();
 
         Location location = locationRepository.findByIdAndWarehouseId(dto.id(), warehouse.id())
-                .orElseThrow();
+                .orElseThrow(()-> new LocationNotFoundException("Location not found"));
 
         location.setId(dto.id());
         location.setName(dto.name());
