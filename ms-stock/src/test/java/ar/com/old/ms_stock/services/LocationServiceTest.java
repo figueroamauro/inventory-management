@@ -5,6 +5,7 @@ import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
+import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -135,6 +136,21 @@ class LocationServiceTest {
             assertNotNull(result);
             assertEquals("B2", result.getName());
         }
+    }
+
+    @Test
+    void shouldFailFindingById_whenIdIsNull(){
+        //GIVEN
+        when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
+
+
+        //WHEN
+        Executable executable = () -> locationService.findOne(null);
+
+        //THEN
+        LocationNotFoundException e = assertThrows(LocationNotFoundException.class, executable);
+        assertEquals("Location not found", e.getMessage());
+
     }
 
 

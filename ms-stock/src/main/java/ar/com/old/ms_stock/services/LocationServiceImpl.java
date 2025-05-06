@@ -5,6 +5,7 @@ import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
+import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,7 +47,7 @@ public class LocationServiceImpl implements LocationService {
     public Location findOne(Long id) {
         WarehouseDTO warehouse = clientService.getWarehouse();
         return locationRepository.findByIdAndWarehouseId(id, warehouse.id())
-                .orElseThrow();
+                .orElseThrow(()-> new LocationNotFoundException("Location not found"));
     }
 
     @Override
