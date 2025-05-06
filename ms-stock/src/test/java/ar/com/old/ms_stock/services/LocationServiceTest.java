@@ -189,7 +189,7 @@ class LocationServiceTest {
         }
 
         @Test
-        void shouldFailUpdatingLocation(){
+        void shouldFailUpdatingLocation_whenNotFound(){
             //GIVEN
             when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
 
@@ -199,6 +199,18 @@ class LocationServiceTest {
             //THEN
             LocationNotFoundException e = assertThrows(LocationNotFoundException.class, executable);
             assertEquals("Location not found", e.getMessage());
+
+            verify(locationRepository,never()).save(any(Location.class));
+        }
+
+        @Test
+        void shouldFailUpdatingLocation_whenDTOIsNull(){
+            //WHEN
+            Executable executable = () -> locationService.update(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("DTO can not be null", e.getMessage());
 
             verify(locationRepository,never()).save(any(Location.class));
         }
