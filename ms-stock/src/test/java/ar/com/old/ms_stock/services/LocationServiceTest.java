@@ -7,6 +7,7 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
+import ar.com.old.ms_stock.repositories.StockMovementRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ class LocationServiceTest {
     private WarehouseClientService clientService;
     @Mock
     private LocationRepository locationRepository;
+    @Mock
+    private StockMovementRepository stockMovementRepository;
 
     private Location location;
     private LocationDTO dto;
@@ -244,6 +247,22 @@ class LocationServiceTest {
             assertEquals("Location already exist", e.getMessage());
 
             verify(locationRepository,never()).save(any(Location.class));
+        }
+    }
+
+    @Nested
+    class Delete{
+
+        @Test
+        void shouldDeleteById(){
+            //GIVEN
+            when(stockMovementRepository.existsByLocationId(1L)).thenReturn(false);
+
+            //WHEN
+            locationService.delete(1L);
+
+            //THEN
+            verify(locationRepository).deleteById(1L);
         }
     }
 }
