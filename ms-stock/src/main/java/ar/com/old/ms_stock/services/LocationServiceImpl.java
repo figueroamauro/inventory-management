@@ -78,13 +78,15 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public void delete(Long id) {
         validateNull(id, "Id can not be null");
+        validateLocationIsDeletable(id);
 
-        if (!hasStock(id)) {
-            locationRepository.deleteById(id);
-        }else {
+        locationRepository.deleteById(id);
+    }
+
+    private void validateLocationIsDeletable(Long id) {
+        if (hasStock(id)) {
             throw new LocationInUseException("Location is in use and cannot be deleted");
         }
-
     }
 
 
