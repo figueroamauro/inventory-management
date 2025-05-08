@@ -264,5 +264,17 @@ class LocationServiceTest {
             //THEN
             verify(locationRepository).deleteById(1L);
         }
+
+        @Test
+        void shouldFailDeletingById_whenIdIsNull(){
+            //WHEN
+            Executable executable = () -> locationService.delete(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(locationRepository, never()).deleteById(anyLong());
+        }
     }
 }

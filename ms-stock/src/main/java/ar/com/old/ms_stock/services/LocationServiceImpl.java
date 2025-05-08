@@ -76,7 +76,9 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public void delete(Long id) {
-        if (!stockMovementRepository.existsByLocationId(id)) {
+        validateNull(id, "Id can not be null");
+
+        if (!hasStock(id)) {
             locationRepository.deleteById(id);
         }
 
@@ -94,5 +96,9 @@ public class LocationServiceImpl implements LocationService {
         if (locationOpt.isPresent()) {
             throw new LocationAlreadyExistException("Location already exist");
         }
+    }
+
+    private boolean hasStock(Long id) {
+        return stockMovementRepository.existsByLocationId(id);
     }
 }
