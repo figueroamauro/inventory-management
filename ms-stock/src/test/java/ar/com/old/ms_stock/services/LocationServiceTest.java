@@ -5,6 +5,7 @@ import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
+import ar.com.old.ms_stock.exceptions.LocationInUseException;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockMovementRepository;
@@ -273,6 +274,21 @@ class LocationServiceTest {
             //THEN
             IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
             assertEquals("Id can not be null", e.getMessage());
+
+            verify(locationRepository, never()).deleteById(anyLong());
+        }
+
+        @Test
+        void shouldFailDeletingById_whenHasStock(){
+            //GIVEN
+            when(stockMovementRepository.existsByLocationId(1L)).thenReturn(true);
+
+            //WHEN
+            Executable executable = () -> locationService.delete(1L);
+
+            //THEN
+            LocationInUseException e = assertThrows(LocationInUseException.class, executable);
+            assertEquals("Location is in use and cannot be deleted", e.getMessage());
 
             verify(locationRepository, never()).deleteById(anyLong());
         }

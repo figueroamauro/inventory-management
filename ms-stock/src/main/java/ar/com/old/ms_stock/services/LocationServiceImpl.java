@@ -5,6 +5,7 @@ import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
+import ar.com.old.ms_stock.exceptions.LocationInUseException;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockMovementRepository;
@@ -80,6 +81,8 @@ public class LocationServiceImpl implements LocationService {
 
         if (!hasStock(id)) {
             locationRepository.deleteById(id);
+        }else {
+            throw new LocationInUseException("Location is in use and cannot be deleted");
         }
 
     }
