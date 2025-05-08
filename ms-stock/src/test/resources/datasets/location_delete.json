@@ -1,0 +1,14 @@
+{
+  "locations": [
+    {
+      "id": 2,
+      "name": "B2",
+      "warehouse_id": 1
+    },
+    {
+      "id": 3,
+      "name": "B3",
+      "warehouse_id": 2
+    }
+  ]
+}

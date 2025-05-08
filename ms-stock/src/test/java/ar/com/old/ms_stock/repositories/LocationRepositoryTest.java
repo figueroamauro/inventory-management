@@ -4,6 +4,7 @@ import ar.com.old.ms_stock.entities.Location;
 import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.configuration.Orthography;
 import com.github.database.rider.core.api.dataset.DataSet;
+import com.github.database.rider.core.api.dataset.ExpectedDataSet;
 import com.github.database.rider.spring.api.DBRider;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -62,5 +64,15 @@ class LocationRepositoryTest {
         //THEN
         assertTrue(result.isPresent());
         assertEquals("B1", result.get().getName());
+    }
+
+    @Test
+    @ExpectedDataSet(value = "location_delete.json")
+    void shouldDeleteByIdAndWarehouseId(){
+        //WHEN
+        locationRepository.deleteByIdAndWarehouseId(1L, 1L);
+
+        //THEN
+        //View dataset locations_delete.json
     }
 }
