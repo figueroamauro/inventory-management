@@ -53,4 +53,14 @@ class LocationRepositoryTest {
         assertTrue(result.stream().anyMatch(location -> location.getName().equals("B1")));
         assertTrue(result.stream().anyMatch(location -> location.getName().equals("B2")));
     }
+
+    @Test
+    void shouldFindByIdAndWarehouseId(){
+        //WHEN
+        Optional<Location> result = locationRepository.findByIdAndWarehouseId(1L, 1L);
+
+        //THEN
+        assertTrue(result.isPresent());
+        assertEquals("B1", result.get().getName());
+    }
 }
