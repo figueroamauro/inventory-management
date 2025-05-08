@@ -257,13 +257,14 @@ class LocationServiceTest {
         @Test
         void shouldDeleteById(){
             //GIVEN
+            when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
             when(stockMovementRepository.existsByLocationId(1L)).thenReturn(false);
 
             //WHEN
             locationService.delete(1L);
 
             //THEN
-            verify(locationRepository).deleteById(1L);
+            verify(locationRepository).deleteByIdAndWarehouseId(1L,1L);
         }
 
         @Test
@@ -290,7 +291,7 @@ class LocationServiceTest {
             LocationInUseException e = assertThrows(LocationInUseException.class, executable);
             assertEquals("Location is in use and cannot be deleted", e.getMessage());
 
-            verify(locationRepository, never()).deleteById(anyLong());
+            verify(locationRepository, never()).deleteByIdAndWarehouseId(anyLong(),anyLong());
         }
     }
 }

@@ -80,14 +80,12 @@ public class LocationServiceImpl implements LocationService {
         validateNull(id, "Id can not be null");
         validateLocationIsDeletable(id);
 
-        locationRepository.deleteById(id);
+        WarehouseDTO warehouse = clientService.getWarehouse();
+
+        locationRepository.deleteByIdAndWarehouseId(id, warehouse.id());
     }
 
-    private void validateLocationIsDeletable(Long id) {
-        if (hasStock(id)) {
-            throw new LocationInUseException("Location is in use and cannot be deleted");
-        }
-    }
+
 
 
     private static void validateNull(Object obj, String message) {
@@ -103,7 +101,15 @@ public class LocationServiceImpl implements LocationService {
         }
     }
 
+    private void validateLocationIsDeletable(Long id) {
+        if (hasStock(id)) {
+            throw new LocationInUseException("Location is in use and cannot be deleted");
+        }
+    }
+
     private boolean hasStock(Long id) {
         return stockMovementRepository.existsByLocationId(id);
     }
+
+
 }
