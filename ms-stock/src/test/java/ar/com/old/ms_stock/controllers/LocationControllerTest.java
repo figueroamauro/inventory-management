@@ -143,6 +143,21 @@ class LocationControllerTest {
     }
 
     @Test
+    void shouldFailFindingById_whenIdIsNull_status400() throws Exception {
+        //GIVEN
+        when(locationService.findOne(1L)).thenThrow(new IllegalArgumentException("Id can not be null"));
+
+        //WHEN
+        mockMvc.perform(get("/api/locations/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Id can not be null"));
+    }
+
+    @Test
     void shouldUpdateLocation_return200() throws Exception {
         //GIVEN
         when(locationService.update(dto)).thenReturn(location);
