@@ -2,6 +2,7 @@ package ar.com.old.ms_stock.controllers;
 
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
+import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
 import ar.com.old.ms_stock.services.LocationServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class LocationControllerTest {
     private MockMvc mockMvc;
     @MockitoBean
     private LocationServiceImpl locationService;
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     void shouldCreateLocation_return201() throws Exception {
@@ -43,5 +44,22 @@ class LocationControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.name").value("B2"));
+    }
+
+    @Test
+    void shouldFailCreatingLocation_whenAlreadyExist_return409() throws Exception {
+        //GIVEN
+        LocationDTO dto = new LocationDTO(1L, "B2");
+        when(locationService.create(dto)).thenThrow(new LocationAlreadyExistException("Location already exist"));
+
+        //WHEN
+        mockMvc.perform(post("/api/locations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Location already exist"));
     }
 }
