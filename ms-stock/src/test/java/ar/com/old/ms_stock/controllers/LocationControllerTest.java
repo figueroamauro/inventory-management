@@ -3,6 +3,7 @@ package ar.com.old.ms_stock.controllers;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
+import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.services.LocationServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,7 +97,6 @@ class LocationControllerTest {
     @Test
     void shouldFindOneLocation_return200() throws Exception {
         //GIVEN
-
         when(locationService.findOne(1L)).thenReturn(location);
 
         //WHEN
@@ -107,6 +107,23 @@ class LocationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.name").value("B2"));
+
+        verify(locationService).findOne(1L);
+    }
+
+    @Test
+    void shouldFailFindingById_whenNotFound_status404() throws Exception {
+        //GIVEN
+        when(locationService.findOne(1L)).thenThrow(new LocationNotFoundException("Location not found"));
+
+        //WHEN
+        mockMvc.perform(get("/api/locations/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Location not found"));
     }
 
 }
