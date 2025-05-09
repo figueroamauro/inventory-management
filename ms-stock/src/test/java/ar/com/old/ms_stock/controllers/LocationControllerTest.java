@@ -7,8 +7,11 @@ import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.services.LocationServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
 import static org.mockito.Mockito.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
@@ -45,216 +48,236 @@ class LocationControllerTest {
         location = new Location(1L, "B2", 1L);
     }
 
-    @Test
-    void shouldCreateLocation_return201() throws Exception {
-        //GIVEN
-        when(locationService.create(dto)).thenReturn(location);
+    @Nested
+    class Create {
 
-        //WHEN
-        mockMvc.perform(post("/api/locations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+        @Test
+        void shouldCreateLocation_return201() throws Exception {
+            //GIVEN
+            when(locationService.create(dto)).thenReturn(location);
 
-                //THEN
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.name").value("B2"));
+            //WHEN
+            mockMvc.perform(post("/api/locations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+
+                    //THEN
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.name").value("B2"));
+        }
+
+        @Test
+        void shouldFailCreatingLocation_whenAlreadyExist_return409() throws Exception {
+            //GIVEN
+            when(locationService.create(dto)).thenThrow(new LocationAlreadyExistException("Location already exist"));
+
+            //WHEN
+            mockMvc.perform(post("/api/locations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+
+                    //THEN
+                    .andExpect(status().isConflict())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Location already exist"));
+        }
+
+        @Test
+        void shouldFailCreatingLocation_whenDTOIsNull_return400() throws Exception {
+            //GIVEN
+            when(locationService.create(dto)).thenThrow(new IllegalArgumentException("DTO can not be null"));
+
+            //WHEN
+            mockMvc.perform(post("/api/locations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+
+                    //THEN
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("DTO can not be null"));
+        }
     }
 
-    @Test
-    void shouldFailCreatingLocation_whenAlreadyExist_return409() throws Exception {
-        //GIVEN
-        when(locationService.create(dto)).thenThrow(new LocationAlreadyExistException("Location already exist"));
+    @Nested
+    class FindAll {
 
-        //WHEN
-        mockMvc.perform(post("/api/locations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+        @Test
+        void shouldFindAllLocations_return200() throws Exception {
+            //GIVEN
+            List<Location> list = List.of(location, location, location);
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<Location> page = new PageImpl<>(list, pageable, list.size());
+            when(locationService.findAll(any(Pageable.class))).thenReturn(page);
 
-                //THEN
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Location already exist"));
+            //WHEN
+            mockMvc.perform(get("/api/locations")
+                            .contentType(MediaType.APPLICATION_JSON))
+
+                    //THEN
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isMap());
+        }
     }
 
-    @Test
-    void shouldFailCreatingLocation_whenDTOIsNull_return400() throws Exception {
-        //GIVEN
-        when(locationService.create(dto)).thenThrow(new IllegalArgumentException("DTO can not be null"));
+    @Nested
+    class FindOne {
 
-        //WHEN
-        mockMvc.perform(post("/api/locations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
+        @Test
+        void shouldFindOneLocation_return200() throws Exception {
+            //GIVEN
+            when(locationService.findOne(1L)).thenReturn(location);
 
-                //THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("DTO can not be null"));
+            //WHEN
+            mockMvc.perform(get("/api/locations/1")
+                            .contentType(MediaType.APPLICATION_JSON))
+
+                    //THEN
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.name").value("B2"));
+
+            verify(locationService).findOne(1L);
+        }
+
+        @Test
+        void shouldFailFindingById_whenNotFound_status404() throws Exception {
+            //GIVEN
+            when(locationService.findOne(1L)).thenThrow(new LocationNotFoundException("Location not found"));
+
+            //WHEN
+            mockMvc.perform(get("/api/locations/1")
+                            .contentType(MediaType.APPLICATION_JSON))
+
+                    //THEN
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Location not found"));
+        }
+
+        @Test
+        void shouldFailFindingById_whenIdIsNull_status400() throws Exception {
+            //GIVEN
+            when(locationService.findOne(1L)).thenThrow(new IllegalArgumentException("Id can not be null"));
+
+            //WHEN
+            mockMvc.perform(get("/api/locations/1")
+                            .contentType(MediaType.APPLICATION_JSON))
+
+                    //THEN
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Id can not be null"));
+        }
     }
 
-    @Test
-    void shouldFindAllLocations_return200() throws Exception {
-        //GIVEN
-        List<Location> list = List.of(location, location, location);
-        Pageable pageable = PageRequest.of(0, 10);
-        Page<Location> page = new PageImpl<>(list, pageable, list.size());
-        when(locationService.findAll(any(Pageable.class))).thenReturn(page);
+    @Nested
+    class Update {
 
-        //WHEN
-        mockMvc.perform(get("/api/locations")
-                        .contentType(MediaType.APPLICATION_JSON))
+        @Test
+        void shouldUpdateLocation_return200() throws Exception {
+            //GIVEN
+            when(locationService.update(dto)).thenReturn(location);
 
-                //THEN
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap());
+            //WHEN
+            mockMvc.perform(put("/api/locations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+
+                    //THEN
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.name").value("B2"));
+
+            verify(locationService).update(dto);
+        }
+
+        @Test
+        void shouldFailUpdatingLocation_whenNotFound_return404() throws Exception {
+            //GIVEN
+            when(locationService.update(dto)).thenThrow(new LocationNotFoundException("Location not found"));
+
+            //WHEN
+            mockMvc.perform(put("/api/locations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+
+                    //THEN
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Location not found"));
+
+            verify(locationService).update(dto);
+        }
+
+        @Test
+        void shouldFailUpdatingLocation_whenDTOHasNullId_return404() throws Exception {
+            //GIVEN
+            when(locationService.update(dto)).thenThrow(new IllegalArgumentException("Id can not be null"));
+
+            //WHEN
+            mockMvc.perform(put("/api/locations")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(dto)))
+
+                    //THEN
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Id can not be null"));
+
+            verify(locationService).update(dto);
+        }
     }
 
-    @Test
-    void shouldFindOneLocation_return200() throws Exception {
-        //GIVEN
-        when(locationService.findOne(1L)).thenReturn(location);
+    @Nested
+    class Delete {
 
-        //WHEN
-        mockMvc.perform(get("/api/locations/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+        @Test
+        void shouldDeleteLocation_return204() throws Exception {
+            //WHEN
+            mockMvc.perform(delete("/api/locations/1")
+                            .contentType(MediaType.APPLICATION_JSON))
 
-                //THEN
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.name").value("B2"));
+                    //THEN
+                    .andExpect(status().isNoContent());
 
-        verify(locationService).findOne(1L);
-    }
+            verify(locationService).delete(anyLong());
+        }
 
-    @Test
-    void shouldFailFindingById_whenNotFound_status404() throws Exception {
-        //GIVEN
-        when(locationService.findOne(1L)).thenThrow(new LocationNotFoundException("Location not found"));
+        @Test
+        void shouldFailDeletingLocation_whenNotFound_return404() throws Exception {
+            //GIVEN
+            doThrow(new LocationNotFoundException("Location not found")).when(locationService).delete(1L);
 
-        //WHEN
-        mockMvc.perform(get("/api/locations/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+            //WHEN
+            mockMvc.perform(delete("/api/locations/1")
+                            .contentType(MediaType.APPLICATION_JSON))
 
-                //THEN
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Location not found"));
-    }
+                    //THEN
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Location not found"));
 
-    @Test
-    void shouldFailFindingById_whenIdIsNull_status400() throws Exception {
-        //GIVEN
-        when(locationService.findOne(1L)).thenThrow(new IllegalArgumentException("Id can not be null"));
+            verify(locationService).delete(anyLong());
+        }
 
-        //WHEN
-        mockMvc.perform(get("/api/locations/1")
-                        .contentType(MediaType.APPLICATION_JSON))
+        @Test
+        void shouldFailDeletingLocation_whenIdIsNull_return400() throws Exception {
+            //GIVEN
+            doThrow(new LocationNotFoundException("Id can not be null")).when(locationService).delete(1L);
 
-                //THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Id can not be null"));
-    }
+            //WHEN
+            mockMvc.perform(delete("/api/locations/1")
+                            .contentType(MediaType.APPLICATION_JSON))
 
-    @Test
-    void shouldUpdateLocation_return200() throws Exception {
-        //GIVEN
-        when(locationService.update(dto)).thenReturn(location);
+                    //THEN
+                    .andExpect(status().isNotFound())
+                    .andExpect(jsonPath("$").isMap())
+                    .andExpect(jsonPath("$.error").value("Id can not be null"));
 
-        //WHEN
-        mockMvc.perform(put("/api/locations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-
-                //THEN
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.name").value("B2"));
-
-        verify(locationService).update(dto);
-    }
-
-    @Test
-    void shouldFailUpdatingLocation_whenNotFound_return404() throws Exception {
-        //GIVEN
-        when(locationService.update(dto)).thenThrow(new LocationNotFoundException("Location not found"));
-
-        //WHEN
-        mockMvc.perform(put("/api/locations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-
-                //THEN
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Location not found"));
-
-        verify(locationService).update(dto);
-    }
-
-    @Test
-    void shouldFailUpdatingLocation_whenDTOHasNullId_return404() throws Exception {
-        //GIVEN
-        when(locationService.update(dto)).thenThrow(new IllegalArgumentException("Id can not be null"));
-
-        //WHEN
-        mockMvc.perform(put("/api/locations")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-
-                //THEN
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Id can not be null"));
-
-        verify(locationService).update(dto);
-    }
-
-    @Test
-    void shouldDeleteLocation_return204() throws Exception {
-        //WHEN
-        mockMvc.perform(delete("/api/locations/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-
-                //THEN
-                .andExpect(status().isNoContent());
-
-        verify(locationService).delete(anyLong());
-    }
-
-    @Test
-    void shouldFailDeletingLocation_whenNotFound_return404() throws Exception {
-        //GIVEN
-        doThrow(new LocationNotFoundException("Location not found")).when(locationService).delete(1L);
-
-        //WHEN
-        mockMvc.perform(delete("/api/locations/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-
-                //THEN
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Location not found"));
-
-        verify(locationService).delete(anyLong());
-    }
-
-    @Test
-    void shouldFailDeletingLocation_whenIdIsNull_return400() throws Exception {
-        //GIVEN
-        doThrow(new LocationNotFoundException("Id can not be null")).when(locationService).delete(1L);
-
-        //WHEN
-        mockMvc.perform(delete("/api/locations/1")
-                        .contentType(MediaType.APPLICATION_JSON))
-
-                //THEN
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$").isMap())
-                .andExpect(jsonPath("$.error").value("Id can not be null"));
-
-        verify(locationService).delete(anyLong());
+            verify(locationService).delete(anyLong());
+        }
     }
 
 }
