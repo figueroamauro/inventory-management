@@ -34,4 +34,11 @@ public class LocationController {
 
         return ResponseEntity.ok(assembler.toModel(page));
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Location> findOne(@PathVariable Long id) {
+        Location location = locationService.findOne(id);
+
+        return ResponseEntity.ok(location);
+    }
 }

@@ -92,4 +92,21 @@ class LocationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap());
     }
+
+    @Test
+    void shouldFindOneLocation_return200() throws Exception {
+        //GIVEN
+
+        when(locationService.findOne(1L)).thenReturn(location);
+
+        //WHEN
+        mockMvc.perform(get("/api/locations/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.name").value("B2"));
+    }
+
 }
