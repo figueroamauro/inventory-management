@@ -208,4 +208,20 @@ class LocationControllerTest {
         verify(locationService).delete(anyLong());
     }
 
+    void shouldFailDeletingLocation_whenIdIsNull_return400() throws Exception {
+        //GIVEN
+        doThrow(new LocationNotFoundException("Id can not be null")).when(locationService).delete(1L);
+
+        //WHEN
+        mockMvc.perform(delete("/api/locations/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Id can not be null"));
+
+        verify(locationService).delete(anyLong());
+    }
+
 }
