@@ -78,6 +78,22 @@ class LocationControllerTest {
     }
 
     @Test
+    void shouldFailCreatingLocation_whenDTOIsNull_return400() throws Exception {
+        //GIVEN
+        when(locationService.create(dto)).thenThrow(new IllegalArgumentException("DTO can not be null"));
+
+        //WHEN
+        mockMvc.perform(post("/api/locations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("DTO can not be null"));
+    }
+
+    @Test
     void shouldFindAllLocations_return200() throws Exception {
         //GIVEN
         List<Location> list = List.of(location, location, location);
@@ -192,6 +208,7 @@ class LocationControllerTest {
         verify(locationService).delete(anyLong());
     }
 
+    @Test
     void shouldFailDeletingLocation_whenNotFound_return404() throws Exception {
         //GIVEN
         doThrow(new LocationNotFoundException("Location not found")).when(locationService).delete(1L);
@@ -208,6 +225,7 @@ class LocationControllerTest {
         verify(locationService).delete(anyLong());
     }
 
+    @Test
     void shouldFailDeletingLocation_whenIdIsNull_return400() throws Exception {
         //GIVEN
         doThrow(new LocationNotFoundException("Id can not be null")).when(locationService).delete(1L);
