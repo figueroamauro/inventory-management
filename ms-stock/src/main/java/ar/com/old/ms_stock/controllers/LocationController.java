@@ -41,4 +41,11 @@ public class LocationController {
 
         return ResponseEntity.ok(location);
     }
+
+    @PutMapping
+    public ResponseEntity<Location> update(@RequestBody LocationDTO dto) {
+        Location location = locationService.update(dto);
+
+        return ResponseEntity.ok(location);
+    }
 }

@@ -126,4 +126,22 @@ class LocationControllerTest {
                 .andExpect(jsonPath("$.error").value("Location not found"));
     }
 
+    @Test
+    void shouldUpdateLocation_return200() throws Exception {
+        //GIVEN
+        when(locationService.update(dto)).thenReturn(location);
+
+        //WHEN
+        mockMvc.perform(put("/api/locations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.name").value("B2"));
+
+        verify(locationService).update(dto);
+    }
+
 }
