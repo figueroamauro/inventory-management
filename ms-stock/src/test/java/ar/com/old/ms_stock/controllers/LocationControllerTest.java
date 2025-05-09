@@ -144,4 +144,22 @@ class LocationControllerTest {
         verify(locationService).update(dto);
     }
 
+    @Test
+    void shouldFailUpdatingLocation_whenNotFound_return404() throws Exception {
+        //GIVEN
+        when(locationService.update(dto)).thenThrow(new LocationNotFoundException("Location not found"));
+
+        //WHEN
+        mockMvc.perform(put("/api/locations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Location not found"));
+
+        verify(locationService).update(dto);
+    }
+
 }
