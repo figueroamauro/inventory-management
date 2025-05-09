@@ -1,5 +1,6 @@
 package ar.com.old.ms_stock.handlers;
 
+import ar.com.old.ms_stock.exceptions.ConnectionFeignException;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -15,25 +16,28 @@ public class GlobalHandler {
 
     @ExceptionHandler(LocationAlreadyExistException.class)
     public ResponseEntity<Map<String, String>> handlerConflictException(Exception e) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", e.getMessage());
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+        return buildResponseError(e, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(LocationNotFoundException.class)
     public ResponseEntity<Map<String, String>> handlerNotFoundException(Exception e) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", e.getMessage());
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return buildResponseError(e, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, String>> handlerBadRequestException(Exception e) {
+        return buildResponseError(e, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConnectionFeignException.class)
+    public ResponseEntity<Map<String, String>> handlerInternalError(Exception e) {
+        return buildResponseError(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    private static ResponseEntity<Map<String, String>> buildResponseError(Exception e, HttpStatus status) {
         Map<String, String> error = new HashMap<>();
         error.put("error", e.getMessage());
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(status).body(error);
     }
 }
