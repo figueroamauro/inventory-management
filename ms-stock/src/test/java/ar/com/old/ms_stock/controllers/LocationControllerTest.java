@@ -162,4 +162,22 @@ class LocationControllerTest {
         verify(locationService).update(dto);
     }
 
+    @Test
+    void shouldFailUpdatingLocation_whenDTOHasNullId_return404() throws Exception {
+        //GIVEN
+        when(locationService.update(dto)).thenThrow(new IllegalArgumentException("Id can not be null"));
+
+        //WHEN
+        mockMvc.perform(put("/api/locations")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Id can not be null"));
+
+        verify(locationService).update(dto);
+    }
+
 }
