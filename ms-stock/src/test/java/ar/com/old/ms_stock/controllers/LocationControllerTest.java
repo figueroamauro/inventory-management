@@ -192,4 +192,20 @@ class LocationControllerTest {
         verify(locationService).delete(anyLong());
     }
 
+    void shouldFailDeletingLocation_whenNotFound_return404() throws Exception {
+        //GIVEN
+        doThrow(new LocationNotFoundException("Location not found")).when(locationService).delete(1L);
+
+        //WHEN
+        mockMvc.perform(delete("/api/locations/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Location not found"));
+
+        verify(locationService).delete(anyLong());
+    }
+
 }
