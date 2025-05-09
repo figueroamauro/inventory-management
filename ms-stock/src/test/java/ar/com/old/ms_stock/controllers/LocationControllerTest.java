@@ -180,4 +180,16 @@ class LocationControllerTest {
         verify(locationService).update(dto);
     }
 
+    @Test
+    void shouldDeleteLocation_return204() throws Exception {
+        //WHEN
+        mockMvc.perform(delete("/api/locations/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNoContent());
+
+        verify(locationService).delete(anyLong());
+    }
+
 }

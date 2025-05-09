@@ -48,4 +48,11 @@ public class LocationController {
 
         return ResponseEntity.ok(location);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        locationService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
