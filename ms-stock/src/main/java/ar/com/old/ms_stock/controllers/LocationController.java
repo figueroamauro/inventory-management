@@ -3,6 +3,7 @@ package ar.com.old.ms_stock.controllers;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.services.LocationService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -22,7 +23,7 @@ public class LocationController {
     }
 
     @PostMapping
-    public ResponseEntity<Location> create(@RequestBody LocationDTO dto) {
+    public ResponseEntity<Location> create(@Valid @RequestBody LocationDTO dto) {
         Location location = locationService.create(dto);
 
         return ResponseEntity.created(URI.create("api/locations/" + location.getId())).body(location);
@@ -43,7 +44,7 @@ public class LocationController {
     }
 
     @PutMapping
-    public ResponseEntity<Location> update(@RequestBody LocationDTO dto) {
+    public ResponseEntity<Location> update(@Valid @RequestBody LocationDTO dto) {
         Location location = locationService.update(dto);
 
         return ResponseEntity.ok(location);
