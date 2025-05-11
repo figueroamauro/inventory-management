@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 public class StockEntry {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "quantity", nullable = false)
@@ -29,8 +28,8 @@ public class StockEntry {
         this.updateAt = LocalDateTime.now();
     }
 
-    public StockEntry(Long id, Integer quantity, Long productId, Long warehouseId) {
-        this.id = id;
+    public StockEntry(Integer quantity, Long productId, Long warehouseId) {
+        this.id = productId;
         this.quantity = quantity;
         this.productId = productId;
         this.warehouseId = warehouseId;
@@ -67,6 +66,7 @@ public class StockEntry {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+        this.id = productId;
     }
 
     public Long getWarehouseId() {
