@@ -21,14 +21,19 @@ public class StockEntry {
     @Column(name = "product_id", nullable = false)
     private Long productId;
 
+    @Column(name = "warehouse_id", nullable = false)
+    private Long warehouseId;
+
+
     public StockEntry() {
         this.updateAt = LocalDateTime.now();
     }
 
-    public StockEntry(Long id, Integer quantity, Long productId) {
+    public StockEntry(Long id, Integer quantity, Long productId, Long warehouseId) {
         this.id = id;
         this.quantity = quantity;
         this.productId = productId;
+        this.warehouseId = warehouseId;
         this.updateAt = LocalDateTime.now();
     }
 
@@ -62,5 +67,13 @@ public class StockEntry {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public Long getWarehouseId() {
+        return warehouseId;
+    }
+
+    public void setWarehouseId(Long warehouseId) {
+        this.warehouseId = warehouseId;
     }
 }

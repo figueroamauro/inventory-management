@@ -11,7 +11,8 @@ CREATE TABLE stock_entry(
 id int AUTO_INCREMENT PRIMARY KEY,
 quantity int,
 update_at timestamp,
-product_id int NOT NULL
+product_id int NOT NULL,
+warehouse_id int NOT NULL
 );
 
 CREATE TABLE stock_movement(
