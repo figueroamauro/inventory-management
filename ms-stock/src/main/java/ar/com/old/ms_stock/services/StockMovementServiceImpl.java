@@ -29,6 +29,7 @@ public class StockMovementServiceImpl implements StockMovementService{
 
     @Override
     public StockMovement create(StockMovementDTO dto) {
+        validateNull(dto, "DTO can not be null");
         WarehouseDTO warehouse = clientService.getWarehouse();
         Location location = locationRepository.findByIdAndWarehouseId(dto.locationId(), warehouse.id())
                 .orElseThrow(() -> new LocationNotFoundException("Location not found"));
@@ -48,5 +49,12 @@ public class StockMovementServiceImpl implements StockMovementService{
     @Override
     public Page<StockMovement> findAllByStockEntry_ProductId(Long productId) {
         return null;
+    }
+
+
+    private void validateNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
     }
 }

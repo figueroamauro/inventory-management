@@ -111,5 +111,17 @@ class StockMovementServiceTest {
             verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
             verify(stockEntryRepository,never()).save(any(StockEntry.class));
         }
+
+        @Test
+        void shouldFailCreatingMovement_whenDTOIsNull(){
+            //WHEN
+            Executable executable = () -> stockMovementService.create(null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("DTO can not be null", e.getMessage());
+
+            verify(stockEntryRepository,never()).save(any(StockEntry.class));
+        }
     }
 }
