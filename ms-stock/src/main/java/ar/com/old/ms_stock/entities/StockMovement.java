@@ -25,20 +25,22 @@ public class StockMovement {
     @Column(name = "note")
     private String note;
 
-    @Column(name = "location_id", nullable = false)
-    private Long locationId;
+    @ManyToOne
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    private Location location;
 
-    @Column(name = "stock_entry_id")
-    private Long stockEntryId;
+    @ManyToOne
+    @JoinColumn(name = "stock_entry_id", referencedColumnName = "id")
+    private StockEntry stockEntry;
 
-    public StockMovement(Long id, MovementType type, Integer quantity, String note, Long locationId, Long stockEntryId) {
+    public StockMovement(Long id, MovementType type, Integer quantity, String note, Location location, StockEntry stockEntry) {
         this.id = id;
         this.type = type;
         this.quantity = quantity;
         this.timestamp = LocalDateTime.now();
         this.note = note;
-        this.locationId = locationId;
-        this.stockEntryId = stockEntryId;
+        this.location = location;
+            this.stockEntry = stockEntry;
     }
 
     public StockMovement() {
@@ -85,19 +87,19 @@ public class StockMovement {
         this.note = note;
     }
 
-    public Long getLocationId() {
-        return locationId;
+    public Location getLocation() {
+        return location;
     }
 
-    public void setLocationId(Long locationId) {
-        this.locationId = locationId;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
-    public Long getStockEntryId() {
-        return stockEntryId;
+    public StockEntry getStockEntry() {
+        return stockEntry;
     }
 
-    public void setStockEntryId(Long stockEntryId) {
-        this.stockEntryId = stockEntryId;
+    public void setStockEntry(StockEntry stockEntry) {
+        this.stockEntry = stockEntry;
     }
 }

@@ -28,3 +28,8 @@ ALTER TABLE stock_movement
 ADD CONSTRAINT fk_movement_location
 FOREIGN KEY (location_id)
 REFERENCES locations(id);
+
+ALTER TABLE stock_movement
+ADD CONSTRAINT fk_movement_stock_entry
+FOREIGN KEY (stock_entry_id)
+REFERENCES stock_entry(id);
