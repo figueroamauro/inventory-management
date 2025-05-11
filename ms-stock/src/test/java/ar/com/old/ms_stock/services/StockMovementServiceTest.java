@@ -7,12 +7,15 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
+import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
 import ar.com.old.ms_stock.repositories.StockMovementRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -54,39 +57,59 @@ class StockMovementServiceTest {
         stockMovement = new StockMovement(1L, MovementType.IN, 20, "", location, stockEntry);
     }
 
-    @Test
-    void shouldCreateStockEntryBeforeToCreateFirstMovement() {
-        //GIVEN
-        when(clientService.getWarehouse()).thenReturn(warehouseDTO);
-        when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-        when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+    @Nested
+    class Create {
 
-        //WHEN
-        stockMovementService.create(dto);
+        @Test
+        void shouldCreateStockEntryBeforeToCreateFirstMovement() {
+            //GIVEN
+            when(clientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
 
-        //THEN
-        verify(stockEntryRepository).findByIdAndWarehouseId(1L, 1L);
-        verify(stockEntryRepository).save(any(StockEntry.class));
-    }
+            //WHEN
+            stockMovementService.create(dto);
 
-    @Test
-    void shouldCreateStockMovement() {
-        //GIVEN
-        when(clientService.getWarehouse()).thenReturn(warehouseDTO);
-        when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-        when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
-        when(stockMovementRepository.save(any(StockMovement.class))).thenReturn(stockMovement);
+            //THEN
+            verify(stockEntryRepository).findByIdAndWarehouseId(1L, 1L);
+            verify(stockEntryRepository).save(any(StockEntry.class));
+        }
 
-        //WHEN
-        StockMovement result = stockMovementService.create(dto);
+        @Test
+        void shouldCreateStockMovement() {
+            //GIVEN
+            when(clientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
+            when(stockMovementRepository.save(any(StockMovement.class))).thenReturn(stockMovement);
 
-        //THEN
-        assertNotNull(result);
-        assertEquals(20, result.getQuantity());
-        assertEquals(1L,result.getStockEntry().getId());
+            //WHEN
+            StockMovement result = stockMovementService.create(dto);
 
-        verify(stockEntryRepository).findByIdAndWarehouseId(1L, 1L);
-        verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
-        verify(stockEntryRepository).save(any(StockEntry.class));
+            //THEN
+            assertNotNull(result);
+            assertEquals(20, result.getQuantity());
+            assertEquals(1L, result.getStockEntry().getId());
+
+            verify(stockEntryRepository).findByIdAndWarehouseId(1L, 1L);
+            verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
+            verify(stockEntryRepository).save(any(StockEntry.class));
+        }
+
+        @Test
+        void shouldFailCreatingMovement_whenLocationIsNull(){
+            //GIVEN
+            when(clientService.getWarehouse()).thenReturn(warehouseDTO);
+
+            //WHEN
+            Executable executable = () -> stockMovementService.create(dto);
+
+            //THEN
+            LocationNotFoundException e = assertThrows(LocationNotFoundException.class, executable);
+            assertEquals("Location not found", e.getMessage());
+
+            verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
+            verify(stockEntryRepository,never()).save(any(StockEntry.class));
+        }
     }
 }

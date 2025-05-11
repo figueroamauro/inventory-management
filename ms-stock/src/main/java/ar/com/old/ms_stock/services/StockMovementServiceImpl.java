@@ -6,6 +6,7 @@ import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
+import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
 import ar.com.old.ms_stock.repositories.StockMovementRepository;
@@ -29,11 +30,11 @@ public class StockMovementServiceImpl implements StockMovementService{
     @Override
     public StockMovement create(StockMovementDTO dto) {
         WarehouseDTO warehouse = clientService.getWarehouse();
+        Location location = locationRepository.findByIdAndWarehouseId(dto.locationId(), warehouse.id())
+                .orElseThrow(() -> new LocationNotFoundException("Location not found"));
+
         StockEntry entry = stockEntryRepository.findByIdAndWarehouseId(dto.productId(), warehouse.id())
                 .orElseGet(() -> stockEntryRepository.save(new StockEntry(dto.quantity(), dto.productId(), warehouse.id())));
-
-        Location location = locationRepository.findByIdAndWarehouseId(dto.locationId(), warehouse.id())
-                .orElseThrow();
 
         StockMovement stockMovement = new StockMovement(null, dto.type(), dto.quantity(), dto.note(), location, entry);
         return stockMovementRepository.save(stockMovement);
