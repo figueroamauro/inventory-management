@@ -57,7 +57,7 @@ public class StockMovementServiceImpl implements StockMovementService {
 
     @Override
     public Page<StockMovement> findAllByProductId(Pageable pageable, Long productId) {
-        return null;
+        return stockMovementRepository.findAllByStockEntry_ProductId(pageable, productId);
     }
 
 

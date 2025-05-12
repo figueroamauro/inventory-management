@@ -12,4 +12,6 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
     boolean existsByLocationId(Long id);
 
     Page<StockMovement> findAllByStockEntry_WarehouseId(Pageable pageable, Long warehouseId);
+
+    Page<StockMovement> findAllByStockEntry_ProductId(Pageable any, Long productId);
 }

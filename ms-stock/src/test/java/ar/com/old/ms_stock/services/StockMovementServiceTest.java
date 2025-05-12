@@ -169,6 +169,27 @@ class StockMovementServiceTest {
             //THEN
             assertNotNull(result);
             assertEquals(3, result.getTotalElements());
+
+            verify(stockMovementRepository).findAllByStockEntry_WarehouseId(any(Pageable.class), anyLong());
+        }
+
+        @Test
+        void shouldFindAllMovementsByProductId(){
+            //GIVEN
+            List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<StockMovement> page = new PageImpl<>(list, pageable, list.size());
+            when(stockMovementRepository.findAllByStockEntry_ProductId(pageable, 1L)).thenReturn(page);
+
+
+            //WHEN
+            Page<StockMovement> result = stockMovementService.findAllByProductId(pageable,1L);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals(3, result.getTotalElements());
+
+            verify(stockMovementRepository).findAllByStockEntry_ProductId(any(Pageable.class), anyLong());
         }
     }
 }
