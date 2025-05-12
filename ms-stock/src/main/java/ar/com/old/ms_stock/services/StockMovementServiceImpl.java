@@ -58,7 +58,14 @@ public class StockMovementServiceImpl implements StockMovementService {
     @Override
     public Page<StockMovement> findAllByProductId(Pageable pageable, Long productId) {
         validateNull(productId, "Id can not be null");
+
         return stockMovementRepository.findAllByStockEntry_ProductId(pageable, productId);
+    }
+
+    @Override
+    public Page<StockMovement> findAllByLocationId(Pageable pageable, Long locationId) {
+
+        return stockMovementRepository.findAllByLocationId(pageable, locationId);
     }
 
 

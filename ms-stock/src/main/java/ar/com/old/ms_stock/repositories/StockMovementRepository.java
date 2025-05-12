@@ -14,4 +14,6 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
     Page<StockMovement> findAllByStockEntry_WarehouseId(Pageable pageable, Long warehouseId);
 
     Page<StockMovement> findAllByStockEntry_ProductId(Pageable any, Long productId);
+
+    Page<StockMovement> findAllByLocationId(Pageable pageable, Long locationId);
 }

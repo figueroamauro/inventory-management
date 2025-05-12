@@ -56,6 +56,9 @@ class StockMovementServiceTest {
     private StockMovement stockMovement;
     private Location location;
     private ProductDTO productDTO;
+    private List<StockMovement> list;
+    private Pageable pageable;
+    private Page<StockMovement> page;
 
     @BeforeEach
     void init() {
@@ -65,6 +68,9 @@ class StockMovementServiceTest {
         location = new Location(1L, "B1", 1L);
         productDTO = new ProductDTO(1L, "product", "description", 100.00, 1L, LocalDateTime.now());
         stockMovement = new StockMovement(1L, MovementType.IN, 20, "", location, stockEntry);
+        list = List.of(stockMovement, stockMovement, stockMovement);
+        pageable = PageRequest.of(0, 10);
+        page = new PageImpl<>(list, pageable, list.size());
     }
 
     @Nested
@@ -156,12 +162,8 @@ class StockMovementServiceTest {
         @Test
         void shouldFindAllMovementsByWarehouseId(){
             //GIVEN
-            List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
-            Pageable pageable = PageRequest.of(0, 10);
-            Page<StockMovement> page = new PageImpl<>(list, pageable, list.size());
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockMovementRepository.findAllByStockEntry_WarehouseId(pageable, 1L)).thenReturn(page);
-
 
             //WHEN
             Page<StockMovement> result = stockMovementService.findAll(pageable);
@@ -202,6 +204,22 @@ class StockMovementServiceTest {
             assertEquals("Id can not be null", e.getMessage());
 
             verify(stockMovementRepository,never()).findAllByStockEntry_ProductId(any(Pageable.class), anyLong());
+        }
+
+        @Test
+        void shouldFindAllMovementsByLocationId(){
+            //GIVEN
+            when(stockMovementRepository.findAllByLocationId(pageable, 1L)).thenReturn(page);
+
+
+            //WHEN
+            Page<StockMovement> result = stockMovementService.findAllByLocationId(pageable,1L);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals(3, result.getTotalElements());
+
+            verify(stockMovementRepository).findAllByLocationId(any(Pageable.class), anyLong());
         }
     }
 }
