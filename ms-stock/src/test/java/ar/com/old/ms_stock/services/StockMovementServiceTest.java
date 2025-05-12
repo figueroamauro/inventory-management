@@ -211,7 +211,6 @@ class StockMovementServiceTest {
             //GIVEN
             when(stockMovementRepository.findAllByLocationId(pageable, 1L)).thenReturn(page);
 
-
             //WHEN
             Page<StockMovement> result = stockMovementService.findAllByLocationId(pageable,1L);
 
@@ -220,6 +219,18 @@ class StockMovementServiceTest {
             assertEquals(3, result.getTotalElements());
 
             verify(stockMovementRepository).findAllByLocationId(any(Pageable.class), anyLong());
+        }
+
+        @Test
+        void shouldFailFindingMovementByLocationId_whenIdIsNull(){
+            //WHEN
+            Executable executable = () -> stockMovementService.findAllByLocationId(Pageable.unpaged(), null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Id can not be null", e.getMessage());
+
+            verify(stockMovementRepository,never()).findAllByLocationId(any(Pageable.class), anyLong());
         }
     }
 }
