@@ -34,26 +34,17 @@ public class StockMovementServiceImpl implements StockMovementService{
     @Override
     public StockMovement create(StockMovementDTO dto) {
         validateNull(dto, "DTO can not be null");
-
-        WarehouseDTO warehouse = productsClientService.getWarehouse();
         validateNonExistentProduct(dto.productId());
 
-        Location location = locationRepository.findByIdAndWarehouseId(dto.locationId(), warehouse.id())
-                .orElseThrow(() -> new LocationNotFoundException("Location not found"));
+        WarehouseDTO warehouse = productsClientService.getWarehouse();
 
-        StockEntry entry = stockEntryRepository.findByIdAndWarehouseId(dto.productId(), warehouse.id())
-                .orElseGet(() -> stockEntryRepository.save(new StockEntry(dto.quantity(), dto.productId(), warehouse.id())));
+        Location location = getLocationAndVerifyIfExist(dto, warehouse);
+
+        StockEntry entry = getEntryAndPersistIfNotExists(dto, warehouse);
 
         StockMovement stockMovement = new StockMovement(null, dto.type(), dto.quantity(), dto.note(), location, entry);
 
         return stockMovementRepository.save(stockMovement);
-    }
-
-    private void validateNonExistentProduct(Long id) {
-        ProductDTO product = productsClientService.getProduct(id);
-        if (product == null) {
-            throw new ProductNotFoundException("Product not found");
-        }
     }
 
     @Override
@@ -71,5 +62,22 @@ public class StockMovementServiceImpl implements StockMovementService{
         if (object == null) {
             throw new IllegalArgumentException(message);
         }
+    }
+
+    private void validateNonExistentProduct(Long id) {
+        ProductDTO product = productsClientService.getProduct(id);
+        if (product == null) {
+            throw new ProductNotFoundException("Product not found");
+        }
+    }
+
+    private Location getLocationAndVerifyIfExist(StockMovementDTO dto, WarehouseDTO warehouse) {
+        return locationRepository.findByIdAndWarehouseId(dto.locationId(), warehouse.id())
+                .orElseThrow(() -> new LocationNotFoundException("Location not found"));
+    }
+
+    private StockEntry getEntryAndPersistIfNotExists(StockMovementDTO dto, WarehouseDTO warehouse) {
+        return stockEntryRepository.findByIdAndWarehouseId(dto.productId(), warehouse.id())
+                .orElseGet(() -> stockEntryRepository.save(new StockEntry(dto.quantity(), dto.productId(), warehouse.id())));
     }
 }

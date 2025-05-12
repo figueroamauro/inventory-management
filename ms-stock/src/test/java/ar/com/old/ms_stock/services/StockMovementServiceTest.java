@@ -122,9 +122,6 @@ class StockMovementServiceTest {
 
         @Test
         void shouldFailCreatingMovement_whenProductNotExists(){
-            //GIVEN
-            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
-
             //WHEN
             Executable executable = () -> stockMovementService.create(dto);
 
