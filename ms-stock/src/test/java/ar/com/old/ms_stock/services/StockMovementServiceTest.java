@@ -1,6 +1,7 @@
 package ar.com.old.ms_stock.services;
 
-import ar.com.old.ms_stock.clients.WarehouseClientService;
+import ar.com.old.ms_stock.clients.ProductsClientService;
+import ar.com.old.ms_stock.clients.dto.ProductDTO;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.Location;
@@ -8,6 +9,7 @@ import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
+import ar.com.old.ms_stock.exceptions.ProductNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
 import ar.com.old.ms_stock.repositories.StockMovementRepository;
@@ -24,6 +26,7 @@ import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,7 +41,7 @@ class StockMovementServiceTest {
     @Mock
     private StockMovementRepository stockMovementRepository;
     @Mock
-    private WarehouseClientService clientService;
+    private ProductsClientService productsClientService;
     @Mock
     private LocationRepository locationRepository;
 
@@ -47,6 +50,7 @@ class StockMovementServiceTest {
     private StockMovementDTO dto;
     private StockMovement stockMovement;
     private Location location;
+    private ProductDTO productDTO;
 
     @BeforeEach
     void init() {
@@ -54,6 +58,7 @@ class StockMovementServiceTest {
         stockEntry = new StockEntry(20, 1L, 1L);
         dto = new StockMovementDTO(MovementType.IN, 20, "", 1L, 1L);
         location = new Location(1L, "B1", 1L);
+        productDTO = new ProductDTO(1L, "product", "description", 100.00, 1L, LocalDateTime.now());
         stockMovement = new StockMovement(1L, MovementType.IN, 20, "", location, stockEntry);
     }
 
@@ -63,9 +68,10 @@ class StockMovementServiceTest {
         @Test
         void shouldCreateStockEntryBeforeToCreateFirstMovement() {
             //GIVEN
-            when(clientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
             when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(productsClientService.getProduct(1L)).thenReturn(productDTO);
 
             //WHEN
             stockMovementService.create(dto);
@@ -78,10 +84,11 @@ class StockMovementServiceTest {
         @Test
         void shouldCreateStockMovement() {
             //GIVEN
-            when(clientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
             when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
             when(stockMovementRepository.save(any(StockMovement.class))).thenReturn(stockMovement);
+            when(productsClientService.getProduct(1L)).thenReturn(productDTO);
 
             //WHEN
             StockMovement result = stockMovementService.create(dto);
@@ -97,9 +104,10 @@ class StockMovementServiceTest {
         }
 
         @Test
-        void shouldFailCreatingMovement_whenLocationIsNull(){
+        void shouldFailCreatingMovement_whenLocationNotExists(){
             //GIVEN
-            when(clientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(productsClientService.getProduct(1L)).thenReturn(productDTO);
 
             //WHEN
             Executable executable = () -> stockMovementService.create(dto);
@@ -109,6 +117,21 @@ class StockMovementServiceTest {
             assertEquals("Location not found", e.getMessage());
 
             verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
+            verify(stockEntryRepository,never()).save(any(StockEntry.class));
+        }
+
+        @Test
+        void shouldFailCreatingMovement_whenProductNotExists(){
+            //GIVEN
+            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+
+            //WHEN
+            Executable executable = () -> stockMovementService.create(dto);
+
+            //THEN
+            ProductNotFoundException e = assertThrows(ProductNotFoundException.class, executable);
+            assertEquals("Product not found", e.getMessage());
+
             verify(stockEntryRepository,never()).save(any(StockEntry.class));
         }
 

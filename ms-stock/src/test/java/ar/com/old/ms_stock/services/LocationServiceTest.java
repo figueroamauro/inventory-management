@@ -1,6 +1,6 @@
 package ar.com.old.ms_stock.services;
 
-import ar.com.old.ms_stock.clients.WarehouseClientService;
+import ar.com.old.ms_stock.clients.ProductsClientService;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
@@ -38,7 +38,7 @@ class LocationServiceTest {
     @InjectMocks
     private LocationServiceImpl locationService;
     @Mock
-    private WarehouseClientService clientService;
+    private ProductsClientService clientService;
     @Mock
     private LocationRepository locationRepository;
     @Mock

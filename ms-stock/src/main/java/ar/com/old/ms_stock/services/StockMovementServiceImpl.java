@@ -1,36 +1,43 @@
 package ar.com.old.ms_stock.services;
 
-import ar.com.old.ms_stock.clients.WarehouseClientService;
+import ar.com.old.ms_stock.clients.ProductsClientService;
+import ar.com.old.ms_stock.clients.dto.ProductDTO;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
+import ar.com.old.ms_stock.exceptions.ProductNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
 import ar.com.old.ms_stock.repositories.StockMovementRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
 
 public class StockMovementServiceImpl implements StockMovementService{
     private final StockMovementRepository stockMovementRepository;
     private final StockEntryRepository stockEntryRepository;
-    private final WarehouseClientService clientService;
+    private final ProductsClientService productsClientService;
     private final LocationRepository locationRepository;
 
-    public StockMovementServiceImpl(StockMovementRepository stockMovementRepository, StockEntryRepository stockEntryRepository, WarehouseClientService clientService, LocationRepository locationRepository) {
+    public StockMovementServiceImpl(StockMovementRepository stockMovementRepository, StockEntryRepository stockEntryRepository,
+                                    ProductsClientService clientService,
+                                    LocationRepository locationRepository) {
         this.stockMovementRepository = stockMovementRepository;
         this.stockEntryRepository = stockEntryRepository;
-        this.clientService = clientService;
+        this.productsClientService = clientService;
         this.locationRepository = locationRepository;
     }
 
     @Override
     public StockMovement create(StockMovementDTO dto) {
         validateNull(dto, "DTO can not be null");
-        WarehouseDTO warehouse = clientService.getWarehouse();
+
+        WarehouseDTO warehouse = productsClientService.getWarehouse();
+        validateNonExistentProduct(dto.productId());
+
         Location location = locationRepository.findByIdAndWarehouseId(dto.locationId(), warehouse.id())
                 .orElseThrow(() -> new LocationNotFoundException("Location not found"));
 
@@ -38,16 +45,24 @@ public class StockMovementServiceImpl implements StockMovementService{
                 .orElseGet(() -> stockEntryRepository.save(new StockEntry(dto.quantity(), dto.productId(), warehouse.id())));
 
         StockMovement stockMovement = new StockMovement(null, dto.type(), dto.quantity(), dto.note(), location, entry);
+
         return stockMovementRepository.save(stockMovement);
     }
 
+    private void validateNonExistentProduct(Long id) {
+        ProductDTO product = productsClientService.getProduct(id);
+        if (product == null) {
+            throw new ProductNotFoundException("Product not found");
+        }
+    }
+
     @Override
-    public Page<StockMovement> findAllByStockEntry_WarehouseId(Long warehouseId) {
+    public Page<StockMovement> findAllByStockEntry_WarehouseId(Pageable pageable, Long warehouseId) {
         return null;
     }
 
     @Override
-    public Page<StockMovement> findAllByStockEntry_ProductId(Long productId) {
+    public Page<StockMovement> findAllByStockEntry_ProductId(Pageable pageable, Long productId) {
         return null;
     }
 

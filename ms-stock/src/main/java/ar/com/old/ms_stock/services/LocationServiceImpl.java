@@ -1,6 +1,6 @@
 package ar.com.old.ms_stock.services;
 
-import ar.com.old.ms_stock.clients.WarehouseClientService;
+import ar.com.old.ms_stock.clients.ProductsClientService;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
@@ -19,10 +19,10 @@ import java.util.Optional;
 public class LocationServiceImpl implements LocationService {
 
     private final LocationRepository locationRepository;
-    private final WarehouseClientService clientService;
+    private final ProductsClientService clientService;
     private final StockMovementRepository stockMovementRepository;
 
-    public LocationServiceImpl(LocationRepository locationRepository, WarehouseClientService clientService, StockMovementRepository stockMovementRepository) {
+    public LocationServiceImpl(LocationRepository locationRepository, ProductsClientService clientService, StockMovementRepository stockMovementRepository) {
         this.locationRepository = locationRepository;
         this.clientService = clientService;
         this.stockMovementRepository = stockMovementRepository;
