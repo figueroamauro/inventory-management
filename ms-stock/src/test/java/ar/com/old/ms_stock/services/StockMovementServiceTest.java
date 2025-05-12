@@ -24,9 +24,14 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -142,6 +147,28 @@ class StockMovementServiceTest {
             assertEquals("DTO can not be null", e.getMessage());
 
             verify(stockEntryRepository,never()).save(any(StockEntry.class));
+        }
+    }
+
+    @Nested
+    class FindAll {
+
+        @Test
+        void shouldFindAllMovementsByWarehouseId(){
+            //GIVEN
+            List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<StockMovement> page = new PageImpl<>(list, pageable, list.size());
+            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(stockMovementRepository.findAllByStockEntry_WarehouseId(pageable, 1L)).thenReturn(page);
+
+
+            //WHEN
+            Page<StockMovement> result = stockMovementService.findAll(pageable);
+
+            //THEN
+            assertNotNull(result);
+            assertEquals(3, result.getTotalElements());
         }
     }
 }

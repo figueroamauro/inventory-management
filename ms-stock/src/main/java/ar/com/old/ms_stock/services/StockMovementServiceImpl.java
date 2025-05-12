@@ -16,13 +16,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 
-public class StockMovementServiceImpl implements StockMovementService{
+public class StockMovementServiceImpl implements StockMovementService {
     private final StockMovementRepository stockMovementRepository;
     private final StockEntryRepository stockEntryRepository;
     private final ProductsClientService productsClientService;
     private final LocationRepository locationRepository;
 
-    public StockMovementServiceImpl(StockMovementRepository stockMovementRepository, StockEntryRepository stockEntryRepository,
+    public StockMovementServiceImpl(StockMovementRepository stockMovementRepository,
+                                    StockEntryRepository stockEntryRepository,
                                     ProductsClientService clientService,
                                     LocationRepository locationRepository) {
         this.stockMovementRepository = stockMovementRepository;
@@ -48,12 +49,14 @@ public class StockMovementServiceImpl implements StockMovementService{
     }
 
     @Override
-    public Page<StockMovement> findAllByStockEntry_WarehouseId(Pageable pageable, Long warehouseId) {
-        return null;
+    public Page<StockMovement> findAll(Pageable pageable) {
+        WarehouseDTO warehouse = productsClientService.getWarehouse();
+
+        return stockMovementRepository.findAllByStockEntry_WarehouseId(pageable, warehouse.id());
     }
 
     @Override
-    public Page<StockMovement> findAllByStockEntry_ProductId(Pageable pageable, Long productId) {
+    public Page<StockMovement> findAllByProductId(Pageable pageable, Long productId) {
         return null;
     }
 

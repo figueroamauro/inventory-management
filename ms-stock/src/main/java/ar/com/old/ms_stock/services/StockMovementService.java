@@ -11,7 +11,7 @@ public interface StockMovementService {
 
     StockMovement create(StockMovementDTO dto);
 
-    Page<StockMovement> findAllByStockEntry_WarehouseId(Pageable pageable,Long warehouseId);
+    Page<StockMovement> findAll(Pageable pageable);
 
-    Page<StockMovement> findAllByStockEntry_ProductId(Pageable pageable, Long productId);
+    Page<StockMovement> findAllByProductId(Pageable pageable, Long productId);
 }
