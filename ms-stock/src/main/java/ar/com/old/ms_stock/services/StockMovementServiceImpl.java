@@ -69,6 +69,11 @@ public class StockMovementServiceImpl implements StockMovementService {
         return stockMovementRepository.findAllByLocationId(pageable, locationId);
     }
 
+    @Override
+    public Page<StockMovement> findAllByLocationIdAndProductId(Pageable pageable, Long locationId, Long productId) {
+        return stockMovementRepository.findAllByLocationIdAndStockEntry_ProductId(pageable,locationId,productId);
+    }
+
 
     private void validateNull(Object object, String message) {
         if (object == null) {

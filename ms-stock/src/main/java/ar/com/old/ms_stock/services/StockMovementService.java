@@ -16,4 +16,6 @@ public interface StockMovementService {
     Page<StockMovement> findAllByProductId(Pageable pageable, Long productId);
 
     Page<StockMovement> findAllByLocationId(Pageable pageable, Long locationId);
+
+    Page<StockMovement> findAllByLocationIdAndProductId(Pageable pageable, Long locationId, Long productId);
 }
