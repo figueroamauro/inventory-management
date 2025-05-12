@@ -247,5 +247,17 @@ class StockMovementServiceTest {
 
             verify(stockMovementRepository).findAllByLocationIdAndStockEntry_ProductId(any(Pageable.class), anyLong(),anyLong());
         }
+
+        @Test
+        void shouldFailFindingMovementByLocationIdAndProductId_whenProductIdIsNull(){
+            //WHEN
+            Executable executable = () -> stockMovementService.findAllByLocationIdAndProductId(Pageable.unpaged(),1L, null);
+
+            //THEN
+            IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+            assertEquals("Product id can not be null", e.getMessage());
+
+            verify(stockMovementRepository,never()).findAllByLocationId(any(Pageable.class), anyLong());
+        }
     }
 }
