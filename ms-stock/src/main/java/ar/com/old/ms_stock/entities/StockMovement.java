@@ -6,21 +6,22 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "stock_movement")
+@Table(name = "stock_movements")
 public class StockMovement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "movement_type", nullable = false)
+    @Column(name = "movement_type", nullable = false, columnDefinition = "VARCHAR(20)")
+    @Enumerated(EnumType.STRING)
     private MovementType type;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @Column(name = "timestamp", nullable = false)
-    private LocalDateTime timestamp;
+    @Column(name = "create_at", nullable = false)
+    private LocalDateTime createAt;
 
     @Column(name = "note")
     private String note;
@@ -37,14 +38,14 @@ public class StockMovement {
         this.id = id;
         this.type = type;
         this.quantity = quantity;
-        this.timestamp = LocalDateTime.now();
+        this.createAt = LocalDateTime.now();
         this.note = note;
         this.location = location;
             this.stockEntry = stockEntry;
     }
 
     public StockMovement() {
-        this.timestamp = LocalDateTime.now();
+        this.createAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -71,12 +72,12 @@ public class StockMovement {
         this.quantity = quantity;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public LocalDateTime getCreateAt() {
+        return createAt;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
     }
 
     public String getNote() {

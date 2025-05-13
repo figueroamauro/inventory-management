@@ -1,0 +1,70 @@
+{
+  "stock_entry": [
+    {
+      "id": 1,
+      "quantity": 20,
+      "update_at": "2025-04-29 17:00:00",
+      "product_id": 1,
+      "warehouse_id": 1
+    }
+  ],
+
+  "locations": [
+    {
+      "id": 1,
+      "name": "B1",
+      "warehouse_id": 1
+    },
+    {
+      "id": 2,
+      "name": "B2",
+      "warehouse_id": 1
+    },
+    {
+      "id": 3,
+      "name": "B3",
+      "warehouse_id": 2
+    }
+  ],
+
+
+  "stock_movements": [
+    {
+      "id": 1,
+      "movement_type": "in",
+      "quantity": 100,
+      "create_at": "2025-04-29 17:00:00",
+      "note": "asd",
+      "location_id": 1,
+      "stock_entry_id": 1
+    },
+    {
+      "id": 2,
+      "movement_type": "in",
+      "quantity": 100,
+      "create_at": "2025-04-29 17:00:00",
+      "note": "asd",
+      "location_id": 1,
+      "stock_entry_id": 1
+    },
+    {
+      "id": 3,
+      "movement_type": "in",
+      "quantity": 100,
+      "create_at": "2025-04-29 17:00:00",
+      "note": "asd",
+      "location_id": 2,
+      "stock_entry_id": 1
+    },
+    {
+      "id": 4,
+      "movement_type": "in",
+      "quantity": 100,
+      "create_at": "2025-04-29 17:00:00",
+      "note": "asd",
+      "location_id": 1,
+      "stock_entry_id": 1
+    }
+
+  ]
+}
