@@ -71,6 +71,24 @@
       "note": "asd",
       "location_id": 1,
       "stock_entry_id": 2
+    },
+    {
+      "id": 5,
+      "movement_type": "IN",
+      "quantity": 100,
+      "create_at": "2025-04-29 17:00:00",
+      "note": "asd",
+      "location_id": 3,
+      "stock_entry_id": 2
+    },
+    {
+      "id": 6,
+      "movement_type": "IN",
+      "quantity": 100,
+      "create_at": "2025-04-29 17:00:00",
+      "note": "asd",
+      "location_id": 3,
+      "stock_entry_id": 1
     }
 
   ]

@@ -44,7 +44,7 @@ class StockMovementRepositoryTest {
 
         //THEN
         assertNotNull(result);
-        assertEquals(3,result.getTotalElements());
+        assertEquals(4,result.getTotalElements());
     }
 
     @Test
@@ -54,6 +54,16 @@ class StockMovementRepositoryTest {
 
         //THEN
         assertNotNull(result);
-        assertEquals(1,result.getTotalElements());
+        assertEquals(2,result.getTotalElements());
+    }
+
+    @Test
+    void shouldFindAllByLocationId(){
+        //WHEN
+        Page<StockMovement> result = stockMovementRepository.findAllByLocationId(Pageable.unpaged(), 3L);
+
+        //THEN
+        assertNotNull(result);
+        assertEquals(2,result.getTotalElements());
     }
 }
