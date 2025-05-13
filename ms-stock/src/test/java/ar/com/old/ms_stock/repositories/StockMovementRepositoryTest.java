@@ -1,5 +1,6 @@
 package ar.com.old.ms_stock.repositories;
 
+import ar.com.old.ms_stock.entities.StockMovement;
 import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.configuration.Orthography;
 import com.github.database.rider.core.api.dataset.DataSet;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,5 +35,15 @@ class StockMovementRepositoryTest {
         //THEN
         assertTrue(trueResult);
         assertFalse(falseResult);
+    }
+
+    @Test
+    void shouldFindAllByWarehouseId(){
+        //WHEN
+        Page<StockMovement> result = stockMovementRepository.findAllByStockEntry_WarehouseId(Pageable.unpaged(), 1L);
+
+        //THEN
+        assertNotNull(result);
+        assertEquals(3,result.getTotalElements());
     }
 }
