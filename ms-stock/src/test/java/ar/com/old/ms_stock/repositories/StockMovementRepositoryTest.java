@@ -46,4 +46,14 @@ class StockMovementRepositoryTest {
         assertNotNull(result);
         assertEquals(3,result.getTotalElements());
     }
+
+    @Test
+    void shouldFindAllByProductId(){
+        //WHEN
+        Page<StockMovement> result = stockMovementRepository.findAllByStockEntry_ProductId(Pageable.unpaged(), 2L);
+
+        //THEN
+        assertNotNull(result);
+        assertEquals(1,result.getTotalElements());
+    }
 }
