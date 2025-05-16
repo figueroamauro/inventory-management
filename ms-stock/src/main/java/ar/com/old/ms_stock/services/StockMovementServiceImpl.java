@@ -9,6 +9,7 @@ import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
 import ar.com.old.ms_stock.exceptions.LocationConflictException;
+import ar.com.old.ms_stock.exceptions.NegativeStockException;
 import ar.com.old.ms_stock.exceptions.ProductConflictException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
@@ -16,6 +17,7 @@ import ar.com.old.ms_stock.repositories.StockMovementRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class StockMovementServiceImpl implements StockMovementService {
@@ -35,6 +37,7 @@ public class StockMovementServiceImpl implements StockMovementService {
     }
 
     @Override
+    @Transactional
     public StockMovement create(StockMovementDTO dto) {
         validateNull(dto, "DTO can not be null");
         validateNonExistentProduct(dto.productId());
@@ -46,6 +49,8 @@ public class StockMovementServiceImpl implements StockMovementService {
         StockEntry entry = getEntryAndPersistIfNotExists(dto, warehouse);
 
         StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(), dto.note(), location, entry);
+
+        adjustStock(entry, dto);
 
         return stockMovementRepository.save(stockMovement);
     }
@@ -101,5 +106,28 @@ public class StockMovementServiceImpl implements StockMovementService {
     private StockEntry getEntryAndPersistIfNotExists(StockMovementDTO dto, WarehouseDTO warehouse) {
         return stockEntryRepository.findByIdAndWarehouseId(dto.productId(), warehouse.id())
                 .orElseGet(() -> stockEntryRepository.save(new StockEntry(dto.quantity(), dto.productId(), warehouse.id())));
+    }
+
+    private void adjustStock(StockEntry entry, StockMovementDTO dto) {
+        int quantity = dto.quantity();
+        MovementType type = MovementType.valueOf(dto.type());
+
+        switch (type) {
+            case IN:
+                entry.setQuantity(entry.getQuantity() + quantity);
+                break;
+
+            case OUT:
+            case RETURN:
+                int newQuantity = entry.getQuantity() - quantity;
+                if (newQuantity < 0) {
+                    throw new NegativeStockException("Stock can not be negative for product ID: " + dto.productId());
+                }
+                entry.setQuantity(newQuantity);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unsupported movement type: " + type);
+        }
     }
 }

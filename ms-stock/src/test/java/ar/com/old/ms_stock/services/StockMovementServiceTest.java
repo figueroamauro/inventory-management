@@ -57,7 +57,6 @@ class StockMovementServiceTest {
     private StockMovement stockMovement;
     private Location location;
     private ProductDTO productDTO;
-    private List<StockMovement> list;
     private Pageable pageable;
     private Page<StockMovement> page;
 
@@ -69,7 +68,7 @@ class StockMovementServiceTest {
         location = new Location(1L, "B1", 1L);
         productDTO = new ProductDTO(1L, "product", "description", 100.00, 1L, LocalDateTime.now());
         stockMovement = new StockMovement(1L, MovementType.IN, 20, "", location, stockEntry);
-        list = List.of(stockMovement, stockMovement, stockMovement);
+        List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
         pageable = PageRequest.of(0, 10);
         page = new PageImpl<>(list, pageable, list.size());
     }
@@ -154,6 +153,23 @@ class StockMovementServiceTest {
             assertEquals("DTO can not be null", e.getMessage());
 
             verify(stockEntryRepository,never()).save(any(StockEntry.class));
+        }
+
+        @Test
+        void shouldModifyStockEntryCreatingMovement_whenTypeIsIN(){
+            //GIVEN
+            stockEntry = new StockEntry(0, 1L, 1L);
+            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(productsClientService.getProduct(1L)).thenReturn(productDTO);
+            dto = new StockMovementDTO("IN", 40, "", 1L, 1L);
+
+            //WHEN
+            stockMovementService.create(dto);
+
+            //THEN
+            assertEquals(40, stockEntry.getQuantity());
         }
     }
 
