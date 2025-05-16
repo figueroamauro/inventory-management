@@ -120,4 +120,20 @@ class StockMovementControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap());
     }
+
+    @Test
+    void shouldFindAllMovementsByLocationId_status200() throws Exception {
+        //GIVEN
+        List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
+        Page<StockMovement> page = new PageImpl<>(list, Pageable.unpaged(), list.size());
+        when(stockMovementService.findAllByLocationId(any(Pageable.class),anyLong())).thenReturn(page);
+
+        //WHEN
+        mockMvc.perform(get("/api/movements?locationId=1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap());
+    }
 }
