@@ -68,7 +68,7 @@ class StockMovementServiceTest {
         dto = new StockMovementDTO("IN", 20, "", 1L, 1L);
         location = new Location(1L, "B1", 1L);
         productDTO = new ProductDTO(1L, "product", "description", 100.00, 1L, LocalDateTime.now());
-        stockMovement = new StockMovement(1L, MovementType.IN, 20,stockEntry.getQuantity(), "", location, stockEntry);
+        stockMovement = new StockMovement(1L, MovementType.IN, 20,stockEntry.getQuantity(),stockEntry.getQuantity(), "", location, stockEntry);
         List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
         pageable = PageRequest.of(0, 10);
         page = new PageImpl<>(list, pageable, list.size());

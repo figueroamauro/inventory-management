@@ -14,7 +14,8 @@ public class GlobalHandler {
 
     @ExceptionHandler({LocationAlreadyExistException.class,
             LocationConflictException.class,
-            ProductConflictException.class})
+            ProductConflictException.class,
+            NegativeStockException.class})
     public ResponseEntity<Map<String, String>> handlerConflictException(Exception e) {
         return buildResponseError(e, HttpStatus.CONFLICT);
     }

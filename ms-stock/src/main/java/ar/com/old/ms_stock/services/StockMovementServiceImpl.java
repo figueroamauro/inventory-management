@@ -48,9 +48,10 @@ public class StockMovementServiceImpl implements StockMovementService {
 
         StockEntry entry = getEntryAndPersistIfNotExists(dto, warehouse);
 
-        StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(),entry.getQuantity(), dto.note(), location, entry);
+        StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(),entry.getQuantity(),null, dto.note(), location, entry);
 
         adjustStock(entry, dto);
+        stockMovement.setAfterStock(entry.getQuantity());
 
         return stockMovementRepository.save(stockMovement);
     }

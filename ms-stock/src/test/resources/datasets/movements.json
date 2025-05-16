@@ -15,7 +15,6 @@
       "warehouse_id": 2
     }
   ],
-
   "locations": [
     {
       "id": 1,
@@ -33,14 +32,13 @@
       "warehouse_id": 2
     }
   ],
-
-
   "stock_movements": [
     {
       "id": 1,
       "movement_type": "IN",
       "quantity": 100,
-      "resulting_stock": 0,
+      "before_stock": 0,
+      "after_stock": 0,
       "create_at": "2025-04-29 17:00:00",
       "note": "asd",
       "location_id": 1,
@@ -50,7 +48,8 @@
       "id": 2,
       "movement_type": "IN",
       "quantity": 100,
-      "resulting_stock": 0,
+      "before_stock": 0,
+      "after_stock": 0,
       "create_at": "2025-04-29 17:00:00",
       "note": "asd",
       "location_id": 1,
@@ -60,7 +59,8 @@
       "id": 3,
       "movement_type": "IN",
       "quantity": 100,
-      "resulting_stock": 0,
+      "before_stock": 0,
+      "after_stock": 0,
       "create_at": "2025-04-29 17:00:00",
       "note": "asd",
       "location_id": 2,
@@ -70,7 +70,8 @@
       "id": 4,
       "movement_type": "IN",
       "quantity": 100,
-      "resulting_stock": 0,
+      "before_stock": 0,
+      "after_stock": 0,
       "create_at": "2025-04-29 17:00:00",
       "note": "asd",
       "location_id": 1,
@@ -80,7 +81,8 @@
       "id": 5,
       "movement_type": "IN",
       "quantity": 100,
-      "resulting_stock": 0,
+      "before_stock": 0,
+      "after_stock": 0,
       "create_at": "2025-04-29 17:00:00",
       "note": "asd",
       "location_id": 3,
@@ -90,12 +92,12 @@
       "id": 6,
       "movement_type": "IN",
       "quantity": 100,
-      "resulting_stock": 0,
+      "before_stock": 0,
+      "after_stock": 0,
       "create_at": "2025-04-29 17:00:00",
       "note": "asd",
       "location_id": 3,
       "stock_entry_id": 1
     }
-
   ]
 }

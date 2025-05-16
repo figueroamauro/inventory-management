@@ -9,6 +9,7 @@ public record StockMovementResponseDTO(
         MovementType type,
         Integer quantity,
         Integer beforeStock,
+        Integer afterStock,
         Integer currentStock,
         String note,
         LocalDateTime createAt,

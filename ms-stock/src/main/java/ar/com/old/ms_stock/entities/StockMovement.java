@@ -20,8 +20,11 @@ public class StockMovement {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @Column(name = "resulting_stock", nullable = false)
-    private Integer resultingStock;
+    @Column(name = "before_stock", nullable = false)
+    private Integer beforeStock;
+
+    @Column(name = "after_stock", nullable = false)
+    private Integer afterStock;
 
     @Column(name = "create_at", nullable = false)
     private LocalDateTime createAt;
@@ -37,11 +40,12 @@ public class StockMovement {
     @JoinColumn(name = "stock_entry_id", referencedColumnName = "id")
     private StockEntry stockEntry;
 
-    public StockMovement(Long id, MovementType type, Integer quantity,Integer resultingStock, String note, Location location, StockEntry stockEntry) {
+    public StockMovement(Long id, MovementType type, Integer quantity,Integer beforeStock, Integer afterStock, String note, Location location, StockEntry stockEntry) {
         this.id = id;
         this.type = type;
         this.quantity = quantity;
-        this.resultingStock = resultingStock;
+        this.beforeStock = beforeStock;
+        this.afterStock = afterStock;
         this.createAt = LocalDateTime.now();
         this.note = note;
         this.location = location;
@@ -76,12 +80,20 @@ public class StockMovement {
         this.quantity = quantity;
     }
 
-    public Integer getResultingStock() {
-        return resultingStock;
+    public Integer getBeforeStock() {
+        return beforeStock;
     }
 
-    public void setResultingStock(Integer resultingStock) {
-        this.resultingStock = resultingStock;
+    public void setBeforeStock(Integer beforeStock) {
+        this.beforeStock = beforeStock;
+    }
+
+    public Integer getAfterStock() {
+        return afterStock;
+    }
+
+    public void setAfterStock(Integer afterStock) {
+        this.afterStock = afterStock;
     }
 
     public LocalDateTime getCreateAt() {
