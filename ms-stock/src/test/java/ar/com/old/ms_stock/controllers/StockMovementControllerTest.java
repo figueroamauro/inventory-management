@@ -10,14 +10,20 @@ import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.exceptions.ProductConflictException;
 import ar.com.old.ms_stock.services.StockMovementService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,13 +40,24 @@ class StockMovementControllerTest {
     private StockMovementService stockMovementService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private StockMovementDTO dto;
+    private Location location;
+    private StockEntry stockEntry;
+    private StockMovement stockMovement;
+
+    @BeforeEach
+    void init() {
+        dto = new StockMovementDTO(MovementType.IN, 100, "", 1L, 1L);
+        location = new Location(1L, "B2", 1L);
+        stockEntry = new StockEntry(20, 1L, 1L);
+        stockMovement = new StockMovement(1L, MovementType.IN, 100, "", location, stockEntry);
+    }
+
+
     @Test
     void shouldCreateMovement_status200() throws Exception {
         //GIVEN
-        StockMovementDTO dto = new StockMovementDTO(MovementType.IN, 100, "", 1L, 1L);
-        Location location = new Location(1L, "B2", 1L);
-        StockEntry stockEntry = new StockEntry(20, 1L, 1L);
-        StockMovement stockMovement = new StockMovement(1L, MovementType.IN, 100, "", location, stockEntry);
+
         when(stockMovementService.create(dto)).thenReturn(stockMovement);
 
         //WHEN
@@ -86,5 +103,21 @@ class StockMovementControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.error").value("Product not found"));
+    }
+
+    @Test
+    void shouldFindAllMovements_status200() throws Exception {
+        //GIVEN
+        List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
+        Page<StockMovement> page = new PageImpl<>(list, Pageable.unpaged(), list.size());
+        when(stockMovementService.findAll(any(Pageable.class))).thenReturn(page);
+
+        //WHEN
+        mockMvc.perform(get("/api/movements")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap());
     }
 }

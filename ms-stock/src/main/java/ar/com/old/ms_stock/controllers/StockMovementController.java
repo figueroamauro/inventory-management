@@ -3,11 +3,11 @@ package ar.com.old.ms_stock.controllers;
 import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.services.StockMovementService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
@@ -26,6 +26,12 @@ public class StockMovementController {
         StockMovement stockMovement = movementService.create(dto);
 
         return ResponseEntity.created(URI.create("/api/movements/" + stockMovement.getId())).body(stockMovement);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> findAll(Pageable pageable, PagedResourcesAssembler<StockMovement> assembler) {
+        Page<StockMovement> page = movementService.findAll(pageable);
+        return ResponseEntity.ok(assembler.toModel(page));
     }
 
 
