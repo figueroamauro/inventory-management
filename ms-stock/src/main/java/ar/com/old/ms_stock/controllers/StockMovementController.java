@@ -1,6 +1,7 @@
 package ar.com.old.ms_stock.controllers;
 
 import ar.com.old.ms_stock.dto.StockMovementDTO;
+import ar.com.old.ms_stock.dto.StockMovementResponseDTO;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.services.StockMovementService;
 import jakarta.validation.Valid;
@@ -23,15 +24,19 @@ public class StockMovementController {
     }
 
     @PostMapping
-    public ResponseEntity<StockMovement> create(@Valid @RequestBody StockMovementDTO dto) {
+    public ResponseEntity<StockMovementResponseDTO> create(@Valid @RequestBody StockMovementDTO dto) {
         StockMovement stockMovement = movementService.create(dto);
 
-        return ResponseEntity.created(URI.create("/api/movements/" + stockMovement.getId())).body(stockMovement);
+        StockMovementResponseDTO response = new StockMovementResponseDTO(stockMovement.getId(), stockMovement.getType(),stockMovement.getQuantity(),
+                stockMovement.getResultingStock(),stockMovement.getStockEntry().getQuantity(),stockMovement.getNote(),
+                stockMovement.getCreateAt(),stockMovement.getLocation().getName());
+
+        return ResponseEntity.created(URI.create("/api/movements/" + stockMovement.getId())).body(response);
     }
 
     @GetMapping
     public ResponseEntity<?> findAll(Pageable pageable,
-                                     PagedResourcesAssembler<StockMovement> assembler,
+                                     PagedResourcesAssembler<StockMovementResponseDTO> assembler,
                                      @RequestParam(required = false) Long locationId,
                                      @RequestParam(required = false) Long productId) {
 
@@ -46,7 +51,11 @@ public class StockMovementController {
             page = movementService.findAll(pageable);
         }
 
-        return ResponseEntity.ok(assembler.toModel(page));
+        Page<StockMovementResponseDTO> result = page.map(stockMovement -> new StockMovementResponseDTO(stockMovement.getId(), stockMovement.getType(), stockMovement.getQuantity(),
+                stockMovement.getResultingStock(), stockMovement.getStockEntry().getQuantity(), stockMovement.getNote(),
+                stockMovement.getCreateAt(), stockMovement.getLocation().getName()));
+
+        return ResponseEntity.ok(assembler.toModel(result));
     }
 
 
