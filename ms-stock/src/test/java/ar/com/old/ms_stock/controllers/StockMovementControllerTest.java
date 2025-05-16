@@ -136,4 +136,20 @@ class StockMovementControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap());
     }
+
+    @Test
+    void shouldFindAllMovementsByProductId_status200() throws Exception {
+        //GIVEN
+        List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
+        Page<StockMovement> page = new PageImpl<>(list, Pageable.unpaged(), list.size());
+        when(stockMovementService.findAllByProductId(any(Pageable.class),anyLong())).thenReturn(page);
+
+        //WHEN
+        mockMvc.perform(get("/api/movements?productId=1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap());
+    }
 }
