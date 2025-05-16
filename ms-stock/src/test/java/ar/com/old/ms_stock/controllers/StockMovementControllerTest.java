@@ -5,6 +5,7 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
+import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.services.StockMovementService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -49,5 +50,22 @@ class StockMovementControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.quantity").value(100));
+    }
+
+    @Test
+    void shouldFailCreatingMovement_whenLocationIsNotExists_status404() throws Exception {
+        //GIVEN
+        StockMovementDTO dto = new StockMovementDTO(MovementType.IN, 100, "", 1L, 1L);
+        when(stockMovementService.create(dto)).thenThrow(new LocationNotFoundException("Location not found"));
+
+        //WHEN
+        mockMvc.perform(post("/api/movements")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Location not found"));
     }
 }
