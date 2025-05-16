@@ -48,7 +48,7 @@ public class StockMovementServiceImpl implements StockMovementService {
 
         StockEntry entry = getEntryAndPersistIfNotExists(dto, warehouse);
 
-        StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(), dto.note(), location, entry);
+        StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(),entry.getQuantity(), dto.note(), location, entry);
 
         adjustStock(entry, dto);
 
@@ -105,7 +105,7 @@ public class StockMovementServiceImpl implements StockMovementService {
 
     private StockEntry getEntryAndPersistIfNotExists(StockMovementDTO dto, WarehouseDTO warehouse) {
         return stockEntryRepository.findByIdAndWarehouseId(dto.productId(), warehouse.id())
-                .orElseGet(() -> stockEntryRepository.save(new StockEntry(dto.quantity(), dto.productId(), warehouse.id())));
+                .orElseGet(() -> stockEntryRepository.save(new StockEntry(0, dto.productId(), warehouse.id())));
     }
 
     private void adjustStock(StockEntry entry, StockMovementDTO dto) {

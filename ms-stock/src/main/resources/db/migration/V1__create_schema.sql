@@ -19,6 +19,7 @@ CREATE TABLE stock_movements(
 id int AUTO_INCREMENT PRIMARY KEY,
 movement_type varchar(20) NOT NULL,
 quantity int NOT NULL,
+resulting_stock int NOT NULL,
 create_at timestamp NOT NULL,
 note varchar(255),
 location_id int NOT NULL,

@@ -48,7 +48,7 @@ class StockMovementControllerTest {
         dto = new StockMovementDTO("IN", 100, "", 1L, 1L);
         Location location = new Location(1L, "B2", 1L);
         StockEntry stockEntry = new StockEntry(20, 1L, 1L);
-        stockMovement = new StockMovement(1L, MovementType.IN, 100, "", location, stockEntry);
+        stockMovement = new StockMovement(1L, MovementType.IN, 100,stockEntry.getQuantity(), "", location, stockEntry);
         List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
         page = new PageImpl<>(list, Pageable.unpaged(), list.size());
     }

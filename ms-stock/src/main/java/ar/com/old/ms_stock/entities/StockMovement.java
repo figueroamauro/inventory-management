@@ -20,6 +20,9 @@ public class StockMovement {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+    @Column(name = "resulting_stock", nullable = false)
+    private Integer resultingStock;
+
     @Column(name = "create_at", nullable = false)
     private LocalDateTime createAt;
 
@@ -34,10 +37,11 @@ public class StockMovement {
     @JoinColumn(name = "stock_entry_id", referencedColumnName = "id")
     private StockEntry stockEntry;
 
-    public StockMovement(Long id, MovementType type, Integer quantity, String note, Location location, StockEntry stockEntry) {
+    public StockMovement(Long id, MovementType type, Integer quantity,Integer resultingStock, String note, Location location, StockEntry stockEntry) {
         this.id = id;
         this.type = type;
         this.quantity = quantity;
+        this.resultingStock = resultingStock;
         this.createAt = LocalDateTime.now();
         this.note = note;
         this.location = location;
@@ -70,6 +74,14 @@ public class StockMovement {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Integer getResultingStock() {
+        return resultingStock;
+    }
+
+    public void setResultingStock(Integer resultingStock) {
+        this.resultingStock = resultingStock;
     }
 
     public LocalDateTime getCreateAt() {
