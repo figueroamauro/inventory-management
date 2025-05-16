@@ -9,6 +9,7 @@ import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
 import ar.com.old.ms_stock.exceptions.LocationConflictException;
+import ar.com.old.ms_stock.exceptions.NegativeStockException;
 import ar.com.old.ms_stock.exceptions.ProductConflictException;
 import ar.com.old.ms_stock.exceptions.ProductNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
@@ -204,6 +205,24 @@ class StockMovementServiceTest {
 
             //THEN
             assertEquals(60, stockEntry.getQuantity());
+        }
+
+        @Test
+        void shouldFailCreatingMovement_whenStockGoesNegative(){
+            //GIVEN
+            stockEntry = new StockEntry(0, 1L, 1L);
+            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(productsClientService.getProduct(1L)).thenReturn(productDTO);
+            dto = new StockMovementDTO("RETURN", 40, "", 1L, 1L);
+
+            //WHEN
+            Executable executable = () -> stockMovementService.create(dto);
+
+            //THEN
+            NegativeStockException e = assertThrows(NegativeStockException.class, executable);
+            assertEquals("Stock can not be negative for product ID: " + dto.productId(),e.getMessage());
         }
     }
 
