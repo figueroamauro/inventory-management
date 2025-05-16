@@ -65,7 +65,7 @@ class StockMovementServiceTest {
     void init() {
         warehouseDTO = new WarehouseDTO(1L, "warehouse", 1L);
         stockEntry = new StockEntry(20, 1L, 1L);
-        dto = new StockMovementDTO(MovementType.IN, 20, "", 1L, 1L);
+        dto = new StockMovementDTO("IN", 20, "", 1L, 1L);
         location = new Location(1L, "B1", 1L);
         productDTO = new ProductDTO(1L, "product", "description", 100.00, 1L, LocalDateTime.now());
         stockMovement = new StockMovement(1L, MovementType.IN, 20, "", location, stockEntry);

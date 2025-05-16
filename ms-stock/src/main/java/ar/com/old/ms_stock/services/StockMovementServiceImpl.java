@@ -7,6 +7,7 @@ import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
+import ar.com.old.ms_stock.enums.MovementType;
 import ar.com.old.ms_stock.exceptions.LocationConflictException;
 import ar.com.old.ms_stock.exceptions.ProductConflictException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
@@ -44,7 +45,7 @@ public class StockMovementServiceImpl implements StockMovementService {
 
         StockEntry entry = getEntryAndPersistIfNotExists(dto, warehouse);
 
-        StockMovement stockMovement = new StockMovement(null, dto.type(), dto.quantity(), dto.note(), location, entry);
+        StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(), dto.note(), location, entry);
 
         return stockMovementRepository.save(stockMovement);
     }

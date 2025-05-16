@@ -6,7 +6,6 @@ import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
 import ar.com.old.ms_stock.exceptions.LocationConflictException;
-import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.exceptions.ProductConflictException;
 import ar.com.old.ms_stock.services.StockMovementService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,7 +46,7 @@ class StockMovementControllerTest {
 
     @BeforeEach
     void init() {
-        dto = new StockMovementDTO(MovementType.IN, 100, "", 1L, 1L);
+        dto = new StockMovementDTO("IN", 100, "", 1L, 1L);
         location = new Location(1L, "B2", 1L);
         stockEntry = new StockEntry(20, 1L, 1L);
         stockMovement = new StockMovement(1L, MovementType.IN, 100, "", location, stockEntry);
@@ -74,7 +73,6 @@ class StockMovementControllerTest {
     @Test
     void shouldFailCreatingMovement_whenLocationIsNotExists_status409() throws Exception {
         //GIVEN
-        StockMovementDTO dto = new StockMovementDTO(MovementType.IN, 100, "", 1L, 1L);
         when(stockMovementService.create(dto)).thenThrow(new LocationConflictException("Location not found"));
 
         //WHEN
@@ -91,7 +89,6 @@ class StockMovementControllerTest {
     @Test
     void shouldFailCreatingMovement_whenProductIsNotExists_status409() throws Exception {
         //GIVEN
-        StockMovementDTO dto = new StockMovementDTO(MovementType.IN, 100, "", 1L, 1L);
         when(stockMovementService.create(dto)).thenThrow(new ProductConflictException("Product not found"));
 
         //WHEN
