@@ -171,6 +171,23 @@ class StockMovementServiceTest {
             //THEN
             assertEquals(40, stockEntry.getQuantity());
         }
+
+        @Test
+        void shouldModifyStockEntryCreatingMovement_whenTypeIsOUT(){
+            //GIVEN
+            stockEntry = new StockEntry(100, 1L, 1L);
+            when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+            when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(productsClientService.getProduct(1L)).thenReturn(productDTO);
+            dto = new StockMovementDTO("OUT", 40, "", 1L, 1L);
+
+            //WHEN
+            stockMovementService.create(dto);
+
+            //THEN
+            assertEquals(60, stockEntry.getQuantity());
+        }
     }
 
     @Nested
