@@ -1,5 +1,7 @@
 package ar.com.old.ms_stock.controllers;
 
+import ar.com.old.ms_stock.clients.ProductsClientService;
+import ar.com.old.ms_stock.clients.dto.ProductDTO;
 import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
@@ -22,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,15 +40,18 @@ class StockMovementControllerTest {
     private MockMvc mockMvc;
     @MockitoBean
     private StockMovementService stockMovementService;
+    @MockitoBean ProductsClientService productsClientService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private StockMovementDTO dto;
     private StockMovement stockMovement;
     private Page<StockMovement> page;
+    private ProductDTO product;
 
     @BeforeEach
     void init() {
         dto = new StockMovementDTO("IN", 100, "", 1L, 1L);
+        product = new ProductDTO(1L, "product 1", "", 100.00, 1L, LocalDateTime.now());
         Location location = new Location(1L, "B2", 1L);
         StockEntry stockEntry = new StockEntry(20, 1L, 1L);
         stockMovement = new StockMovement(1L, MovementType.IN, 100,stockEntry.getQuantity(),stockEntry.getQuantity(), "", location, stockEntry);
@@ -58,6 +64,7 @@ class StockMovementControllerTest {
     void shouldCreateMovement_status200() throws Exception {
         //GIVEN
         when(stockMovementService.create(dto)).thenReturn(stockMovement);
+        when(productsClientService.getProduct(anyLong())).thenReturn(product);
 
         //WHEN
         mockMvc.perform(post("/api/movements")
@@ -106,6 +113,7 @@ class StockMovementControllerTest {
     void shouldFindAllMovements_status200() throws Exception {
         //GIVEN
         when(stockMovementService.findAll(any(Pageable.class))).thenReturn(page);
+        when(productsClientService.getProduct(anyLong())).thenReturn(product);
 
         //WHEN
         mockMvc.perform(get("/api/movements")
@@ -120,6 +128,7 @@ class StockMovementControllerTest {
     void shouldFindAllMovementsByLocationId_status200() throws Exception {
         //GIVEN
         when(stockMovementService.findAllByLocationId(any(Pageable.class),anyLong())).thenReturn(page);
+        when(productsClientService.getProduct(anyLong())).thenReturn(product);
 
         //WHEN
         mockMvc.perform(get("/api/movements?locationId=1")
@@ -134,6 +143,7 @@ class StockMovementControllerTest {
     void shouldFindAllMovementsByProductId_status200() throws Exception {
         //GIVEN
         when(stockMovementService.findAllByProductId(any(Pageable.class),anyLong())).thenReturn(page);
+        when(productsClientService.getProduct(anyLong())).thenReturn(product);
 
         //WHEN
         mockMvc.perform(get("/api/movements?productId=1")
@@ -148,6 +158,7 @@ class StockMovementControllerTest {
     void shouldFindAllMovementsByProductIdAndLocationId_status200() throws Exception {
         //GIVEN
         when(stockMovementService.findAllByLocationIdAndProductId(any(Pageable.class),anyLong(),anyLong())).thenReturn(page);
+        when(productsClientService.getProduct(anyLong())).thenReturn(product);
 
         //WHEN
         mockMvc.perform(get("/api/movements?productId=1&locationId=1")

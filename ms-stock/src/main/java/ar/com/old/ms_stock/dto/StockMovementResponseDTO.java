@@ -6,13 +6,14 @@ import java.time.LocalDateTime;
 
 public record StockMovementResponseDTO(
         Long id,
-        MovementType type,
+        MovementType entryType,
         Integer quantity,
+        String product,
+        Integer stock,
         Integer beforeStock,
         Integer afterStock,
-        Integer currentStock,
         String note,
-        LocalDateTime createAt,
-        String locationName
+        String location,
+        LocalDateTime createAt
 ) {
 }
