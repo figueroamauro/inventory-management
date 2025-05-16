@@ -23,7 +23,7 @@ public class StockMovementController {
     }
 
     @PostMapping
-    public ResponseEntity<StockMovement> create(@RequestBody StockMovementDTO dto) {
+    public ResponseEntity<StockMovement> create(@Valid @RequestBody StockMovementDTO dto) {
         StockMovement stockMovement = movementService.create(dto);
 
         return ResponseEntity.created(URI.create("/api/movements/" + stockMovement.getId())).body(stockMovement);
