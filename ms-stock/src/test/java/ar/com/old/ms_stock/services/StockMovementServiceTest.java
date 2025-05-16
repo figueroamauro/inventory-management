@@ -8,7 +8,8 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
-import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
+import ar.com.old.ms_stock.exceptions.LocationConflictException;
+import ar.com.old.ms_stock.exceptions.ProductConflictException;
 import ar.com.old.ms_stock.exceptions.ProductNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
@@ -124,7 +125,7 @@ class StockMovementServiceTest {
             Executable executable = () -> stockMovementService.create(dto);
 
             //THEN
-            LocationNotFoundException e = assertThrows(LocationNotFoundException.class, executable);
+            LocationConflictException e = assertThrows(LocationConflictException.class, executable);
             assertEquals("Location not found", e.getMessage());
 
             verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
@@ -137,7 +138,7 @@ class StockMovementServiceTest {
             Executable executable = () -> stockMovementService.create(dto);
 
             //THEN
-            ProductNotFoundException e = assertThrows(ProductNotFoundException.class, executable);
+            ProductConflictException e = assertThrows(ProductConflictException.class, executable);
             assertEquals("Product not found", e.getMessage());
 
             verify(stockEntryRepository,never()).save(any(StockEntry.class));

@@ -5,6 +5,7 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
+import ar.com.old.ms_stock.exceptions.LocationConflictException;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.services.StockMovementService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -53,10 +54,10 @@ class StockMovementControllerTest {
     }
 
     @Test
-    void shouldFailCreatingMovement_whenLocationIsNotExists_status404() throws Exception {
+    void shouldFailCreatingMovement_whenLocationIsNotExists_status409() throws Exception {
         //GIVEN
         StockMovementDTO dto = new StockMovementDTO(MovementType.IN, 100, "", 1L, 1L);
-        when(stockMovementService.create(dto)).thenThrow(new LocationNotFoundException("Location not found"));
+        when(stockMovementService.create(dto)).thenThrow(new LocationConflictException("Location not found"));
 
         //WHEN
         mockMvc.perform(post("/api/movements")
@@ -64,7 +65,7 @@ class StockMovementControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
 
                 //THEN
-                .andExpect(status().isNotFound())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.error").value("Location not found"));
     }

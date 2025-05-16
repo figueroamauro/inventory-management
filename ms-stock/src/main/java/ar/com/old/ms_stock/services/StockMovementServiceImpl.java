@@ -7,7 +7,9 @@ import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
+import ar.com.old.ms_stock.exceptions.LocationConflictException;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
+import ar.com.old.ms_stock.exceptions.ProductConflictException;
 import ar.com.old.ms_stock.exceptions.ProductNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
@@ -87,13 +89,13 @@ public class StockMovementServiceImpl implements StockMovementService {
     private void validateNonExistentProduct(Long id) {
         ProductDTO product = productsClientService.getProduct(id);
         if (product == null) {
-            throw new ProductNotFoundException("Product not found");
+            throw new ProductConflictException("Product not found");
         }
     }
 
     private Location getLocationAndVerifyIfExist(StockMovementDTO dto, WarehouseDTO warehouse) {
         return locationRepository.findByIdAndWarehouseId(dto.locationId(), warehouse.id())
-                .orElseThrow(() -> new LocationNotFoundException("Location not found"));
+                .orElseThrow(() -> new LocationConflictException("Location not found"));
     }
 
     private StockEntry getEntryAndPersistIfNotExists(StockMovementDTO dto, WarehouseDTO warehouse) {

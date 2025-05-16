@@ -1,8 +1,6 @@
 package ar.com.old.ms_stock.handlers;
 
-import ar.com.old.ms_stock.exceptions.ConnectionFeignException;
-import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
-import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
+import ar.com.old.ms_stock.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,7 +12,9 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalHandler {
 
-    @ExceptionHandler(LocationAlreadyExistException.class)
+    @ExceptionHandler({LocationAlreadyExistException.class,
+            LocationConflictException.class,
+            ProductConflictException.class})
     public ResponseEntity<Map<String, String>> handlerConflictException(Exception e) {
         return buildResponseError(e, HttpStatus.CONFLICT);
     }
