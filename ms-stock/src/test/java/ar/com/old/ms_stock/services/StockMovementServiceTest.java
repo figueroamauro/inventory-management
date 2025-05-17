@@ -67,7 +67,7 @@ class StockMovementServiceTest {
         stockEntry = new StockEntry(20, 1L, 1L);
         dto = new StockMovementDTO("IN", 20, "", 1L, 1L);
         location = new Location(1L, "B1", 1L);
-        productDTO = new ProductDTO(1L, "product", "description", 100.00, 1L, LocalDateTime.now());
+        productDTO = new ProductDTO(1L, "productName", "description", 100.00, 1L, LocalDateTime.now());
         stockMovement = new StockMovement(1L, MovementType.IN, 20,stockEntry.getQuantity(),stockEntry.getQuantity(), "", location, stockEntry);
         List<StockMovement> list = List.of(stockMovement, stockMovement, stockMovement);
         pageable = PageRequest.of(0, 10);
@@ -222,7 +222,7 @@ class StockMovementServiceTest {
 
             //THEN
             NegativeStockException e = assertThrows(NegativeStockException.class, executable);
-            assertEquals("Stock can not be negative for product ID: " + dto.productId(),e.getMessage());
+            assertEquals("Stock can not be negative for productName ID: " + dto.productId(),e.getMessage());
         }
     }
 

@@ -122,7 +122,7 @@ public class StockMovementServiceImpl implements StockMovementService {
             case RETURN:
                 int newQuantity = entry.getQuantity() - quantity;
                 if (newQuantity < 0) {
-                    throw new NegativeStockException("Stock can not be negative for product ID: " + dto.productId());
+                    throw new NegativeStockException("Stock can not be negative for productName ID: " + dto.productId());
                 }
                 entry.setQuantity(newQuantity);
                 break;

@@ -36,7 +36,7 @@ public class StockMovementController {
         ProductDTO product = productsClientService.getProduct(dto.productId());
 
         StockMovementResponseDTO response = new StockMovementResponseDTO(stockMovement.getId(), stockMovement.getType(),
-                stockMovement.getQuantity(), product.name(),stockMovement.getStockEntry().getQuantity(),
+                stockMovement.getQuantity(),product.id(), product.name(),stockMovement.getStockEntry().getQuantity(),
                 stockMovement.getBeforeStock(), stockMovement.getAfterStock(), stockMovement.getNote(),
                 stockMovement.getLocation().getName(),stockMovement.getCreateAt());
 
@@ -65,7 +65,7 @@ public class StockMovementController {
             ProductDTO product = productsClientService.getProduct(stockMovement.getStockEntry().getProductId());
 
             return new StockMovementResponseDTO(stockMovement.getId(), stockMovement.getType(),
-                    stockMovement.getQuantity(), product.name(),stockMovement.getStockEntry().getQuantity(),
+                    stockMovement.getQuantity(),product.id(), product.name(),stockMovement.getStockEntry().getQuantity(),
                     stockMovement.getBeforeStock(), stockMovement.getAfterStock(), stockMovement.getNote(),
                     stockMovement.getLocation().getName(),stockMovement.getCreateAt());
         });

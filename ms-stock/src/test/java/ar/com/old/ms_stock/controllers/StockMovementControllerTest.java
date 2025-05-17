@@ -51,7 +51,7 @@ class StockMovementControllerTest {
     @BeforeEach
     void init() {
         dto = new StockMovementDTO("IN", 100, "", 1L, 1L);
-        product = new ProductDTO(1L, "product 1", "", 100.00, 1L, LocalDateTime.now());
+        product = new ProductDTO(1L, "productName 1", "", 100.00, 1L, LocalDateTime.now());
         Location location = new Location(1L, "B2", 1L);
         StockEntry stockEntry = new StockEntry(20, 1L, 1L);
         stockMovement = new StockMovement(1L, MovementType.IN, 100,stockEntry.getQuantity(),stockEntry.getQuantity(), "", location, stockEntry);
