@@ -27,6 +27,13 @@ location_id int NOT NULL,
 stock_entry_id int NOT NULL
 );
 
+CREATE TABLE location_stock(
+id int AUTO_INCREMENT PRIMARY KEY,
+product_id int NOT NULL,
+quantity int,
+location_id int NOT NULL
+)
+
 ALTER TABLE stock_movements
 ADD CONSTRAINT fk_movement_location
 FOREIGN KEY (location_id)
@@ -36,3 +43,8 @@ ALTER TABLE stock_movements
 ADD CONSTRAINT fk_movement_stock_entry
 FOREIGN KEY (stock_entry_id)
 REFERENCES stock_entry(id);
+
+ALTER TABLE location_stock
+ADD CONSTRAINT fk_location_stock_location
+FOREIGN KEY (location_id)
+REFERENCES locations(id);
