@@ -44,7 +44,7 @@ public class StockMovementController {
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(@PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<?> findAll(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
                                      PagedResourcesAssembler<StockMovementResponseDTO> assembler,
                                      @RequestParam(required = false) Long locationId,
                                      @RequestParam(required = false) Long productId) {
