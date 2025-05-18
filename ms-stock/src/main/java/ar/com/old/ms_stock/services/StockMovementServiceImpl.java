@@ -5,6 +5,7 @@ import ar.com.old.ms_stock.clients.dto.ProductDTO;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.Location;
+import ar.com.old.ms_stock.entities.LocationStock;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
@@ -18,6 +19,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class StockMovementServiceImpl implements StockMovementService {
@@ -46,9 +50,29 @@ public class StockMovementServiceImpl implements StockMovementService {
 
         Location location = getLocationAndVerifyIfExist(dto, warehouse);
 
+
+        LocationStock locationStock = location.getLocationStockList().stream().filter(stock -> stock.getProductId().equals(dto.productId()))
+                .findFirst()
+                .orElseGet(() -> {
+                    LocationStock newStock = new LocationStock(null, dto.productId(), 0, location);
+                    location.addStock(newStock);
+                    return newStock;
+                });
+
+        if (dto.type().equals("IN")) {
+            locationStock.setQuantity(locationStock.getQuantity() + dto.quantity());
+        } else if (dto.type().equals("OUT") || dto.type().equals("RETURN")) {
+            int updated = locationStock.getQuantity() - dto.quantity();
+            if (updated < 0) {
+                throw new NegativeStockException("There is not enough stock of the product at this location.");
+            }
+            locationStock.setQuantity(updated);
+        }
+
         StockEntry entry = getEntryAndPersistIfNotExists(dto, warehouse);
 
-        StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(),entry.getQuantity(),null, dto.note(), location, entry);
+        StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(), entry.getQuantity(), null, dto.note(), location, entry);
+
 
         adjustStock(entry, dto);
         stockMovement.setAfterStock(entry.getQuantity());
@@ -79,10 +103,10 @@ public class StockMovementServiceImpl implements StockMovementService {
 
     @Override
     public Page<StockMovement> findAllByLocationIdAndProductId(Pageable pageable, Long locationId, Long productId) {
-        validateNull(locationId,"Location id can not be null");
+        validateNull(locationId, "Location id can not be null");
         validateNull(productId, "Product id can not be null");
 
-        return stockMovementRepository.findAllByLocationIdAndStockEntry_ProductId(pageable,locationId,productId);
+        return stockMovementRepository.findAllByLocationIdAndStockEntry_ProductId(pageable, locationId, productId);
     }
 
 

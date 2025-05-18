@@ -1,16 +1,22 @@
 package ar.com.old.ms_stock.controllers;
 
 import ar.com.old.ms_stock.dto.LocationDTO;
+import ar.com.old.ms_stock.dto.LocationResponseDTO;
+import ar.com.old.ms_stock.dto.LocationStockDTO;
 import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.services.LocationService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/locations")
@@ -23,31 +29,45 @@ public class LocationController {
     }
 
     @PostMapping
-    public ResponseEntity<Location> create(@Valid @RequestBody LocationDTO dto) {
+    public ResponseEntity<LocationResponseDTO> create(@Valid @RequestBody LocationDTO dto) {
         Location location = locationService.create(dto);
 
-        return ResponseEntity.created(URI.create("api/locations/" + location.getId())).body(location);
+        LocationResponseDTO response = buildResponse(location);
+
+        return ResponseEntity.created(URI.create("api/locations/" + location.getId())).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<?> findAll(Pageable pageable, PagedResourcesAssembler<Location> assembler) {
+    public ResponseEntity<?> findAll(Pageable pageable, PagedResourcesAssembler<LocationResponseDTO> assembler) {
         Page<Location> page = locationService.findAll(pageable);
 
-        return ResponseEntity.ok(assembler.toModel(page));
+        Page<LocationResponseDTO> dtoPage = page.map(location -> {
+            List<LocationStockDTO> stockList = location.getLocationStockList().stream()
+                    .map(stock -> new LocationStockDTO(stock.getId(), stock.getProductId(), stock.getQuantity()))
+                    .toList();
+
+            return new LocationResponseDTO(location.getId(), location.getName(), stockList);
+        });
+
+        return ResponseEntity.ok(assembler.toModel(dtoPage));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Location> findOne(@PathVariable Long id) {
+    public ResponseEntity<LocationResponseDTO> findOne(@PathVariable Long id) {
         Location location = locationService.findOne(id);
 
-        return ResponseEntity.ok(location);
+        LocationResponseDTO response = buildResponse(location);
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping
-    public ResponseEntity<Location> update(@Valid @RequestBody LocationDTO dto) {
+    public ResponseEntity<LocationResponseDTO> update(@Valid @RequestBody LocationDTO dto) {
         Location location = locationService.update(dto);
 
-        return ResponseEntity.ok(location);
+        LocationResponseDTO response = buildResponse(location);
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
@@ -55,5 +75,18 @@ public class LocationController {
         locationService.delete(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+
+    private LocationResponseDTO buildResponse(Location location) {
+        List<LocationStockDTO> list = getLocationResponseDTOList(location);
+        return new LocationResponseDTO(location.getId(), location.getName(), list);
+    }
+
+    private List<LocationStockDTO> getLocationResponseDTOList(Location location) {
+        return location.getLocationStockList().stream().map(stock -> {
+            return new LocationStockDTO(stock.getId(), stock.getProductId(), stock.getQuantity());
+        }).toList();
+
     }
 }

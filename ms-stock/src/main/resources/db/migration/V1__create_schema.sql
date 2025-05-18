@@ -32,7 +32,7 @@ id int AUTO_INCREMENT PRIMARY KEY,
 product_id int NOT NULL,
 quantity int,
 location_id int NOT NULL
-)
+);
 
 ALTER TABLE stock_movements
 ADD CONSTRAINT fk_movement_location

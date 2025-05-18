@@ -5,6 +5,7 @@ import ar.com.old.ms_stock.clients.dto.ProductDTO;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.entities.Location;
+import ar.com.old.ms_stock.entities.LocationStock;
 import ar.com.old.ms_stock.entities.StockEntry;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.enums.MovementType;
@@ -82,7 +83,7 @@ class StockMovementServiceTest {
             //GIVEN
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
 
             //WHEN
@@ -162,7 +163,7 @@ class StockMovementServiceTest {
             stockEntry = new StockEntry(0, 1L, 1L);
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
             dto = new StockMovementDTO("IN", 40, "", 1L, 1L);
 
@@ -176,10 +177,12 @@ class StockMovementServiceTest {
         @Test
         void shouldModifyStockEntryCreatingMovement_whenTypeIsOUT(){
             //GIVEN
+            location = new Location(1L, "B1", 1L);
+            location.getLocationStockList().add(new LocationStock(1L,1L,100,location));
             stockEntry = new StockEntry(100, 1L, 1L);
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
             dto = new StockMovementDTO("OUT", 40, "", 1L, 1L);
 
@@ -193,10 +196,12 @@ class StockMovementServiceTest {
         @Test
         void shouldModifyStockEntryCreatingMovement_whenTypeIsRETURN(){
             //GIVEN
+            location = new Location(1L, "B1", 1L);
+            location.getLocationStockList().add(new LocationStock(1L,1L,100,location));
             stockEntry = new StockEntry(100, 1L, 1L);
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
             dto = new StockMovementDTO("RETURN", 40, "", 1L, 1L);
 
@@ -210,10 +215,12 @@ class StockMovementServiceTest {
         @Test
         void shouldFailCreatingMovement_whenStockGoesNegative(){
             //GIVEN
+            location = new Location(1L, "B1", 1L);
+            location.getLocationStockList().add(new LocationStock(1L,1L,100,location));
             stockEntry = new StockEntry(0, 1L, 1L);
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(new Location(1L, "B1", 1L)));
+            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
             dto = new StockMovementDTO("RETURN", 40, "", 1L, 1L);
 

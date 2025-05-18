@@ -32,6 +32,10 @@ public class Location {
     public Location() {
     }
 
+    public void addStock(LocationStock stock) {
+        locationStockList.add(stock);
+    }
+
     public Long getId() {
         return id;
     }

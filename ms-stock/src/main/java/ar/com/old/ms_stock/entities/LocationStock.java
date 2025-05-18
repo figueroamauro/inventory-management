@@ -27,6 +27,9 @@ public class LocationStock {
         this.location = location;
     }
 
+    public LocationStock() {
+    }
+
     public Long getId() {
         return id;
     }
