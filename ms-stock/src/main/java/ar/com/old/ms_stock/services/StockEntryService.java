@@ -9,9 +9,5 @@ import org.springframework.stereotype.Service;
 public interface StockEntryService {
     Page<StockEntry> findAll(Pageable pageable);
 
-    Page<StockEntry> findAllByProductId(Pageable pageable, Long productId);
-
-    Page<StockEntry> findAllByLocationId(Pageable pageable, Long locationId);
-
-    Page<StockEntry> findAllByLocationIdAndProductId(Pageable pageable, Long locationId, Long productId);
+    StockEntry findOne(Long id);
 }

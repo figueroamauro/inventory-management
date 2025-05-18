@@ -15,6 +15,4 @@ public interface StockEntryRepository extends JpaRepository<StockEntry, Long> {
 
     Page<StockEntry> findAllByWarehouseId(Pageable pageable, Long warehouseId);
 
-    Page<StockEntry> findAllByProductId(Pageable any, Long productId);
-
 }
