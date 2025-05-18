@@ -4,7 +4,8 @@ USE inventory_stock;
 CREATE TABLE locations(
 id int AUTO_INCREMENT PRIMARY KEY,
 name varchar(50) NOT NULL,
-warehouse_id int NOT NULL
+warehouse_id int NOT NULL,
+active boolean NOT NULL
 );
 
 CREATE TABLE stock_entry(
