@@ -8,7 +8,6 @@ import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
 import ar.com.old.ms_stock.exceptions.LocationInUseException;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
-import ar.com.old.ms_stock.repositories.StockMovementRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,12 +19,10 @@ public class LocationServiceImpl implements LocationService {
 
     private final LocationRepository locationRepository;
     private final ProductsClientService clientService;
-    private final StockMovementRepository stockMovementRepository;
 
-    public LocationServiceImpl(LocationRepository locationRepository, ProductsClientService clientService, StockMovementRepository stockMovementRepository) {
+    public LocationServiceImpl(LocationRepository locationRepository, ProductsClientService clientService) {
         this.locationRepository = locationRepository;
         this.clientService = clientService;
-        this.stockMovementRepository = stockMovementRepository;
     }
 
     @Override

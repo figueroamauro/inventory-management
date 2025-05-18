@@ -20,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 public class StockMovementServiceImpl implements StockMovementService {
     private final StockMovementRepository stockMovementRepository;
@@ -46,6 +48,8 @@ public class StockMovementServiceImpl implements StockMovementService {
         WarehouseDTO warehouse = productsClientService.getWarehouse();
         Location location = getLocationAndVerifyIfExist(dto, warehouse);
         StockEntry entry = getEntryAndPersistIfNotExists(dto, warehouse);
+        entry.setUpdateAt(LocalDateTime.now());
+
         StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(), entry.getQuantity(), null, dto.note(), location, entry);
 
         adjustLocationStock(dto, location);
