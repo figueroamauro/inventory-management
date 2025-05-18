@@ -7,7 +7,6 @@ import ar.com.old.ms_stock.entities.Location;
 import ar.com.old.ms_stock.services.LocationService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/locations")
@@ -41,16 +38,11 @@ public class LocationController {
     public ResponseEntity<?> findAll(Pageable pageable, PagedResourcesAssembler<LocationResponseDTO> assembler) {
         Page<Location> page = locationService.findAll(pageable);
 
-        Page<LocationResponseDTO> dtoPage = page.map(location -> {
-            List<LocationStockDTO> stockList = location.getLocationStockList().stream()
-                    .map(stock -> new LocationStockDTO(stock.getId(), stock.getProductId(), stock.getQuantity()))
-                    .toList();
-
-            return new LocationResponseDTO(location.getId(), location.getName(), stockList);
-        });
+        Page<LocationResponseDTO> dtoPage = mapToLocationResponseDTOPage(page);
 
         return ResponseEntity.ok(assembler.toModel(dtoPage));
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<LocationResponseDTO> findOne(@PathVariable Long id) {
@@ -83,10 +75,19 @@ public class LocationController {
         return new LocationResponseDTO(location.getId(), location.getName(), list);
     }
 
-    private List<LocationStockDTO> getLocationResponseDTOList(Location location) {
-        return location.getLocationStockList().stream().map(stock -> {
-            return new LocationStockDTO(stock.getId(), stock.getProductId(), stock.getQuantity());
-        }).toList();
+    private static Page<LocationResponseDTO> mapToLocationResponseDTOPage(Page<Location> page) {
+        return page.map(location -> {
+            List<LocationStockDTO> stockList = location.getLocationStockList().stream()
+                    .map(stock -> new LocationStockDTO(stock.getId(), stock.getProductId(), stock.getQuantity()))
+                    .toList();
 
+            return new LocationResponseDTO(location.getId(), location.getName(), stockList);
+        });
+    }
+
+    private List<LocationStockDTO> getLocationResponseDTOList(Location location) {
+
+        return location.getLocationStockList().stream().map(stock ->
+                new LocationStockDTO(stock.getId(), stock.getProductId(), stock.getQuantity())).toList();
     }
 }
