@@ -36,6 +36,10 @@ public class Location {
         locationStockList.add(stock);
     }
 
+    public void removeStock(LocationStock stock) {
+        locationStockList.remove(stock);
+    }
+
     public Long getId() {
         return id;
     }

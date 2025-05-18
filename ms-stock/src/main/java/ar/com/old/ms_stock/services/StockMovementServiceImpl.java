@@ -141,6 +141,9 @@ public class StockMovementServiceImpl implements StockMovementService {
             int updated = locationStock.getQuantity() - dto.quantity();
             if (updated < 0) {
                 throw new NegativeStockException("There is not enough stock of the product at this location.");
+            } else if (updated == 0) {
+                location.removeStock(locationStock);
+                return;
             }
             locationStock.setQuantity(updated);
         }

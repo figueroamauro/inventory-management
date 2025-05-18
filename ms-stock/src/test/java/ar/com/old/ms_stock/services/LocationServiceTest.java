@@ -4,6 +4,7 @@ import ar.com.old.ms_stock.clients.ProductsClientService;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.LocationDTO;
 import ar.com.old.ms_stock.entities.Location;
+import ar.com.old.ms_stock.entities.LocationStock;
 import ar.com.old.ms_stock.exceptions.LocationAlreadyExistException;
 import ar.com.old.ms_stock.exceptions.LocationInUseException;
 import ar.com.old.ms_stock.exceptions.LocationNotFoundException;
@@ -258,7 +259,6 @@ class LocationServiceTest {
         void shouldDeleteById(){
             //GIVEN
             when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
-            when(stockMovementRepository.existsByLocationId(1L)).thenReturn(false);
 
             //WHEN
             locationService.delete(1L);
@@ -282,7 +282,8 @@ class LocationServiceTest {
         @Test
         void shouldFailDeletingById_whenHasStock(){
             //GIVEN
-            when(stockMovementRepository.existsByLocationId(1L)).thenReturn(true);
+            location.getLocationStockList().add(new LocationStock(1L, 1L, 100, location));
+            when(locationRepository.findById(1L)).thenReturn(Optional.ofNullable(location));
 
             //WHEN
             Executable executable = () -> locationService.delete(1L);

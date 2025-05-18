@@ -107,8 +107,11 @@ public class LocationServiceImpl implements LocationService {
         }
     }
 
+
     private boolean hasStock(Long id) {
-        return stockMovementRepository.existsByLocationId(id);
+        Optional<Location> location = locationRepository.findById(id);
+        return location.filter(value -> !value.getLocationStockList().isEmpty()).isPresent();
+
     }
 
 
