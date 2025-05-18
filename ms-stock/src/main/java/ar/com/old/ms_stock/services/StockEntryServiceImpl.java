@@ -30,6 +30,8 @@ public class StockEntryServiceImpl implements StockEntryService {
 
     @Override
     public StockEntry findOne(Long id) {
-        return null;
+        WarehouseDTO warehouse = productsClientService.getWarehouse();
+        return  stockEntryRepository.findByIdAndWarehouseId(1L, warehouse.id())
+                .orElseThrow();
     }
 }

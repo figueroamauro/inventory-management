@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
@@ -54,6 +55,23 @@ class StockEntryServiceTest {
         //THEN
         assertNotNull(result);
         assertEquals(3, result.getTotalElements());
+
+        verify(productsClientService).getWarehouse();
+        verify(stockEntryRepository).findAllByWarehouseId(any(Pageable.class), anyLong());
+    }
+    
+    @Test
+    void shouldFindOneStockEntry(){
+        //GIVEN
+        when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+        when(stockEntryRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.ofNullable(stockEntry));
+    
+        //WHEN
+        StockEntry result = stockEntryService.findOne(1L);
+
+        //THEN
+        assertNotNull(result);
+        assertEquals(100, result.getQuantity());
 
     }
 }
