@@ -30,8 +30,15 @@ public class StockEntryServiceImpl implements StockEntryService {
 
     @Override
     public StockEntry findOne(Long id) {
+        validateNull(id, "Stock not found");
         WarehouseDTO warehouse = productsClientService.getWarehouse();
         return  stockEntryRepository.findByIdAndWarehouseId(1L, warehouse.id())
                 .orElseThrow();
+    }
+
+    private void validateNull(Object object, String message) {
+        if (object == null) {
+            throw new IllegalArgumentException(message);
+        }
     }
 }

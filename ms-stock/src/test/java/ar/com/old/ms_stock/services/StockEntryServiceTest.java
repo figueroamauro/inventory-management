@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
@@ -73,5 +74,19 @@ class StockEntryServiceTest {
         assertNotNull(result);
         assertEquals(100, result.getQuantity());
 
+        verify(productsClientService).getWarehouse();
+        verify(stockEntryRepository).findByIdAndWarehouseId(anyLong(), anyLong());
+    }
+
+    @Test
+    void shouldFailFindingOneStockEntry_whenIdIsNull(){
+        //WHEN
+        Executable executable = () -> stockEntryService.findOne(null);
+
+        //THEN
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
+        assertEquals("Stock not found", e.getMessage());
+
+        verify(stockEntryRepository,never()).findByIdAndWarehouseId(anyLong(), anyLong());
     }
 }
