@@ -35,10 +35,7 @@ public class StockMovementController {
 
         ProductDTO product = productsClientService.getProduct(dto.productId());
 
-        StockMovementResponseDTO response = new StockMovementResponseDTO(stockMovement.getId(), stockMovement.getType(),
-                stockMovement.getQuantity(),product.id(), product.name(),stockMovement.getStockEntry().getQuantity(),
-                stockMovement.getBeforeStock(), stockMovement.getAfterStock(), stockMovement.getNote(),
-                stockMovement.getLocation().getName(),stockMovement.getCreateAt());
+        StockMovementResponseDTO response = getStockMovementResponseDTO(stockMovement, product);
 
         return ResponseEntity.created(URI.create("/api/movements/" + stockMovement.getId())).body(response);
     }
@@ -49,8 +46,24 @@ public class StockMovementController {
                                      @RequestParam(required = false) Long locationId,
                                      @RequestParam(required = false) Long productId) {
 
+        Page<StockMovement> page = getPage(pageable, locationId, productId);
 
+        Page<StockMovementResponseDTO> result = mapToStockMovementResponseDTO(page);
+
+        return ResponseEntity.ok(assembler.toModel(result));
+    }
+
+
+    private static StockMovementResponseDTO getStockMovementResponseDTO(StockMovement stockMovement, ProductDTO product) {
+        return new StockMovementResponseDTO(stockMovement.getId(), stockMovement.getType(),
+                stockMovement.getQuantity(), product.id(), product.name(), stockMovement.getStockEntry().getQuantity(),
+                stockMovement.getBeforeStock(), stockMovement.getAfterStock(), stockMovement.getNote(),
+                stockMovement.getLocation().getName(), stockMovement.getCreateAt());
+    }
+
+    private Page<StockMovement> getPage(Pageable pageable, Long locationId, Long productId) {
         Page<StockMovement> page;
+
         if (locationId != null && productId != null) {
             page = movementService.findAllByLocationIdAndProductId(pageable, locationId, productId);
         } else if (locationId != null) {
@@ -60,18 +73,14 @@ public class StockMovementController {
         } else {
             page = movementService.findAll(pageable);
         }
-
-        Page<StockMovementResponseDTO> result = page.map(stockMovement -> {
-            ProductDTO product = productsClientService.getProduct(stockMovement.getStockEntry().getProductId());
-
-            return new StockMovementResponseDTO(stockMovement.getId(), stockMovement.getType(),
-                    stockMovement.getQuantity(),product.id(), product.name(),stockMovement.getStockEntry().getQuantity(),
-                    stockMovement.getBeforeStock(), stockMovement.getAfterStock(), stockMovement.getNote(),
-                    stockMovement.getLocation().getName(),stockMovement.getCreateAt());
-        });
-
-        return ResponseEntity.ok(assembler.toModel(result));
+        return page;
     }
 
+    private Page<StockMovementResponseDTO> mapToStockMovementResponseDTO(Page<StockMovement> page) {
+        return page.map(stockMovement -> {
+            ProductDTO product = productsClientService.getProduct(stockMovement.getStockEntry().getProductId());
 
+            return getStockMovementResponseDTO(stockMovement, product);
+        });
+    }
 }
