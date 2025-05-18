@@ -3,17 +3,20 @@
     {
       "id": 1,
       "name": "B1",
-      "warehouse_id": 1
+      "warehouse_id": 1,
+      "active": true
     },
     {
       "id": 2,
       "name": "B2",
-      "warehouse_id": 1
+      "warehouse_id": 1,
+      "active": true
     },
     {
       "id": 3,
       "name": "B3",
-      "warehouse_id": 2
+      "warehouse_id": 2,
+      "active": true
     }
   ]
 }

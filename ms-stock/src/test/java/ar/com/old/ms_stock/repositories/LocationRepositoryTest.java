@@ -33,7 +33,7 @@ class LocationRepositoryTest {
     @Test
     void shouldFindByNameAndWarehouseId() {
         //WHEN
-        Optional<Location> result = locationRepository.findByNameAndWarehouseId("B1", 1L);
+        Optional<Location> result = locationRepository.findByNameAndWarehouseIdAndActiveTrue("B1", 1L);
 
         //THEN
         assertTrue(result.isPresent());
@@ -46,7 +46,7 @@ class LocationRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         //WHEN
-        Page<Location> result = locationRepository.findAllByWarehouseId(pageable, 1L);
+        Page<Location> result = locationRepository.findAllByWarehouseIdAndActiveTrue(pageable, 1L);
 
         //THEN
         assertNotNull(result);
@@ -58,7 +58,7 @@ class LocationRepositoryTest {
     @Test
     void shouldFindByIdAndWarehouseId(){
         //WHEN
-        Optional<Location> result = locationRepository.findByIdAndWarehouseId(1L, 1L);
+        Optional<Location> result = locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L);
 
         //THEN
         assertTrue(result.isPresent());

@@ -44,7 +44,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     public Page<Location> findAll(Pageable pageable) {
         WarehouseDTO warehouse = clientService.getWarehouse();
-        return locationRepository.findAllByWarehouseId(pageable, warehouse.id());
+        return locationRepository.findAllByWarehouseIdAndActiveTrue(pageable, warehouse.id());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class LocationServiceImpl implements LocationService {
 
         WarehouseDTO warehouse = clientService.getWarehouse();
 
-        return locationRepository.findByIdAndWarehouseId(id, warehouse.id())
+        return locationRepository.findByIdAndWarehouseIdAndActiveTrue(id, warehouse.id())
                 .orElseThrow(()-> new LocationNotFoundException("Location not found"));
     }
 
@@ -66,7 +66,7 @@ public class LocationServiceImpl implements LocationService {
 
         validateExistingLocation(dto.name(),warehouse.id());
 
-        Location location = locationRepository.findByIdAndWarehouseId(dto.id(), warehouse.id())
+        Location location = locationRepository.findByIdAndWarehouseIdAndActiveTrue(dto.id(), warehouse.id())
                 .orElseThrow(()-> new LocationNotFoundException("Location not found"));
 
         location.setId(dto.id());
@@ -95,7 +95,7 @@ public class LocationServiceImpl implements LocationService {
     }
 
     private void validateExistingLocation(String name, Long id) {
-        Optional<Location> locationOpt = locationRepository.findByNameAndWarehouseId(name, id);
+        Optional<Location> locationOpt = locationRepository.findByNameAndWarehouseIdAndActiveTrue(name, id);
         if (locationOpt.isPresent()) {
             throw new LocationAlreadyExistException("Location already exist");
         }

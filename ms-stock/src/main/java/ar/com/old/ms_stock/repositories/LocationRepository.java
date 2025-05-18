@@ -14,14 +14,14 @@ import java.util.Optional;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
 
-    Optional<Location> findByNameAndWarehouseId(String name, Long warehouseId);
+    Optional<Location> findByNameAndWarehouseIdAndActiveTrue(String name, Long warehouseId);
 
-    Page<Location> findAllByWarehouseId(Pageable pageable, Long warehouseId);
+    Page<Location> findAllByWarehouseIdAndActiveTrue(Pageable pageable, Long warehouseId);
 
-    Optional<Location> findByIdAndWarehouseId(Long id, Long warehouseId);
+    Optional<Location> findByIdAndWarehouseIdAndActiveTrue(Long id, Long warehouseId);
 
     @Modifying
     @Transactional
-    @Query("DELETE from Location l WHERE l.id =:id AND l.warehouseId =:warehouseId")
+    @Query("UPDATE Location l SET l.active = false WHERE l.id = :id AND l.warehouseId = :warehouseId")
     void deleteByIdAndWarehouseId(Long id, Long warehouseId);
 }

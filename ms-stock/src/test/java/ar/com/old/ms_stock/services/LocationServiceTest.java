@@ -89,7 +89,7 @@ class LocationServiceTest {
         void shouldFailCreatingLocation_whenNameAlreadyExist() {
             //GIVEN
             when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
-            when(locationRepository.findByNameAndWarehouseId("B2", 1L)).thenReturn(Optional.ofNullable(location));
+            when(locationRepository.findByNameAndWarehouseIdAndActiveTrue("B2", 1L)).thenReturn(Optional.ofNullable(location));
 
             //WHEN
             Executable executable = () -> locationService.create(dto);
@@ -112,7 +112,7 @@ class LocationServiceTest {
             Pageable pageable = PageRequest.of(0, 10);
             Page<Location> page = new PageImpl<>(list, pageable, list.size());
             when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
-            when(locationRepository.findAllByWarehouseId(pageable,1L)).thenReturn(page);
+            when(locationRepository.findAllByWarehouseIdAndActiveTrue(pageable,1L)).thenReturn(page);
 
             //WHEN
             Page<Location> result = locationService.findAll(pageable);
@@ -121,7 +121,7 @@ class LocationServiceTest {
             assertNotNull(result);
             assertEquals(3, result.getTotalElements());
 
-            verify(locationRepository).findAllByWarehouseId(pageable,1L);
+            verify(locationRepository).findAllByWarehouseIdAndActiveTrue(pageable,1L);
         }
     }
 
@@ -132,7 +132,7 @@ class LocationServiceTest {
         void shouldFindOne(){
             //GIVEN
             when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.ofNullable(location));
+            when(locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L)).thenReturn(Optional.ofNullable(location));
 
             //WHEN
             Location result = locationService.findOne(1L);
@@ -141,7 +141,7 @@ class LocationServiceTest {
             assertNotNull(result);
             assertEquals("B2", result.getName());
 
-            verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
+            verify(locationRepository).findByIdAndWarehouseIdAndActiveTrue(1L, 1L);
         }
     }
 
@@ -157,7 +157,7 @@ class LocationServiceTest {
         LocationNotFoundException e = assertThrows(LocationNotFoundException.class, executable);
         assertEquals("Location not found", e.getMessage());
 
-        verify(locationRepository).findByIdAndWarehouseId(anyLong(),anyLong());
+        verify(locationRepository).findByIdAndWarehouseIdAndActiveTrue(anyLong(),anyLong());
     }
 
     @Test
@@ -169,7 +169,7 @@ class LocationServiceTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
         assertEquals("Id can not be null", e.getMessage());
 
-        verify(locationRepository, never()).findByIdAndWarehouseId(anyLong(), anyLong());
+        verify(locationRepository, never()).findByIdAndWarehouseIdAndActiveTrue(anyLong(), anyLong());
     }
 
     @Nested
@@ -180,7 +180,7 @@ class LocationServiceTest {
             //GIVEN
             dto = new LocationDTO(1L, "new name");
             when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.ofNullable(location));
+            when(locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L)).thenReturn(Optional.ofNullable(location));
             when(locationRepository.save(any(Location.class))).thenReturn(location);
 
             //WHEN
@@ -239,7 +239,7 @@ class LocationServiceTest {
         void shouldFailUpdatingLocation_whenAlreadyExist(){
             //GIVEN
             when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
-            when(locationRepository.findByNameAndWarehouseId("B2", 1L)).thenReturn(Optional.ofNullable(location));
+            when(locationRepository.findByNameAndWarehouseIdAndActiveTrue("B2", 1L)).thenReturn(Optional.ofNullable(location));
 
             //WHEN
             Executable executable = () -> locationService.update(dto);

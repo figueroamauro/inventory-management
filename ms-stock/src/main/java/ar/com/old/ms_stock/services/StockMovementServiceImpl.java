@@ -99,7 +99,7 @@ public class StockMovementServiceImpl implements StockMovementService {
     }
 
     private Location getLocationAndVerifyIfExist(StockMovementDTO dto, WarehouseDTO warehouse) {
-        return locationRepository.findByIdAndWarehouseId(dto.locationId(), warehouse.id())
+        return locationRepository.findByIdAndWarehouseIdAndActiveTrue(dto.locationId(), warehouse.id())
                 .orElseThrow(() -> new LocationConflictException("Location not found"));
     }
 

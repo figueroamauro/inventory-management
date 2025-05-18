@@ -22,6 +22,9 @@ public class Location {
     @OneToMany(mappedBy = "location",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<LocationStock> locationStockList;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     public Location(Long id, String name, Long warehouseId) {
         this.locationStockList = new ArrayList<>();
         this.id = id;
@@ -70,5 +73,13 @@ public class Location {
 
     public void setLocationStockList(List<LocationStock> locationStockList) {
         this.locationStockList = locationStockList;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

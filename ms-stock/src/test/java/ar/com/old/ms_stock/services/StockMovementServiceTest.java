@@ -12,7 +12,6 @@ import ar.com.old.ms_stock.enums.MovementType;
 import ar.com.old.ms_stock.exceptions.LocationConflictException;
 import ar.com.old.ms_stock.exceptions.NegativeStockException;
 import ar.com.old.ms_stock.exceptions.ProductConflictException;
-import ar.com.old.ms_stock.exceptions.ProductNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
 import ar.com.old.ms_stock.repositories.StockMovementRepository;
@@ -83,7 +82,7 @@ class StockMovementServiceTest {
             //GIVEN
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
+            when(locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
 
             //WHEN
@@ -99,7 +98,7 @@ class StockMovementServiceTest {
             //GIVEN
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
+            when(locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L)).thenReturn(Optional.of(location));
             when(stockMovementRepository.save(any(StockMovement.class))).thenReturn(stockMovement);
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
 
@@ -112,7 +111,7 @@ class StockMovementServiceTest {
             assertEquals(1L, result.getStockEntry().getId());
 
             verify(stockEntryRepository).findByIdAndWarehouseId(1L, 1L);
-            verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
+            verify(locationRepository).findByIdAndWarehouseIdAndActiveTrue(1L, 1L);
             verify(stockEntryRepository).save(any(StockEntry.class));
         }
 
@@ -129,7 +128,7 @@ class StockMovementServiceTest {
             LocationConflictException e = assertThrows(LocationConflictException.class, executable);
             assertEquals("Location not found", e.getMessage());
 
-            verify(locationRepository).findByIdAndWarehouseId(1L, 1L);
+            verify(locationRepository).findByIdAndWarehouseIdAndActiveTrue(1L, 1L);
             verify(stockEntryRepository,never()).save(any(StockEntry.class));
         }
 
@@ -163,7 +162,7 @@ class StockMovementServiceTest {
             stockEntry = new StockEntry(0, 1L, 1L);
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
+            when(locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
             dto = new StockMovementDTO("IN", 40, "", 1L, 1L);
 
@@ -182,7 +181,7 @@ class StockMovementServiceTest {
             stockEntry = new StockEntry(100, 1L, 1L);
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
+            when(locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
             dto = new StockMovementDTO("OUT", 40, "", 1L, 1L);
 
@@ -201,7 +200,7 @@ class StockMovementServiceTest {
             stockEntry = new StockEntry(100, 1L, 1L);
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
+            when(locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
             dto = new StockMovementDTO("RETURN", 40, "", 1L, 1L);
 
@@ -220,7 +219,7 @@ class StockMovementServiceTest {
             stockEntry = new StockEntry(0, 1L, 1L);
             when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
             when(stockEntryRepository.save(any(StockEntry.class))).thenReturn(stockEntry);
-            when(locationRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.of(location));
+            when(locationRepository.findByIdAndWarehouseIdAndActiveTrue(1L, 1L)).thenReturn(Optional.of(location));
             when(productsClientService.getProduct(1L)).thenReturn(productDTO);
             dto = new StockMovementDTO("RETURN", 40, "", 1L, 1L);
 
