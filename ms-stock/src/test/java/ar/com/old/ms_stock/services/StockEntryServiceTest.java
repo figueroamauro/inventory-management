@@ -3,6 +3,7 @@ package ar.com.old.ms_stock.services;
 import ar.com.old.ms_stock.clients.ProductsClientService;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.entities.StockEntry;
+import ar.com.old.ms_stock.exceptions.StockEntryNotFoundException;
 import ar.com.old.ms_stock.repositories.StockEntryRepository;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,8 +86,24 @@ class StockEntryServiceTest {
 
         //THEN
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, executable);
-        assertEquals("Stock not found", e.getMessage());
+        assertEquals("Id can not be null", e.getMessage());
 
         verify(stockEntryRepository,never()).findByIdAndWarehouseId(anyLong(), anyLong());
+    }
+
+    @Test
+    void shouldFailFindingOneStockEntry_whenStockNotFound(){
+        //GIVEN
+        when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+        when(stockEntryRepository.findByIdAndWarehouseId(1L, 1L)).thenReturn(Optional.empty());
+
+        //WHEN
+        Executable executable = () -> stockEntryService.findOne(1L);
+
+        //THEN
+        StockEntryNotFoundException e = assertThrows(StockEntryNotFoundException.class, executable);
+        assertEquals("Stock not found", e.getMessage());
+
+        verify(stockEntryRepository).findByIdAndWarehouseId(anyLong(), anyLong());
     }
 }
