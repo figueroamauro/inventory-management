@@ -20,9 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 @Service
 public class StockMovementServiceImpl implements StockMovementService {
     private final StockMovementRepository stockMovementRepository;
@@ -47,33 +44,11 @@ public class StockMovementServiceImpl implements StockMovementService {
         validateNonExistentProduct(dto.productId());
 
         WarehouseDTO warehouse = productsClientService.getWarehouse();
-
         Location location = getLocationAndVerifyIfExist(dto, warehouse);
-
-
-        LocationStock locationStock = location.getLocationStockList().stream().filter(stock -> stock.getProductId().equals(dto.productId()))
-                .findFirst()
-                .orElseGet(() -> {
-                    LocationStock newStock = new LocationStock(null, dto.productId(), 0, location);
-                    location.addStock(newStock);
-                    return newStock;
-                });
-
-        if (dto.type().equals("IN")) {
-            locationStock.setQuantity(locationStock.getQuantity() + dto.quantity());
-        } else if (dto.type().equals("OUT") || dto.type().equals("RETURN")) {
-            int updated = locationStock.getQuantity() - dto.quantity();
-            if (updated < 0) {
-                throw new NegativeStockException("There is not enough stock of the product at this location.");
-            }
-            locationStock.setQuantity(updated);
-        }
-
         StockEntry entry = getEntryAndPersistIfNotExists(dto, warehouse);
-
         StockMovement stockMovement = new StockMovement(null, MovementType.valueOf(dto.type()), dto.quantity(), entry.getQuantity(), null, dto.note(), location, entry);
 
-
+        adjustLocationStock(dto, location);
         adjustStock(entry, dto);
         stockMovement.setAfterStock(entry.getQuantity());
 
@@ -155,4 +130,30 @@ public class StockMovementServiceImpl implements StockMovementService {
                 throw new IllegalArgumentException("Unsupported movement type: " + type);
         }
     }
+
+    private void adjustLocationStock(StockMovementDTO dto, Location location) {
+
+        LocationStock locationStock = getLocationStockOrCreateIfNotExist(dto, location);
+
+        if (dto.type().equals("IN")) {
+            locationStock.setQuantity(locationStock.getQuantity() + dto.quantity());
+        } else if (dto.type().equals("OUT") || dto.type().equals("RETURN")) {
+            int updated = locationStock.getQuantity() - dto.quantity();
+            if (updated < 0) {
+                throw new NegativeStockException("There is not enough stock of the product at this location.");
+            }
+            locationStock.setQuantity(updated);
+        }
+    }
+
+    private LocationStock getLocationStockOrCreateIfNotExist(StockMovementDTO dto, Location location) {
+        return location.getLocationStockList().stream().filter(stock -> stock.getProductId().equals(dto.productId()))
+                .findFirst()
+                .orElseGet(() -> {
+                    LocationStock newStock = new LocationStock(null, dto.productId(), 0, location);
+                    location.addStock(newStock);
+                    return newStock;
+                });
+    }
+
 }
