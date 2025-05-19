@@ -56,4 +56,19 @@ class StockEntryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap());
     }
+
+    @Test
+    void shouldFindOne_status200() throws Exception {
+        //GIVEN
+        when(stockEntryService.findOne(1L)).thenReturn(stockEntry);
+
+        //WHEN
+        mockMvc.perform(get("/api/stock/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.quantity").value(100));
+    }
 }
