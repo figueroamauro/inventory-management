@@ -1,6 +1,7 @@
 package ar.com.old.ms_stock.controllers;
 
 import ar.com.old.ms_stock.entities.StockEntry;
+import ar.com.old.ms_stock.exceptions.StockEntryNotFoundException;
 import ar.com.old.ms_stock.services.StockEntryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,5 +71,20 @@ class StockEntryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isMap())
                 .andExpect(jsonPath("$.quantity").value(100));
+    }
+
+    @Test
+    void shouldFailFindingOne_status404() throws Exception {
+        //GIVEN
+        when(stockEntryService.findOne(1L)).thenThrow(new StockEntryNotFoundException("Stock not found"));
+
+        //WHEN
+        mockMvc.perform(get("/api/stock/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$").isMap())
+                .andExpect(jsonPath("$.error").value("Stock not found"));
     }
 }

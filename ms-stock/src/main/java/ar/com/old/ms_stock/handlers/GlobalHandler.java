@@ -21,7 +21,8 @@ public class GlobalHandler {
         return buildResponseError(e, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(LocationNotFoundException.class)
+    @ExceptionHandler({LocationNotFoundException.class,
+            StockEntryNotFoundException.class})
     public ResponseEntity<Map<String, String>> handlerNotFoundException(Exception e) {
         return buildResponseError(e, HttpStatus.NOT_FOUND);
     }
