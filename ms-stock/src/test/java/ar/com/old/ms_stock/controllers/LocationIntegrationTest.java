@@ -40,15 +40,20 @@ public class LocationIntegrationTest {
     @Autowired
     private LocationRepository locationRepository;
 
+    private Location location;
+    private WarehouseDTO warehouseDTO;
+
     @BeforeEach
     void cleanup() {
         locationRepository.deleteAll();
+        location = new Location(null, "B1", 1L);
+        warehouseDTO = new WarehouseDTO(1L, "warehouse", 1L);
     }
 
     @Test
     void shouldCreateLocation() {
         //GIVEN
-        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
 
         LocationResponseDTO response = given()
                 .baseUri("http://localhost")
@@ -75,10 +80,8 @@ public class LocationIntegrationTest {
     @Test
     void shouldFindAllLocations_whenLocationsExist(){
         //GIVEN
-        Location location1 = new Location(null, "location 1", 1L);
-        Location location2 = new Location(null, "location 2", 1L);
-        locationRepository.saveAll(List.of(location1, location2));
-        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+        locationRepository.saveAll(List.of(location));
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
 
         Response response = given()
                 .port(port)
@@ -97,13 +100,13 @@ public class LocationIntegrationTest {
 
         assertThat(content).isNotEmpty();
         assertThat(content.get(0)).containsKey("id");
-        assertThat(content.size()).isEqualTo(2);
+        assertThat(content.size()).isEqualTo(1);
     }
 
     @Test
     void shouldFailFindingAllLocations_whenNotExist(){
         //GIVEN
-        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
 
         given()
                 .port(port)
@@ -122,10 +125,9 @@ public class LocationIntegrationTest {
     @Test
     void shouldFindOneLocation(){
         //GIVEN
-        Location location = new Location(null, "location 1", 1L);
         Location savedLocation = locationRepository.save(location);
         Long id = savedLocation.getId();
-        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
 
         LocationResponseDTO response = given()
                 .port(port)
@@ -141,13 +143,13 @@ public class LocationIntegrationTest {
                 .extract().as(LocationResponseDTO.class);
 
         assertThat(response).isNotNull();
-        assertThat(response.name()).isEqualTo("location 1");
+        assertThat(response.name()).isEqualTo("B1");
     }
 
     @Test
     void shouldFailFindingOneLocation_whenNotExist(){
         //GIVEN
-        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
 
         Response response = given()
                 .port(port)
@@ -169,8 +171,7 @@ public class LocationIntegrationTest {
     @Test
     void shouldUpdateLocation() {
         //GIVEN
-        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
-        Location location = new Location(null, "location 1", 1L);
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
         Location savedLocation = locationRepository.save(location);
         Long id = savedLocation.getId();
 
@@ -219,10 +220,9 @@ public class LocationIntegrationTest {
     @Test
     void shouldDeleteLocation(){
         //GIVEN
-        Location location = new Location(null, "B1", 1L);
         Location savedLocation = locationRepository.save(location);
         Long id = savedLocation.getId();
-        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
 
         given()
                 .port(port)
@@ -238,6 +238,5 @@ public class LocationIntegrationTest {
 
         Optional<Location> deletedLocation = locationRepository.findByIdAndWarehouseIdAndActiveTrue(id,1L);
         assertThat(deletedLocation).isEmpty();
-
     }
 }
