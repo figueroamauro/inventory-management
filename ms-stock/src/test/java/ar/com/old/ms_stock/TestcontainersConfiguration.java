@@ -7,7 +7,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.testcontainers.containers.MySQLContainer;
 
 @TestConfiguration
-class TestcontainersConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+public class TestcontainersConfiguration implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
 	private static final MySQLContainer<?> mysqlContainer =
 			new MySQLContainer<>("mysql:8.0.33")
