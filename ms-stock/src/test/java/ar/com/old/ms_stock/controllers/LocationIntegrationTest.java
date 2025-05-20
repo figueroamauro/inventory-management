@@ -117,4 +117,29 @@ public class LocationIntegrationTest {
                 .statusCode(200)
                 .extract().response();
     }
+
+    @Test
+    void shouldFindOneLocation(){
+        //GIVEN
+        Location location = new Location(null, "location 1", 1L);
+        Location savedLocation = locationRepository.save(location);
+        Long id = savedLocation.getId();
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+
+        LocationResponseDTO response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/locations/"+id)
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().as(LocationResponseDTO.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.name()).isEqualTo("location 1");
+    }
 }
