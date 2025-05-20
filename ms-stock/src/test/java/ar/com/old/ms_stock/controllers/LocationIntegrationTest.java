@@ -100,7 +100,7 @@ public class LocationIntegrationTest {
     }
 
     @Test
-    void shouldFindAllLocations_whenLocationsNotExist(){
+    void shouldFailFindingAllLocations_whenNotExist(){
         //GIVEN
         Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
 
@@ -141,5 +141,27 @@ public class LocationIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response.name()).isEqualTo("location 1");
+    }
+
+    @Test
+    void shouldFailFindingOneLocation_whenNotExist(){
+        //GIVEN
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/locations/1")
+
+                //THEN
+                .then()
+                .statusCode(404)
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Location not found\"}");
     }
 }
