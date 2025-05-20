@@ -48,4 +48,9 @@ public class WarehouseController {
         return ResponseEntity.ok(warehouse);
     }
 
+    @GetMapping("/current")
+    public ResponseEntity<Warehouse> findCurrent() {
+        Warehouse warehouse = warehouseService.findCurrentWarehouse();
+        return ResponseEntity.ok(warehouse);
+    }
 }

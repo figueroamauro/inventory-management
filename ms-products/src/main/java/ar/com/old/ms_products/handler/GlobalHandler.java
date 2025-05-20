@@ -19,7 +19,6 @@ public class GlobalHandler {
     @ExceptionHandler({
             ExistingCategoryException.class,
             WarehouseAlreadyExistException.class,
-            WarehouseAlreadyExistException.class,
             ProductAlreadyExistException.class})
     public ResponseEntity<Map<String, String>> handlerConflict(Exception e) {
         return buildResponseError(e, HttpStatus.CONFLICT);

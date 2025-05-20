@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -79,6 +80,14 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .orElseThrow(()-> new WarehouseNotFoundException("Warehouse not found"));
 
         warehouseRepository.deleteById(id);
+    }
+
+    @Override
+    public Warehouse findCurrentWarehouse() {
+        UserDTO userDTO = clientService.getUser();
+
+        return warehouseRepository.findByUserId(userDTO.id())
+                .orElseThrow(()-> new WarehouseNotFoundException("Warehouse not found"));
     }
 
 
