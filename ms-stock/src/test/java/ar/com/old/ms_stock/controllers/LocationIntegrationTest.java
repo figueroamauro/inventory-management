@@ -164,4 +164,31 @@ public class LocationIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.asString()).isEqualTo("{\"error\":\"Location not found\"}");
     }
+
+    @Test
+    void shouldUpdateLocation() {
+        //GIVEN
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+        Location location = new Location(null, "location 1", 1L);
+        Location savedLocation = locationRepository.save(location);
+        Long id = savedLocation.getId();
+
+        LocationResponseDTO response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body("{\"id\":" +id+",\"name\":\"B3\"}")
+
+                //WHEN
+                .when()
+                .put("/api/locations")
+
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().as(LocationResponseDTO.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.name()).isEqualTo("B3");
+    }
 }
