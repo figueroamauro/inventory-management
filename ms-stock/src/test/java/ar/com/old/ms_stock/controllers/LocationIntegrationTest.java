@@ -98,4 +98,23 @@ public class LocationIntegrationTest {
         assertThat(content.get(0)).containsKey("id");
         assertThat(content.size()).isEqualTo(2);
     }
+
+    @Test
+    void shouldFindAllLocations_whenLocationsNotExist(){
+        //GIVEN
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+
+        given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/locations")
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().response();
+    }
 }
