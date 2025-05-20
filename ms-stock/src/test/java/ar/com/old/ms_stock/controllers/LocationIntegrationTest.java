@@ -22,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -213,5 +214,30 @@ public class LocationIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response.asString()).isEqualTo("{\"error\":\"Id can not be null\"}");
+    }
+
+    @Test
+    void shouldDeleteLocation(){
+        //GIVEN
+        Location location = new Location(null, "B1", 1L);
+        Location savedLocation = locationRepository.save(location);
+        Long id = savedLocation.getId();
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse", 1L));
+
+        given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .delete("/api/locations/" + id)
+
+                //THEN
+                .then()
+                .statusCode(204);
+
+        Optional<Location> deletedLocation = locationRepository.findByIdAndWarehouseIdAndActiveTrue(id,1L);
+        assertThat(deletedLocation).isEmpty();
+
     }
 }
