@@ -191,4 +191,27 @@ public class LocationIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.name()).isEqualTo("B3");
     }
+
+    @Test
+    void shouldFailUpdatingLocation_whenDTOHasNullId() {
+        //GIVEN
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"B1\"}")
+
+                //WHEN
+                .when()
+                .put("/api/locations")
+
+
+                //THEN
+                .then()
+                .statusCode(400)
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Id can not be null\"}");
+    }
 }
