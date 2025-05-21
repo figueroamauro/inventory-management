@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.*;
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -238,5 +239,28 @@ public class LocationIntegrationTest {
 
         Optional<Location> deletedLocation = locationRepository.findByIdAndWarehouseIdAndActiveTrue(id,1L);
         assertThat(deletedLocation).isEmpty();
+    }
+
+    @Test
+    void shouldFailDeletingLocation_whenNotFound(){
+        //GIVEN
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .delete("/api/locations/1")
+
+                //THEN
+                .then()
+                .statusCode(404)
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Location not found\"}");
+
     }
 }

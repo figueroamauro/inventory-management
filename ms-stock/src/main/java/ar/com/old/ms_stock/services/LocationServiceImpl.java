@@ -106,8 +106,9 @@ public class LocationServiceImpl implements LocationService {
 
 
     private boolean hasStock(Long id) {
-        Optional<Location> location = locationRepository.findById(id);
-        return location.filter(value -> !value.getLocationStockList().isEmpty()).isPresent();
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new LocationNotFoundException("Location not found"));
+        return !location.getLocationStockList().isEmpty();
 
     }
 

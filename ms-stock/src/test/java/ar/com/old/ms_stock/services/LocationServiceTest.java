@@ -258,6 +258,7 @@ class LocationServiceTest {
         @Test
         void shouldDeleteById(){
             //GIVEN
+            when(locationRepository.findById(1L)).thenReturn(Optional.ofNullable(location));
             when(clientService.getWarehouse()).thenReturn(new WarehouseDTO(1L, "warehouse1", 1L));
 
             //WHEN
