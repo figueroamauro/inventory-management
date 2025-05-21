@@ -1,4 +1,4 @@
-package ar.com.old.ms_stock.controllers;
+package ar.com.old.ms_stock.integrations;
 
 import ar.com.old.ms_stock.TestcontainersConfiguration;
 import ar.com.old.ms_stock.clients.ProductsClientService;
@@ -25,9 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.*;
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
 
 @ActiveProfiles("integration")
 @ContextConfiguration(initializers = TestcontainersConfiguration.class)
