@@ -16,10 +16,12 @@ import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +45,8 @@ public class WarehouseIntegrationTest {
     private UserClientService userClientService;
     @Autowired
     private WarehouseRepository warehouseRepository;
+    @Autowired
+    private DataSource dataSource;
 
 
     @BeforeEach
@@ -56,6 +60,9 @@ public class WarehouseIntegrationTest {
     @AfterEach
     void clean() {
         warehouseRepository.deleteAll();
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.execute("ALTER TABLE warehouses AUTO_INCREMENT = 1");
 
     }
 
@@ -110,11 +117,9 @@ public class WarehouseIntegrationTest {
     @Test
     void shouldFindAllWarehouses() {
         //GIVEN
-
         Response response = given()
                 .port(port)
                 .contentType(ContentType.JSON)
-                .body(REQUEST_BODY)
 
                 //WHEN
                 .when()
@@ -123,12 +128,32 @@ public class WarehouseIntegrationTest {
                 //THEN
                 .then()
                 .statusCode(200)
-                .log().all()
                 .extract().response();
 
         List<Map<String,Object>> responseList = response.path("_embedded.warehouseList");
         assertThat(responseList).isNotNull();
         assertThat(responseList.size()).isEqualTo(3);
+    }
+
+    @Test
+    void shouldFindOneWarehouse() {
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        Warehouse response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/warehouses/1")
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().as(Warehouse.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getName()).isEqualTo("warehouse1");
 
     }
 }
