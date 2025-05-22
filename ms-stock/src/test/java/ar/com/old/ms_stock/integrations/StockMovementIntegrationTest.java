@@ -19,11 +19,14 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.sql.DataSource;
 import java.time.LocalDateTime;
 
 import static io.restassured.RestAssured.*;
@@ -33,6 +36,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = TestcontainersConfiguration.class)
 @ExtendWith(SpringExtension.class)
+
 public class StockMovementIntegrationTest {
     public static final String VALID_REQUEST_BODY = """
             {
@@ -54,6 +58,8 @@ public class StockMovementIntegrationTest {
     private StockMovementRepository stockMovementRepository;
     private ProductDTO productDTO;
     private WarehouseDTO warehouseDTO;
+    @Autowired
+    private DataSource dataSource;
 
     @BeforeEach
     void init() {
@@ -67,6 +73,10 @@ public class StockMovementIntegrationTest {
     void clean() {
         stockMovementRepository.deleteAll();
         locationRepository.deleteAll();
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.execute("ALTER TABLE locations AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE stock_movements AUTO_INCREMENT = 1");
     }
 
     @Test
@@ -97,7 +107,7 @@ public class StockMovementIntegrationTest {
     }
 
     @Test
-    void shouldFailCreatingMovement() {
+    void shouldFailCreatingMovement_whenProductNotFound() {
         //GIVEN
         Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
         Mockito.when(productsClientService.getProduct(1L))
@@ -119,6 +129,30 @@ public class StockMovementIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response.asString()).isEqualTo("{\"error\":\"Product with id 1 not found in warehouse service.\"}");
+    }
 
+    @Test
+    void shouldFailCreatingMovement_whenWarehouseNotFound() {
+        //GIVEN
+        Mockito.when(productsClientService.getWarehouse())
+                .thenThrow(new ResourceNotFoundException("Warehouse not found in remote service"));
+        Mockito.when(productsClientService.getProduct(1L)).thenReturn(productDTO);
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(VALID_REQUEST_BODY)
+
+                //WHEN
+                .when()
+                .post("/api/movements")
+
+                //THEN
+                .then()
+                .statusCode(404)
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Warehouse not found in remote service\"}");
     }
 }
