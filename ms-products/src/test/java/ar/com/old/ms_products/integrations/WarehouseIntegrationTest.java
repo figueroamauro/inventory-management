@@ -154,6 +154,26 @@ public class WarehouseIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response.getName()).isEqualTo("warehouse1");
+    }
 
+    @Test
+    void shouldFailFindingOneWarehouse_whenNotFound() {
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/warehouses/15")
+
+                //THEN
+                .then()
+                .statusCode(404)
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Warehouse not found\"}");
     }
 }
