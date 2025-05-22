@@ -6,8 +6,12 @@ import ar.com.old.ms_stock.clients.dto.ProductDTO;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.dto.StockMovementResponseDTO;
 import ar.com.old.ms_stock.entities.Location;
+import ar.com.old.ms_stock.entities.StockEntry;
+import ar.com.old.ms_stock.entities.StockMovement;
+import ar.com.old.ms_stock.enums.MovementType;
 import ar.com.old.ms_stock.exceptions.ResourceNotFoundException;
 import ar.com.old.ms_stock.repositories.LocationRepository;
+import ar.com.old.ms_stock.repositories.StockEntryRepository;
 import ar.com.old.ms_stock.repositories.StockMovementRepository;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
@@ -28,6 +32,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import javax.sql.DataSource;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -56,22 +62,29 @@ public class StockMovementIntegrationTest {
     private LocationRepository locationRepository;
     @Autowired
     private StockMovementRepository stockMovementRepository;
-    private ProductDTO productDTO;
-    private WarehouseDTO warehouseDTO;
+    @Autowired
+    private StockEntryRepository stockEntryRepository;
     @Autowired
     private DataSource dataSource;
+    private ProductDTO productDTO;
+    private WarehouseDTO warehouseDTO;
+    private Location location;
+    private StockEntry stockEntry;
 
     @BeforeEach
     void init() {
         productDTO = new ProductDTO(1L, "product", "description", 100.00, 1L, LocalDateTime.now());
         warehouseDTO = new WarehouseDTO(1L, "warehouse", 1L);
-        Location location = new Location(null, "B1", 1L);
+        location = new Location(null, "B1", 1L);
         locationRepository.save(location);
+        stockEntry = new StockEntry(100, 2L, 1L);
+        stockEntryRepository.save(stockEntry);
     }
 
     @AfterEach
     void clean() {
         stockMovementRepository.deleteAll();
+        stockEntryRepository.deleteAll();
         locationRepository.deleteAll();
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
@@ -154,5 +167,36 @@ public class StockMovementIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response.asString()).isEqualTo("{\"error\":\"Warehouse not found in remote service\"}");
+    }
+
+    @Test
+    void shouldFindAllMovements(){
+        //GIVEN
+        Mockito.when(productsClientService.getWarehouse()).thenReturn(warehouseDTO);
+        Mockito.when(productsClientService.getProduct(Mockito.anyLong())).thenReturn(productDTO);
+
+        StockMovement stockMovement = new StockMovement(null, MovementType.IN, 100, 0, 100, "", location, stockEntry);
+        StockMovement stockMovement2 = new StockMovement(null, MovementType.IN, 200, 0, 200, "", location, stockEntry);
+        StockMovement stockMovement3 = new StockMovement(null, MovementType.IN, 300, 0, 300, "", location, stockEntry);
+        stockMovementRepository.saveAll(List.of(stockMovement, stockMovement2, stockMovement3));
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/movements")
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        List<Map<String, Object>> movementList = response.path("_embedded.stockMovementResponseDTOList");
+
+        assertThat(movementList.size()).isEqualTo(3);
+        assertThat(movementList.get(0).get("quantity")).isEqualTo(300);
+
     }
 }
