@@ -3,6 +3,7 @@ package ar.com.old.ms_stock.clients;
 import ar.com.old.ms_stock.clients.dto.ProductDTO;
 import ar.com.old.ms_stock.clients.dto.WarehouseDTO;
 import ar.com.old.ms_stock.exceptions.ConnectionFeignException;
+import ar.com.old.ms_stock.exceptions.ResourceNotFoundException;
 import feign.FeignException;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,10 @@ public class ProductsClientService {
         try {
             return warehouseClient.findCurrentWarehouse();
         } catch (FeignException e) {
-            throw new ConnectionFeignException("Can not connect to another service, verify you current token");
+            if (e.status() == 404) {
+                throw new ResourceNotFoundException("Warehouse not found in remote service");
+            }
+            throw new ConnectionFeignException("Error connecting to warehouse service: " + e.getMessage());
         }
     }
 
@@ -27,7 +31,11 @@ public class ProductsClientService {
         try {
             return warehouseClient.findOneProduct(id);
         } catch (FeignException e) {
-            throw new ConnectionFeignException("Can not connect to another service, verify you current token");
+            if (e.status() == 404) {
+                throw new ResourceNotFoundException("Product with id " + id + " not found in warehouse service");
+            }
+            throw new ConnectionFeignException("Error connecting to warehouse service: " + e.getMessage());
         }
     }
+
 }
