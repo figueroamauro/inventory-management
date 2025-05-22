@@ -61,7 +61,6 @@ public class WarehouseIntegrationTest {
 
     @Test
     void shouldCreateWarehouse() {
-
         //GIVEN
         when(userClientService.getUser()).thenReturn(new UserDTO(4L, "user", "user@mail.com"));
         Warehouse response = given()
@@ -82,7 +81,30 @@ public class WarehouseIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.getId()).isNotNull();
         assertThat(response.getName()).isEqualTo("Warehouse");
+    }
 
+    @Test
+    void shouldFailCreatingWarehouse_whenUserAlreadyHasWarehouse() {
+        //GIVEN
+        warehouseRepository.save(new Warehouse(null, "warehouseMock", 4L));
+        when(userClientService.getUser()).thenReturn(new UserDTO(4L, "user", "user@mail.com"));
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(REQUEST_BODY)
+
+                //WHEN
+                .when()
+                .post("/api/warehouses")
+
+                //THEN
+                .then()
+                .statusCode(409)
+                .extract()
+                .response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"You already have a registered warehouse\"}");
     }
 
     @Test
