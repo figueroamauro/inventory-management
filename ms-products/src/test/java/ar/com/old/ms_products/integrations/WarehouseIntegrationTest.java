@@ -34,7 +34,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class WarehouseIntegrationTest {
     private static final String REQUEST_BODY = """
             {
-                "id": 1,
                 "name": "Warehouse"
             }
             """;
@@ -206,6 +205,28 @@ public class WarehouseIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.getId()).isNotNull();
         assertThat(response.getName()).isEqualTo("new name");
+    }
+
+    @Test
+    void shouldFailUpdatingOneWarehouse_whenIdIsNull() {
+        //GIVEN
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(REQUEST_BODY)
+
+                //WHEN
+                .when()
+                .put("/api/warehouses")
+
+                //THEN
+                .then()
+                .statusCode(400)
+                .log().all()
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Id can not be null\"}");
     }
 
 }
