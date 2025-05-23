@@ -130,7 +130,7 @@ public class WarehouseIntegrationTest {
                 .statusCode(200)
                 .extract().response();
 
-        List<Map<String,Object>> responseList = response.path("_embedded.warehouseList");
+        List<Map<String, Object>> responseList = response.path("_embedded.warehouseList");
         assertThat(responseList).isNotNull();
         assertThat(responseList.size()).isEqualTo(3);
     }
@@ -176,4 +176,36 @@ public class WarehouseIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.asString()).isEqualTo("{\"error\":\"Warehouse not found\"}");
     }
+
+
+    @Test
+    void shouldUpdateWarehouse() {
+        //GIVEN
+        String body = """
+                 {
+                    "id": 1,
+                    "name": "new name"
+                }
+                """;
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        Warehouse response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(body)
+
+                //WHEN
+                .when()
+                .put("/api/warehouses")
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .log().all()
+                .extract().as(Warehouse.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isNotNull();
+        assertThat(response.getName()).isEqualTo("new name");
+    }
+
 }
