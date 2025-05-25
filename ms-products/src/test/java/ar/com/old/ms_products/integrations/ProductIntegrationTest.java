@@ -5,20 +5,26 @@ import ar.com.old.ms_products.clients.UserClientService;
 import ar.com.old.ms_products.clients.dto.UserDTO;
 import ar.com.old.ms_products.dto.ProductResponseDTO;
 import ar.com.old.ms_products.entities.Category;
+import ar.com.old.ms_products.entities.Product;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.ProductRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+
+import javax.sql.DataSource;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +53,8 @@ public class ProductIntegrationTest {
     private CategoryRepository categoryRepository;
     @Autowired
     private WarehouseRepository warehouseRepository;
+    @Autowired
+    private DataSource dataSource;
     private Category category;
     private Warehouse warehouse;
 
@@ -58,6 +66,17 @@ public class ProductIntegrationTest {
         categoryRepository.save(category);
     }
 
+    @AfterEach
+    void clean() {
+        productRepository.deleteAll();
+        categoryRepository.deleteAll();
+        warehouseRepository.deleteAll();
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.execute("ALTER TABLE products AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE categories AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE warehouses AUTO_INCREMENT = 1");
+    }
 
     @Test
     void shouldCreateProduct(){
@@ -81,5 +100,29 @@ public class ProductIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.name()).isEqualTo("Product 1");
         assertThat(response.price()).isEqualTo(100);
+    }
+
+    @Test
+    void shouldFailCreatingProduct_whenNameAlreadyExist(){
+        //GIVEN
+        productRepository.save(new Product(null, "Product 1", "", 100.00, category, warehouse));
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(REQUEST_BODY)
+
+                //WHEN
+                .when()
+                .post("/api/products")
+
+
+                //THEN
+                .then()
+                .statusCode(409)
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Product already exist\"}");
     }
 }
