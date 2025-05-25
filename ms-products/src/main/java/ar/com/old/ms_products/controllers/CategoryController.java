@@ -7,7 +7,6 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.PagedModel;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,25 +23,25 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getAll(@PageableDefault(sort = "name") Pageable pageable, PagedResourcesAssembler<Category> assembler) {
-        Page<Category> page = categoryService.findAll(pageable);
-
-        return ResponseEntity.ok(assembler.toModel(page));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Category> getOne(@PathVariable Long id) {
-        Category category = categoryService.findOne(id);
-        return ResponseEntity.ok(category);
-    }
-
 
     @PostMapping
     public ResponseEntity<Category> create(@Valid @RequestBody CategoryDTO categoryDTO) {
         Category category = categoryService.create(categoryDTO);
 
         return ResponseEntity.created(URI.create("/api/categories/" + category.getId())).body(category);
+    }
+
+    @GetMapping
+    public ResponseEntity<?> findAll(@PageableDefault(sort = "name") Pageable pageable, PagedResourcesAssembler<Category> assembler) {
+        Page<Category> page = categoryService.findAll(pageable);
+
+        return ResponseEntity.ok(assembler.toModel(page));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Category> findOne(@PathVariable Long id) {
+        Category category = categoryService.findOne(id);
+        return ResponseEntity.ok(category);
     }
 
     @DeleteMapping("/{id}")

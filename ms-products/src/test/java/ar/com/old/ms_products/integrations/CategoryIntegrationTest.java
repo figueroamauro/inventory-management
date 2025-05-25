@@ -175,7 +175,6 @@ public class CategoryIntegrationTest {
                 .port(port)
                 .contentType(ContentType.JSON)
 
-
                 //WHEN
                 .when()
                 .get("/api/categories/10")
@@ -186,6 +185,27 @@ public class CategoryIntegrationTest {
                 .extract().response();
 
         assertThat(response.asString()).isEqualTo("{\"error\":\"Category not found\"}");
+    }
+
+    @Test
+    void shouldDeleteCategory(){
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+        given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .delete("/api/categories/1")
+
+                //THEN
+                .then()
+                .statusCode(204);
+
+        List<Category> result = categoryRepository.findAll();
+        assertThat(result.size()).isEqualTo(2);
 
     }
 }
