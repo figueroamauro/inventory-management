@@ -143,4 +143,26 @@ public class CategoryIntegrationTest {
 
         assertThat(results.size()).isEqualTo(3);
     }
+
+    @Test
+    void shouldFindOneCategory(){
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+        Category response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+
+                //WHEN
+                .when()
+                .get("/api/categories/1")
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().as(Category.class);
+
+        assertThat(response.getName()).isEqualTo("category1");
+    }
 }
