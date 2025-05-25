@@ -6,7 +6,6 @@ import ar.com.old.ms_products.dto.CategoryDTO;
 import ar.com.old.ms_products.entities.Category;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.exceptions.CategoryNotFoundException;
-import ar.com.old.ms_products.exceptions.ConnectionFeignException;
 import ar.com.old.ms_products.exceptions.ExistingCategoryException;
 import ar.com.old.ms_products.exceptions.WarehouseNotFoundException;
 import ar.com.old.ms_products.repositories.CategoryRepository;

@@ -8,6 +8,9 @@ import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.repositories.CategoryRepository;
 import ar.com.old.ms_products.repositories.WarehouseRepository;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,10 +19,12 @@ import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import javax.sql.DataSource;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.*;
@@ -42,12 +47,29 @@ public class CategoryIntegrationTest {
     private UserClientService userClientService;
     @Autowired
     private WarehouseRepository warehouseRepository;
+    private Warehouse warehouse;
+    @Autowired
+    private DataSource dataSource;
+
+    @BeforeEach
+    void init() {
+        warehouse = new Warehouse(null, "warehouse", 1L);
+    }
+
+    @AfterEach
+    void clean() {
+        categoryRepository.deleteAll();
+        warehouseRepository.deleteAll();
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        jdbcTemplate.execute("ALTER TABLE warehouses AUTO_INCREMENT = 1");
+        jdbcTemplate.execute("ALTER TABLE categories AUTO_INCREMENT = 1");
+    }
 
     @Test
     void shouldCreateCategory() {
         //GIVEN
         when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-        Warehouse warehouse = new Warehouse(null, "warehouse", 1L);
         warehouseRepository.save(warehouse);
 
         Category result = given()
@@ -66,5 +88,30 @@ public class CategoryIntegrationTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo("technology");
+    }
+
+    @Test
+    void shouldFailCreatingCategory_whenAlreadyExist() {
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        warehouseRepository.save(warehouse);
+        categoryRepository.save(new Category(null, "technology", warehouse));
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(REQUEST_BODY)
+
+                //WHEN
+                .when()
+                .post("/api/categories")
+
+
+                //THEN
+                .then()
+                .statusCode(409)
+                .extract().response();
+
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Category already exist\"}");
     }
 }
