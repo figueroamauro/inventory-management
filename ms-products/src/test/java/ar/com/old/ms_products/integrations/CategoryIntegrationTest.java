@@ -206,6 +206,26 @@ public class CategoryIntegrationTest {
 
         List<Category> result = categoryRepository.findAll();
         assertThat(result.size()).isEqualTo(2);
+    }
 
+    @Test
+    void shouldFailDeletingOneCategory_whenNotFound(){
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .delete("/api/categories/10")
+
+                //THEN
+                .then()
+                .statusCode(404)
+                .extract().response();
+
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Category not found\"}");
     }
 }
