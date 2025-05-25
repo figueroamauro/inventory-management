@@ -25,6 +25,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.sql.DataSource;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static io.restassured.RestAssured.*;
@@ -54,6 +56,12 @@ public class CategoryIntegrationTest {
     @BeforeEach
     void init() {
         warehouse = new Warehouse(null, "warehouse", 1L);
+        warehouseRepository.save(warehouse);
+
+        Category category1 = new Category(null, "category1", warehouse);
+        Category category2 = new Category(null, "category2", warehouse);
+        Category category3 = new Category(null, "category3", warehouse);
+        categoryRepository.saveAll(List.of(category1, category2, category3));
     }
 
     @AfterEach
@@ -70,7 +78,6 @@ public class CategoryIntegrationTest {
     void shouldCreateCategory() {
         //GIVEN
         when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-        warehouseRepository.save(warehouse);
 
         Category result = given()
                 .contentType(ContentType.JSON)
@@ -94,7 +101,6 @@ public class CategoryIntegrationTest {
     void shouldFailCreatingCategory_whenAlreadyExist() {
         //GIVEN
         when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
-        warehouseRepository.save(warehouse);
         categoryRepository.save(new Category(null, "technology", warehouse));
 
         Response response = given()
@@ -113,5 +119,28 @@ public class CategoryIntegrationTest {
                 .extract().response();
 
         assertThat(response.asString()).isEqualTo("{\"error\":\"Category already exist\"}");
+    }
+
+    @Test
+    void shouldFindAllCategories(){
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/categories")
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        List<Map<String, Object>> results = response.path("_embedded.categoryList");
+
+        assertThat(results.size()).isEqualTo(3);
     }
 }
