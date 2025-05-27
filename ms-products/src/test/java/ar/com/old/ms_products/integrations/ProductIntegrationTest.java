@@ -181,4 +181,26 @@ public class ProductIntegrationTest {
         assertThat(response).isNotNull();
         assertThat(response.name()).isEqualTo("Product 1");
     }
+
+    @Test
+    void shouldFailFindingOneProduct_whenNotFound(){
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/products/1")
+
+
+                //THEN
+                .then()
+                .statusCode(404)
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"Product not found\"}");
+    }
 }
