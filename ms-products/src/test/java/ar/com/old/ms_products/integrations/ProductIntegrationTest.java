@@ -234,4 +234,26 @@ public class ProductIntegrationTest {
         assertThat(response.price()).isEqualTo(50);
         assertThat(response.description()).isEqualTo("new description");
     }
+
+    @Test
+    void shouldFailUpdatingOneProduct_whenIdIsNull() {
+        //GIVEN
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body(REQUEST_BODY)
+
+                //WHEN
+                .when()
+                .put("/api/products")
+
+                //THEN
+                .then()
+                .statusCode(400)
+                .extract().response();
+
+        assertThat(response).isNotNull();
+        assertThat(response.asString()).isEqualTo("{\"error\":\"id can not be null\"}");
+    }
 }
