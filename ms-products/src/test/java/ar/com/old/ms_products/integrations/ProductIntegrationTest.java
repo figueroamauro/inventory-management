@@ -158,4 +158,27 @@ public class ProductIntegrationTest {
 
         assertThat(results.size()).isEqualTo(2);
     }
+
+    @Test
+    void shouldFindOneProduct(){
+        //GIVEN
+        productRepository.save(product);
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        ProductResponseDTO response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/products/1")
+
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().as(ProductResponseDTO.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.name()).isEqualTo("Product 1");
+    }
 }
