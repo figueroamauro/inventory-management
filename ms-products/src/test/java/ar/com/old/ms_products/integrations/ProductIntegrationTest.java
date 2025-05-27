@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -85,7 +86,7 @@ public class ProductIntegrationTest {
     }
 
     @Test
-    void shouldCreateProduct(){
+    void shouldCreateProduct() {
         //GIVEN
         when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
         ProductResponseDTO response = given()
@@ -96,7 +97,6 @@ public class ProductIntegrationTest {
                 //WHEN
                 .when()
                 .post("/api/products")
-
 
                 //THEN
                 .then()
@@ -109,7 +109,7 @@ public class ProductIntegrationTest {
     }
 
     @Test
-    void shouldFailCreatingProduct_whenNameAlreadyExist(){
+    void shouldFailCreatingProduct_whenNameAlreadyExist() {
         //GIVEN
         productRepository.save(product);
         when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
@@ -122,7 +122,6 @@ public class ProductIntegrationTest {
                 .when()
                 .post("/api/products")
 
-
                 //THEN
                 .then()
                 .statusCode(409)
@@ -133,7 +132,7 @@ public class ProductIntegrationTest {
     }
 
     @Test
-    void shouldFindAllProducts(){
+    void shouldFindAllProducts() {
         //GIVEN
         Product product1 = new Product(null, "Product 1", "", 100.00, category, warehouse);
         Product product2 = new Product(null, "Product 2", "", 100.00, category, warehouse);
@@ -160,7 +159,7 @@ public class ProductIntegrationTest {
     }
 
     @Test
-    void shouldFindOneProduct(){
+    void shouldFindOneProduct() {
         //GIVEN
         productRepository.save(product);
         when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
@@ -172,7 +171,6 @@ public class ProductIntegrationTest {
                 .when()
                 .get("/api/products/1")
 
-
                 //THEN
                 .then()
                 .statusCode(200)
@@ -183,7 +181,7 @@ public class ProductIntegrationTest {
     }
 
     @Test
-    void shouldFailFindingOneProduct_whenNotFound(){
+    void shouldFailFindingOneProduct_whenNotFound() {
         //GIVEN
         when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
         Response response = given()
@@ -194,7 +192,6 @@ public class ProductIntegrationTest {
                 .when()
                 .get("/api/products/1")
 
-
                 //THEN
                 .then()
                 .statusCode(404)
@@ -202,5 +199,39 @@ public class ProductIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response.asString()).isEqualTo("{\"error\":\"Product not found\"}");
+    }
+
+    @Test
+    void shouldUpdateProduct() {
+        //GIVEN
+        productRepository.save(product);
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+        ProductResponseDTO response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .body("""
+                        {
+                        "id": 1,
+                        "name":"new name",
+                        "description": "new description",
+                        "price": 50.00,
+                        "categoryId": 1
+                       }
+                    """
+                )
+
+                //WHEN
+                .when()
+                .put("/api/products")
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().as(ProductResponseDTO.class);
+
+        assertThat(response).isNotNull();
+        assertThat(response.name()).isEqualTo("new name");
+        assertThat(response.price()).isEqualTo(50);
+        assertThat(response.description()).isEqualTo("new description");
     }
 }
