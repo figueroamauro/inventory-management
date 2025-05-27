@@ -15,6 +15,7 @@ import io.restassured.response.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import static org.mockito.Mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import javax.sql.DataSource;
+
+import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,6 +61,7 @@ public class ProductIntegrationTest {
     private DataSource dataSource;
     private Category category;
     private Warehouse warehouse;
+    private Product product;
 
     @BeforeEach
     void init() {
@@ -64,6 +69,7 @@ public class ProductIntegrationTest {
         warehouseRepository.save(warehouse);
         category = new Category(null, "category", warehouse);
         categoryRepository.save(category);
+        product = new Product(null, "Product 1", "", 100.00, category, warehouse);
     }
 
     @AfterEach
@@ -105,7 +111,7 @@ public class ProductIntegrationTest {
     @Test
     void shouldFailCreatingProduct_whenNameAlreadyExist(){
         //GIVEN
-        productRepository.save(new Product(null, "Product 1", "", 100.00, category, warehouse));
+        productRepository.save(product);
         when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
         Response response = given()
                 .port(port)
@@ -124,5 +130,32 @@ public class ProductIntegrationTest {
 
         assertThat(response).isNotNull();
         assertThat(response.asString()).isEqualTo("{\"error\":\"Product already exist\"}");
+    }
+
+    @Test
+    void shouldFindAllProducts(){
+        //GIVEN
+        Product product1 = new Product(null, "Product 1", "", 100.00, category, warehouse);
+        Product product2 = new Product(null, "Product 2", "", 100.00, category, warehouse);
+        productRepository.saveAll(List.of(product1, product2));
+
+        when(userClientService.getUser()).thenReturn(new UserDTO(1L, "user", "user@mail.com"));
+
+        Response response = given()
+                .port(port)
+                .contentType(ContentType.JSON)
+
+                //WHEN
+                .when()
+                .get("/api/products")
+
+                //THEN
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        List<Map<String, Object>> results = response.path("_embedded.productResponseDTOList");
+
+        assertThat(results.size()).isEqualTo(2);
     }
 }
