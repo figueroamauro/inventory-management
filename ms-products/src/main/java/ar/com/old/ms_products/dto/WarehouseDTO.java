@@ -7,10 +7,10 @@ import jakarta.validation.constraints.Size;
 
 public record WarehouseDTO(
 
-        @Schema(name = "1")
+        @Schema(example = "1")
         Long id,
 
-        @Schema(name = "Deposito central")
+        @Schema(example = "Deposito central")
         @NotBlank(message = "Warehouse name can not be blank")
         @Size(min = 4, max = 30, message = "Warehouse name must be between 4 and 30 characters long")
         @Pattern(regexp = NAME_PATTERN,message = "Invalid warehouse name pattern. Must contain only alphanumeric characters")

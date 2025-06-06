@@ -6,6 +6,12 @@ import ar.com.old.ms_stock.dto.StockMovementDTO;
 import ar.com.old.ms_stock.dto.StockMovementResponseDTO;
 import ar.com.old.ms_stock.entities.StockMovement;
 import ar.com.old.ms_stock.services.StockMovementService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,9 +23,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
+@Tag(name = "Movimientos de stock", description = "Gestión de movimientos: creación y consulta de información")
 @RestController
 @RequestMapping("/api/movements")
 public class StockMovementController {
+    private static final String DEFAULT_PAGE = "{\"page\": 0, \"size\": 10, \"sort\": \"name\"}";
 
     private final StockMovementService movementService;
     private final ProductsClientService productsClientService;
@@ -29,6 +37,8 @@ public class StockMovementController {
         this.productsClientService = productsClientService;
     }
 
+    @ApiResponse(responseCode = "201")
+    @Operation(summary = "Crear movimiento")
     @PostMapping
     public ResponseEntity<StockMovementResponseDTO> create(@Valid @RequestBody StockMovementDTO dto) {
         StockMovement stockMovement = movementService.create(dto);
@@ -40,10 +50,16 @@ public class StockMovementController {
         return ResponseEntity.created(URI.create("/api/movements/" + stockMovement.getId())).body(response);
     }
 
+    @ApiResponse(responseCode = "200")
+    @Operation(summary = "Obtener lista de movimientos")
     @GetMapping
-    public ResponseEntity<?> findAll(@PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+    public ResponseEntity<?> findAll(@PageableDefault(sort = "id", direction = Sort.Direction.DESC)
+                                     @Schema(example = DEFAULT_PAGE)
+                                     Pageable pageable,
                                      PagedResourcesAssembler<StockMovementResponseDTO> assembler,
+                                     @Parameter(in = ParameterIn.QUERY, description = "ID de la ubicacion", example = "1")
                                      @RequestParam(required = false) Long locationId,
+                                     @Parameter(in = ParameterIn.QUERY, description = "ID del producto", example = "1")
                                      @RequestParam(required = false) Long productId) {
 
         Page<StockMovement> page = getPage(pageable, locationId, productId);
