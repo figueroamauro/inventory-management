@@ -43,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         checkExistingCategory(dto, warehouse.getId());
 
-        Category category = new Category(dto.id(), dto.name(), warehouse);
+        Category category = new Category(null, dto.name(), warehouse);
 
         return categoryRepository.save(category);
     }
