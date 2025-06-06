@@ -1,17 +1,21 @@
 package ar.com.old.ms_users.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
 public record UserUpdateRequestDTO(
+        @Schema(example = "1")
         @NotNull(message = "Id can not be null")
         Long id,
 
+        @Schema( example = "usuario")
         @NotBlank(message = "Username can not be blank")
         @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters long")
         @Pattern(regexp = USERNAME_PATTERN,
                 message = "Invalid username pattern. Must contain only alphanumeric characters and underscores")
         String userName,
 
+        @Schema(example = "usuario@mail.com")
         @NotBlank(message = "Email can not be blank")
         @Email(message = "Invalid email pattern")
         @Size(max = 255, message = "Email can not be longer than 255 characters")

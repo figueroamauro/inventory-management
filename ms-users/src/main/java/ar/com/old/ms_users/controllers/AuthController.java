@@ -8,6 +8,9 @@ import ar.com.old.ms_users.mappers.UserResponseMapper;
 import ar.com.old.ms_users.security.CustomUserDetails;
 import ar.com.old.ms_users.security.JwtService;
 import ar.com.old.ms_users.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +27,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
+@Tag(name = "Autenticación", description = "Operaciones de autenticación de usuarios")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -40,6 +44,8 @@ public class AuthController {
         this.jwtService = jwtService;
     }
 
+    @ApiResponse(responseCode = "201")
+    @Operation(summary = "Registrar un usuario")
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRequestDTO dto) {
         User user = userService.create(dto);
@@ -49,6 +55,9 @@ public class AuthController {
                 .body(mapper.toDto(user));
     }
 
+
+    @ApiResponse(responseCode = "200")
+    @Operation(summary = "Loguearse con usuario y contraseña")
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody UserLoginDTO dto) {
         Authentication loginAuthentication = new UsernamePasswordAuthenticationToken(dto.userName(), dto.password());

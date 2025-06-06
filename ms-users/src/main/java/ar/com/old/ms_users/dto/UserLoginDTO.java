@@ -1,17 +1,19 @@
 package ar.com.old.ms_users.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record UserLoginDTO(
-
+        @Schema( example = "usuario")
         @NotBlank(message = "Username can not be blank")
         @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters long")
         @Pattern(regexp = USERNAME_PATTERN,
                 message = "Invalid username pattern. Must contain only alphanumeric characters and underscores")
         String userName,
 
+        @Schema(example = "clave.1234")
         @NotBlank(message = "Password can not be blank")
         @Size(min = 8, max = 30, message = "Password must be between 8 and 30 characters long")
         @Pattern(regexp = PASSWORD_PATTERN,
