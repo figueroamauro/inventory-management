@@ -3,6 +3,7 @@ package ar.com.old.ms_products.controllers;
 import ar.com.old.ms_products.dto.WarehouseDTO;
 import ar.com.old.ms_products.entities.Warehouse;
 import ar.com.old.ms_products.services.WarehouseService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@Tag(name = "Almacenes", description = "Gestión de almacenes: creación, actualización, eliminación y consulta de información")
+@Tag(name = "Almacenes", description = "Gestión de almacenes: creación, actualización  y consulta de información")
 @RestController
 @RequestMapping("/api/warehouses")
 public class WarehouseController {
@@ -66,8 +67,7 @@ public class WarehouseController {
     }
 
 
-    @ApiResponse(responseCode = "204")
-    @Operation(summary = "Eliminar almacen por su id")
+    @Hidden
     @GetMapping("/current")
     public ResponseEntity<Warehouse> findCurrent() {
         Warehouse warehouse = warehouseService.findCurrentWarehouse();

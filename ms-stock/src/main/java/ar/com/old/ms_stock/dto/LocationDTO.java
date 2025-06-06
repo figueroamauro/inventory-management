@@ -1,12 +1,15 @@
 package ar.com.old.ms_stock.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record LocationDTO(
+        @Schema(example = "1")
         Long id,
 
+        @Schema(example = "B1")
         @NotBlank(message = "Location can not be blank")
         @Size(min = 2, max = 20, message = "Location must be between 2 and 20 characters long")
         @Pattern(regexp = NAME_PATTERN, message = "Invalid location name pattern. Must contain only alphanumeric characters")
