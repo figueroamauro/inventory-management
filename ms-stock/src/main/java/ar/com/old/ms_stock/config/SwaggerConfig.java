@@ -15,9 +15,9 @@ public class SwaggerConfig implements WebMvcConfigurer {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Bonpland API")
+                        .title("Microservicio Stock")
                         .version("1.0")
-                        .description("Documentación de la API de Bonpland"))
+                        .description("Documentación del Microservicio de Stock"))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()

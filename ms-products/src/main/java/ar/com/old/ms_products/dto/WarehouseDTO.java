@@ -1,12 +1,16 @@
 package ar.com.old.ms_products.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record WarehouseDTO(
+
+        @Schema(name = "1")
         Long id,
 
+        @Schema(name = "Deposito central")
         @NotBlank(message = "Warehouse name can not be blank")
         @Size(min = 4, max = 30, message = "Warehouse name must be between 4 and 30 characters long")
         @Pattern(regexp = NAME_PATTERN,message = "Invalid warehouse name pattern. Must contain only alphanumeric characters")

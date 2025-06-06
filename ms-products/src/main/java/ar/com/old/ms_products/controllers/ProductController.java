@@ -73,7 +73,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @ApiResponse(responseCode = "200")
+    @ApiResponse(responseCode = "204")
     @Operation(summary = "Eliminar producto por su id")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
