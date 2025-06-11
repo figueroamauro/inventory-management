@@ -27,7 +27,7 @@ import java.net.URI;
 @RestController
 @RequestMapping("/api/movements")
 public class StockMovementController {
-    private static final String DEFAULT_PAGE = "{\"page\": 0, \"size\": 10, \"sort\": \"name\"}";
+    private static final String DEFAULT_PAGE = "{\"page\": 0, \"size\": 10,}";
 
     private final StockMovementService movementService;
     private final ProductsClientService productsClientService;

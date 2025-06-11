@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/stock")
 public class StockEntryController {
-    private static final String DEFAULT_PAGE = "{\"page\": 0, \"size\": 10, \"sort\": \"name\"}";
+    private static final String DEFAULT_PAGE = "{\"page\": 0, \"size\": 10}";
     private final StockEntryService stockEntryService;
 
     public StockEntryController(StockEntryService stockEntryService) {
